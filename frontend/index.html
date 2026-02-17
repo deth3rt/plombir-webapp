@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PLOMBIR Web App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .tg-theme {
+            --tg-theme-bg-color: #1a1a2e;
+            --tg-theme-text-color: #ffffff;
+            --tg-theme-hint-color: #999999;
+            --tg-theme-link-color: #0088cc;
+            --tg-theme-button-color: #6366f1;
+            --tg-theme-button-text-color: #ffffff;
+        }
+        
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            position: relative;
+            padding-bottom: 80px;
+        }
+        
+        .header {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .profile-section { padding: 24px 20px; }
+        
+        .profile-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.3), transparent);
+            border-radius: 50%;
+        }
+        
+        .avatar-container {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-info h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .user-id { color: rgba(255, 255, 255, 0.6); font-size: 14px; }
+        
+        .rating-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-value { font-size: 20px; font-weight: 700; color: #6366f1; }
+        .stat-label { font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 4px; }
+        
+        .progress-section { margin-top: 20px; }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+        
+        .menu-grid {
+            padding: 0 20px 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        
+        .menu-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .menu-item:hover::before, .menu-item:active::before { opacity: 1; }
+        .menu-item:active { transform: scale(0.98); }
+        .menu-icon { font-size: 32px; margin-bottom: 12px; display: block; }
+        .menu-title { font-weight: 600; font-size: 14px; }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-around;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 12px;
+        }
+        
+        .nav-item:hover { color: rgba(255, 255, 255, 0.8); background: rgba(255, 255, 255, 0.05); }
+        .nav-item.active { color: #6366f1; background: rgba(99, 102, 241, 0.1); }
+        .nav-icon { font-size: 24px; }
+        .nav-label { font-size: 11px; font-weight: 500; }
+        
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .farm-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 20px;
+        }
+        
+        .farm-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .farm-item:hover { background: rgba(99, 102, 241, 0.1); border-color: #6366f1; }
+        .farm-emoji { font-size: 36px; margin-bottom: 8px; }
+        .farm-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .farm-income { font-size: 11px; color: #10b981; }
+        .farm-count { font-size: 11px; color: rgba(255, 255, 255, 0.6); margin-top: 4px; }
+        
+        .pvp-card {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+        
+        .task-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 0 20px 16px;
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .task-reward {
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-overlay.active { display: flex; }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: modalIn 0.3s ease;
+        }
+        
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+        .input-group { margin-bottom: 16px; }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus { border-color: #6366f1; background: rgba(99, 102, 241, 0.05); }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 2000;
+            transition: all 0.3s ease;
+            max-width: 90%;
+        }
+        
+        .notification.show { transform: translateX(-50%) translateY(0); }
+        .notification.success { border-color: #10b981; }
+        .notification.error { border-color: #ef4444; }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .rank-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        .rank-ice { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .rank-subzero { background: rgba(147, 51, 234, 0.2); color: #a855f7; }
+        .rank-real { background: rgba(236, 72, 153, 0.2); color: #ec4899; }
+        .rank-vip { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+        .rank-king { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        
+        .verification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .verification-status {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .verification-status.verified { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .verification-status.pending { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+        .verification-status.unverified { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        
+        .animal-shop-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 20px;
+        }
+        
+        .shop-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .shop-item:hover { border-color: #6366f1; background: rgba(99, 102, 241, 0.1); }
+        .shop-item.owned { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+        
+        .protection-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            padding: 20px;
+        }
+        
+        .top-player-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin: 0 20px 12px;
+        }
+        
+        .top-rank {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .top-rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+        .top-rank-2 { background: linear-gradient(135deg, #9ca3af, #6b7280); }
+        .top-rank-3 { background: linear-gradient(135deg, #b45309, #92400e); }
+        .top-rank-other { background: rgba(255, 255, 255, 0.1); }
+        
+        .section-title { font-size: 20px; font-weight: 700; padding: 20px 20px 12px; }
+        
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 20px;
+        }
+        
+        .admin-stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .admin-stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .admin-stat-label { font-size: 13px; color: rgba(255, 255, 255, 0.6); margin-top: 4px; }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 26, 46, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .loading-overlay.hidden { display: none; }
+    </style>
+</head>
+<body class="tg-theme">
+    <!-- Loading Screen -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div style="color: rgba(255,255,255,0.6);">Загрузка...</div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">🍦 PLOMBIR</div>
+                <div class="header-actions">
+                    <i class="ri-notification-3-line" style="font-size: 24px; cursor: pointer;" onclick="showNotifications()"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page: Home -->
+        <div id="page-home" class="page active">
+            <div class="profile-section">
+                <div class="profile-card">
+                    <div class="rating-badge">
+                        <i class="ri-star-fill"></i>
+                        <span id="user-rating">0</span>
+                    </div>
+                    <div class="avatar-container">
+                        <div class="avatar" id="user-avatar">🧊</div>
+                        <div class="user-info">
+                            <h2 id="user-name">Загрузка...</h2>
+                            <div class="user-id" id="user-plmbr-id">#PLMBR-0</div>
+                            <div class="rank-badge rank-ice" id="user-rank">НОВИЧОК</div>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-animals">0</div>
+                            <div class="stat-label">Животных</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-income">+0</div>
+                            <div class="stat-label">Доход/час</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-pvp-wins">0</div>
+                            <div class="stat-label">Побед в PvP</div>
+                        </div>
+                    </div>
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>Прогресс до следующего ранга</span>
+                            <span id="progress-text">0 / 300</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-grid">
+                <div class="menu-item" onclick="navigateTo('farm')">
+                    <span class="menu-icon">🏚</span>
+                    <div class="menu-title">Ферма</div>
+                </div>
+                <div class="menu-item" onclick="navigateTo('pvp')">
+                    <span class="menu-icon">⚔️</span>
+                    <div class="menu-title">Арена</div>
+                </div>
+                <div class="menu-item" onclick="navigateTo('tasks')">
+                    <span class="menu-icon">📋</span>
+                    <div class="menu-title">Задания</div>
+                </div>
+                <div class="menu-item" onclick="navigateTo('earn')">
+                    <span class="menu-icon">⚡</span>
+                    <div class="menu-title">Заработать</div>
+                </div>
+                <div class="menu-item" onclick="navigateTo('top')">
+                    <span class="menu-icon">🏆</span>
+                    <div class="menu-title">Топ-20</div>
+                </div>
+                <div class="menu-item" onclick="navigateTo('giveaways')">
+                    <span class="menu-icon">🎁</span>
+                    <div class="menu-title">Розыгрыши</div>
+                </div>
+                <div class="menu-item" onclick="navigateTo('promo')">
+                    <span class="menu-icon">🎟</span>
+                    <div class="menu-title">Промокод</div>
+                </div>
+                <div class="menu-item" onclick="navigateTo('settings')">
+                    <span class="menu-icon">⚙️</span>
+                    <div class="menu-title">Настройки</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page: Farm -->
+        <div id="page-farm" class="page">
+            <div class="section-title">🏚 Моя Ферма</div>
+            <div class="profile-section">
+                <div class="profile-card">
+                    <div class="rating-badge">
+                        <i class="ri-coins-line"></i>
+                        <span id="farm-balance">0 pts</span>
+                    </div>
+                    <div style="margin-top: 60px;">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value" id="farm-total-animals">0</div>
+                                <div class="stat-label">Всего</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="farm-hourly-income">+0</div>
+                                <div class="stat-label">Доход/час</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="farm-protection">0</div>
+                                <div class="stat-label">Защита</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="menu-grid" style="margin-top: 20px;">
+                <div class="menu-item" onclick="showModal('buy-animal')">
+                    <span class="menu-icon">🛒</span>
+                    <div class="menu-title">Купить животное</div>
+                </div>
+                <div class="menu-item" onclick="showModal('buy-protection')">
+                    <span class="menu-icon">🛡</span>
+                    <div class="menu-title">Купить защиту</div>
+                </div>
+                <div class="menu-item" onclick="navigateTo('farm-attack')">
+                    <span class="menu-icon">🥷</span>
+                    <div class="menu-title">Грабить</div>
+                </div>
+                <div class="menu-item" onclick="showModal('farm-rules')">
+                    <span class="menu-icon">📖</span>
+                    <div class="menu-title">Правила</div>
+                </div>
+            </div>
+
+            <div class="section-title">🐾 Ваши животные</div>
+            <div class="farm-grid" id="user-animals"></div>
+        </div>
+
+        <!-- Page: PvP -->
+        <div id="page-pvp" class="page">
+            <div class="section-title">⚔️ Арена</div>
+            
+            <div class="pvp-card">
+                <h3 style="margin-bottom: 12px;">🥊 Создать вызов</h3>
+                <p style="color: rgba(255,255,255,0.6); margin-bottom: 16px; font-size: 14px;">
+                    Брось вызов любому игроку и сразись за рейтинг!
+                </p>
+                <button class="btn btn-primary" onclick="showModal('create-pvp')">
+                    <i class="ri-sword-line"></i>
+                    Создать битву
+                </button>
+            </div>
+
+            <div class="section-title">📢 Открытые вызовы</div>
+            <div id="pvp-offers"></div>
+
+            <div class="section-title">🏆 Зал славы</div>
+            <div class="menu-grid">
+                <div class="menu-item" onclick="showModal('pvp-stats')">
+                    <span class="menu-icon">💎</span>
+                    <div class="menu-title">Щедрые</div>
+                </div>
+                <div class="menu-item" onclick="showModal('pvp-unlucky')">
+                    <span class="menu-icon">💀</span>
+                    <div class="menu-title">Невезучие</div>
+                </div>
+                <div class="menu-item" onclick="showModal('pvp-today')">
+                    <span class="menu-icon">📅</span>
+                    <div class="menu-title">Герои дня</div>
+                </div>
+                <div class="menu-item" onclick="showModal('pvp-history')">
+                    <span class="menu-icon">📜</span>
+                    <div class="menu-title">История</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page: Tasks -->
+        <div id="page-tasks" class="page">
+            <div class="section-title">📋 Доступные задания</div>
+            <div id="tasks-list"></div>
+        </div>
+
+        <!-- Page: Earn -->
+        <div id="page-earn" class="page">
+            <div class="section-title">⚡ Заработать рейтинг</div>
+            
+            <div class="task-card">
+                <div class="task-header">
+                    <h4>🎲 Ежедневный кубик</h4>
+                    <span class="task-reward">+20-100 pts</span>
+                </div>
+                <p style="color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 12px;">
+                    Бросай кубик раз в 24 часа и получай случайную награду!
+                </p>
+                <button class="btn btn-primary" id="dice-btn" onclick="rollDice()">
+                    <i class="ri-dice-5-line"></i>
+                    Бросить кубик
+                </button>
+            </div>
+
+            <div class="task-card">
+                <div class="task-header">
+                    <h4>📸 Привязать Instagram</h4>
+                    <span class="task-reward">+50 pts</span>
+                </div>
+                <div class="verification-item">
+                    <span id="insta-status">Не привязан</span>
+                    <div class="verification-status unverified" id="insta-verified">
+                        <i class="ri-close-line"></i>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" style="margin-top: 12px;" onclick="showModal('verify-insta')">
+                    Привязать
+                </button>
+            </div>
+
+            <div class="task-card">
+                <div class="task-header">
+                    <h4>🎥 Привязать TikTok</h4>
+                    <span class="task-reward">+50 pts</span>
+                </div>
+                <div class="verification-item">
+                    <span id="tiktok-status">Не привязан</span>
+                    <div class="verification-status unverified" id="tiktok-verified">
+                        <i class="ri-close-line"></i>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" style="margin-top: 12px;" onclick="showModal('verify-tiktok')">
+                    Привязать
+                </button>
+            </div>
+
+            <div class="task-card">
+                <div class="task-header">
+                    <h4>📱 Привязать телефон</h4>
+                    <span class="task-reward">+20 pts</span>
+                </div>
+                <div class="verification-item">
+                    <span id="phone-status">Не привязан</span>
+                    <div class="verification-status unverified" id="phone-verified">
+                        <i class="ri-close-line"></i>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" style="margin-top: 12px;" onclick="verifyPhone()">
+                    Привязать
+                </button>
+            </div>
+        </div>
+
+        <!-- Page: Top -->
+        <div id="page-top" class="page">
+            <div class="section-title">🏆 ТОП-20 Лидеров</div>
+            <div id="top-players"></div>
+        </div>
+
+        <!-- Page: Giveaways -->
+        <div id="page-giveaways" class="page">
+            <div class="section-title">🎁 Активные розыгрыши</div>
+            <div id="giveaways-list"></div>
+        </div>
+
+        <!-- Page: Promo -->
+        <div id="page-promo" class="page">
+            <div class="section-title">🎟 Промокод</div>
+            <div class="task-card">
+                <p style="color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 16px;">
+                    Введи промокод и получи бонусные очки! Ищи коды в наших соцсетях.
+                </p>
+                <div class="input-group">
+                    <input type="text" class="input-field" id="promo-input" placeholder="Введите промокод">
+                </div>
+                <button class="btn btn-primary" onclick="activatePromo()">
+                    Активировать
+                </button>
+            </div>
+        </div>
+
+        <!-- Page: Settings -->
+        <div id="page-settings" class="page">
+            <div class="section-title">⚙️ Настройки</div>
+            
+            <div class="task-card">
+                <h4 style="margin-bottom: 16px;">👤 Редактирование профиля</h4>
+                <div class="verification-item">
+                    <span>Имя</span>
+                    <button class="btn btn-secondary" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="showModal('edit-name')">
+                        Изменить
+                    </button>
+                </div>
+                <div class="verification-item">
+                    <span>Факультет</span>
+                    <button class="btn btn-secondary" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="showModal('edit-faculty')">
+                        Изменить
+                    </button>
+                </div>
+                <div class="verification-item">
+                    <span>Instagram</span>
+                    <button class="btn btn-secondary" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="showModal('edit-insta')">
+                        Изменить
+                    </button>
+                </div>
+                <div class="verification-item">
+                    <span>TikTok</span>
+                    <button class="btn btn-secondary" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="showModal('edit-tiktok')">
+                        Изменить
+                    </button>
+                </div>
+            </div>
+
+            <div class="task-card">
+                <h4 style="margin-bottom: 16px;">🔔 Уведомления</h4>
+                <div class="verification-item">
+                    <span>Уведомления о PvP битвах</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="pvp-notifications" class="sr-only peer" onchange="togglePvpNotifications()">
+                        <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="task-card">
+                <h4 style="margin-bottom: 16px;">ℹ️ О приложении</h4>
+                <p style="color: rgba(255,255,255,0.6); font-size: 14px;">
+                    PLOMBIR Web App v1.0.0<br>
+                    Разработано для сообщества ПЛОМБИР
+                </p>
+                <button class="btn btn-secondary" style="margin-top: 12px;" onclick="showModal('guide')">
+                    📖 Инструкция
+                </button>
+            </div>
+        </div>
+
+        <!-- Page: Admin -->
+        <div id="page-admin" class="page">
+            <div class="section-title">🛠 Панель администратора</div>
+            
+            <div class="admin-stats-grid">
+                <div class="admin-stat-card">
+                    <div class="admin-stat-value" id="admin-total-users">0</div>
+                    <div class="admin-stat-label">Пользователей</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-value" id="admin-total-rating">0</div>
+                    <div class="admin-stat-label">Всего PTS</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-value" id="admin-active-tasks">0</div>
+                    <div class="admin-stat-label">Заданий</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-value" id="admin-pending-reports">0</div>
+                    <div class="admin-stat-label">Отчётов</div>
+                </div>
+            </div>
+
+            <div class="menu-grid">
+                <div class="menu-item" onclick="showModal('admin-mailing')">
+                    <span class="menu-icon">📢</span>
+                    <div class="menu-title">Рассылка</div>
+                </div>
+                <div class="menu-item" onclick="showModal('admin-task-create')">
+                    <span class="menu-icon">💎</span>
+                    <div class="menu-title">Создать задание</div>
+                </div>
+                <div class="menu-item" onclick="showModal('admin-giveaway')">
+                    <span class="menu-icon">🎉</span>
+                    <div class="menu-title">Розыгрыш</div>
+                </div>
+                <div class="menu-item" onclick="showModal('admin-promo')">
+                    <span class="menu-icon">🎟</span>
+                    <div class="menu-title">Промокод</div>
+                </div>
+                <div class="menu-item" onclick="showModal('admin-farm')">
+                    <span class="menu-icon">🏚</span>
+                    <div class="menu-title">Ферма</div>
+                </div>
+                <div class="menu-item" onclick="exportDatabase()">
+                    <span class="menu-icon">📊</span>
+                    <div class="menu-title">Экспорт БД</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="navigateTo('home')" data-page="home">
+                <i class="ri-home-5-line nav-icon"></i>
+                <span class="nav-label">Главная</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('farm')" data-page="farm">
+                <i class="ri-home-gear-line nav-icon"></i>
+                <span class="nav-label">Ферма</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('pvp')" data-page="pvp">
+                <i class="ri-sword-line nav-icon"></i>
+                <span class="nav-label">Арена</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('tasks')" data-page="tasks">
+                <i class="ri-task-line nav-icon"></i>
+                <span class="nav-label">Задания</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('settings')" data-page="settings">
+                <i class="ri-settings-4-line nav-icon"></i>
+                <span class="nav-label">Настройки</span>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notification-text"></span>
+    </div>
+
+    <script>
+        // ==================== CONFIG ====================
+        const API_BASE = 'https://plombir-webapp.onrender.com/api';
+        const ADMIN_IDS = [494900720];
+        
+        // ==================== STATE ====================
+        let state = {
+            user: null,
+            animals: [],
+            protection: [],
+            tasks: [],
+            pvpOffers: [],
+            topPlayers: [],
+            giveaways: [],
+            farmShop: {
+                animals: [
+                    { key: 'chicken', name: 'Курица', emoji: '🐔', income: 3, price: 500 },
+                    { key: 'rooster', name: 'Петух', emoji: '🐓', income: 8, price: 1000 },
+                    { key: 'duck', name: 'Утка', emoji: '🦆', income: 20, price: 2500 },
+                    { key: 'goose', name: 'Гусь', emoji: '🪿', income: 45, price: 5000 },
+                    { key: 'pig', name: 'Свинья', emoji: '🐷', income: 100, price: 12000 },
+                    { key: 'sheep', name: 'Овца', emoji: '🐑', income: 220, price: 25000 },
+                    { key: 'cow', name: 'Корова', emoji: '🐮', income: 500, price: 50000 },
+                    { key: 'horse', name: 'Лошадь', emoji: '🐴', income: 1300, price: 120000 },
+                    { key: 'elephant', name: 'Слон', emoji: '🐘', income: 3500, price: 300000 },
+                    { key: 'unicorn', name: 'Единорог', emoji: '🦄', income: 10000, price: 800000 },
+                    { key: 'dragon', name: 'Дракон', emoji: '🐉', income: 30000, price: 2000000 }
+                ],
+                protection: [
+                    { key: 'scarecrow', name: 'Пугало', emoji: '👤', bonus: 0.05, price: 1000 },
+                    { key: 'battle_cat', name: 'Боевой кот', emoji: '😼', bonus: 0.15, price: 5000 },
+                    { key: 'dog', name: 'Собака', emoji: '🐕', bonus: 0.35, price: 15000 },
+                    { key: 'fence_electric', name: 'Электрозабор', emoji: '⚡️', bonus: 0.55, price: 50000 },
+                    { key: 'guard', name: 'Наемник', emoji: '💂‍♂️', bonus: 0.80, price: 150000 }
+                ]
+            }
+        };
+
+        // ==================== API ====================
+        async function apiCall(endpoint, method = 'GET', data = null) {
+    const tg = window.Telegram.WebApp;
+    
+    const options = {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+    };
+    
+    const requestData = data || {};
+    requestData.initData = tg.initData;
+    
+    if (method !== 'GET') {
+        options.body = JSON.stringify(requestData);
+    } else if (Object.keys(requestData).length > 0) {
+        const params = new URLSearchParams();
+        for (const [key, value] of Object.entries(requestData)) {
+            params.append(key, value);
+        }
+        endpoint += '?' + params.toString();
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}${endpoint}`, options);
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'API Error');
+        }
+        
+        return result;
+    } catch (error) {
+        console.error('API Error:', error);
+        showNotification('❌ Ошибка соединения', 'error');
+        return null;
+    }
+}
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Init Telegram Web App
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                tg.ready();
+                tg.expand();
+                
+                // Set theme
+                document.documentElement.style.setProperty('--tg-theme-bg-color', tg.backgroundColor || '#1a1a2e');
+                document.documentElement.style.setProperty('--tg-theme-text-color', tg.textColor || '#ffffff');
+            }
+            
+            // Load user data
+            await loadUserData();
+            
+            // Hide loading
+            document.getElementById('loading-overlay').classList.add('hidden');
+        });
+
+        async function loadUserData() {
+            const tg = window.Telegram.WebApp;
+            if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
+                showNotification('❌ Ошибка авторизации', 'error');
+                return;
+            }
+            
+            const tgUser = tg.initDataUnsafe.user;
+            
+            // Auth with backend
+            const authData = await apiCall('/auth', 'POST', {
+                initData: tg.initData,
+                user: {
+                    id: tgUser.id,
+                    username: tgUser.username,
+                    first_name: tgUser.first_name,
+                    last_name: tgUser.last_name
+                }
+            });
+            
+            if (!authData) return;
+            
+            state.user = authData.user;
+            
+            // Load all data
+            await Promise.all([
+                loadFarmData(),
+                loadTasks(),
+                loadPvpOffers(),
+                loadTopPlayers(),
+                loadGiveaways()
+            ]);
+            
+            // Render
+            renderUserProfile();
+            renderFarmAnimals();
+            renderPvpOffers();
+            renderTopPlayers();
+            renderGiveaways();
+            renderTasks();
+            checkAdminAccess();
+        }
+
+        async function loadFarmData() {
+            const farmData = await apiCall('/farm');
+            if (farmData) {
+                state.animals = farmData.animals || [];
+                state.protection = farmData.protection || [];
+            }
+        }
+
+        async function loadTasks() {
+            const tasks = await apiCall('/tasks');
+            if (tasks) state.tasks = tasks;
+        }
+
+        async function loadPvpOffers() {
+            const offers = await apiCall('/pvp/offers');
+            if (offers) state.pvpOffers = offers;
+        }
+
+        async function loadTopPlayers() {
+            const players = await apiCall('/top');
+            if (players) state.topPlayers = players;
+        }
+
+        async function loadGiveaways() {
+            const giveaways = await apiCall('/giveaways');
+            if (giveaways) state.giveaways = giveaways;
+        }
+
+        // ==================== NAVIGATION ====================
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(`page-${pageId}`)?.classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === pageId) item.classList.add('active');
+            });
+            
+            window.scrollTo(0, 0);
+            
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+            }
+        }
+
+        // ==================== RENDERING ====================
+        function renderUserProfile() {
+            if (!state.user) return;
+            
+            document.getElementById('user-name').textContent = state.user.name;
+            document.getElementById('user-plmbr-id').textContent = `#PLMBR-${state.user.short_id}`;
+            document.getElementById('user-rating').textContent = state.user.rating.toLocaleString();
+            
+            const rank = getRank(state.user.rating);
+            document.getElementById('user-rank').textContent = rank.name;
+            document.getElementById('user-rank').className = `rank-badge ${rank.class}`;
+            
+            const totalAnimals = state.animals.reduce((sum, a) => sum + a.count, 0);
+            const hourlyIncome = state.animals.reduce((sum, a) => sum + (a.income * a.count), 0);
+            
+            document.getElementById('stat-animals').textContent = totalAnimals;
+            document.getElementById('stat-income').textContent = `+${hourlyIncome}`;
+            document.getElementById('stat-pvp-wins').textContent = state.user.pvp_wins || 0;
+            
+            const progress = (state.user.rating / rank.nextRank) * 100;
+            document.getElementById('progress-fill').style.width = `${Math.min(progress, 100)}%`;
+            document.getElementById('progress-text').textContent = `${state.user.rating.toLocaleString()} / ${rank.nextRank.toLocaleString()}`;
+            
+            updateVerificationStatus('insta', state.user.insta_verified);
+            updateVerificationStatus('tiktok', state.user.tiktok_verified);
+            updateVerificationStatus('phone', state.user.phone_verified);
+        }
+
+        function getRank(rating) {
+            if (rating <= 300) return { name: 'НОВИЧОК (ICE)', class: 'rank-ice', nextRank: 300 };
+            if (rating <= 3000) return { name: 'БОЕЦ (SUB-ZERO)', class: 'rank-subzero', nextRank: 3000 };
+            if (rating <= 7000) return { name: 'РЕАЛЬНЫЙ', class: 'rank-real', nextRank: 7000 };
+            if (rating <= 15000) return { name: 'VIP', class: 'rank-vip', nextRank: 15000 };
+            return { name: 'КОРОЛЬ', class: 'rank-king', nextRank: 15000 };
+        }
+
+        function renderFarmAnimals() {
+            const container = document.getElementById('user-animals');
+            container.innerHTML = state.animals.map(animal => `
+                <div class="farm-item">
+                    <div class="farm-emoji">${animal.emoji}</div>
+                    <div class="farm-name">${animal.name}</div>
+                    <div class="farm-income">+${animal.income}/час</div>
+                    <div class="farm-count">${animal.count} шт.</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('farm-total-animals').textContent = state.animals.reduce((sum, a) => sum + a.count, 0);
+            const hourlyIncome = state.animals.reduce((sum, a) => sum + (a.income * a.count), 0);
+            document.getElementById('farm-hourly-income').textContent = `+${hourlyIncome}`;
+            document.getElementById('farm-protection').textContent = state.protection.length;
+            document.getElementById('farm-balance').textContent = `${state.user?.rating?.toLocaleString() || 0} pts`;
+        }
+
+        function renderPvpOffers() {
+            const container = document.getElementById('pvp-offers');
+            if (!state.pvpOffers || state.pvpOffers.length === 0) {
+                container.innerHTML = `
+                    <div class="task-card" style="text-align: center;">
+                        <p style="color: rgba(255,255,255,0.6);">На арене пока пусто...</p>
+                        <button class="btn btn-primary" style="margin-top: 12px;" onclick="showModal('create-pvp')">
+                            Создать первый вызов
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = state.pvpOffers.map(offer => `
+                <div class="top-player-item">
+                    <div class="top-rank top-rank-other"><i class="ri-sword-line"></i></div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">${offer.challenger_name}</div>
+                        <div style="font-size: 12px; color: rgba(255,255,255,0.6);">#${offer.challenger_short_id}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 700; color: #fbbf24;">${offer.bet} pts</div>
+                        <button class="btn btn-primary" style="width: auto; padding: 8px 16px; font-size: 12px; margin-top: 4px;" onclick="acceptPvp(${offer.battle_id})">
+                            Принять
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTopPlayers() {
+            const container = document.getElementById('top-players');
+            if (!state.topPlayers || state.topPlayers.length === 0) {
+                container.innerHTML = '<div class="task-card" style="text-align: center;"><p style="color: rgba(255,255,255,0.6);">Список лидеров пуст</p></div>';
+                return;
+            }
+            
+            container.innerHTML = state.topPlayers.map((player, index) => `
+                <div class="top-player-item">
+                    <div class="top-rank top-rank-${index < 3 ? index + 1 : 'other'}">${index + 1}</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">${player.name}</div>
+                        <div style="font-size: 12px; color: rgba(255,255,255,0.6);">#${player.short_id}</div>
+                    </div>
+                    <div style="font-weight: 700; color: #6366f1;">${player.rating.toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderGiveaways() {
+            const container = document.getElementById('giveaways-list');
+            if (!state.giveaways || state.giveaways.length === 0) {
+                container.innerHTML = '<div class="task-card" style="text-align: center;"><p style="color: rgba(255,255,255,0.6);">Активных розыгрышей нет</p></div>';
+                return;
+            }
+            
+            container.innerHTML = state.giveaways.map(gv => `
+                <div class="task-card">
+                    <div class="task-header">
+                        <h4>🎁 ${gv.prize_text}</h4>
+                        <span class="task-reward">${gv.winners_count} победителей</span>
+                    </div>
+                    <p style="color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 12px;">
+                        🏁 Итоги: ${gv.end_time} (МСК)<br>
+                        👥 Участников: ${gv.participants || 0}
+                    </p>
+                    <button class="btn btn-primary" onclick="joinGiveaway(${gv.id})">
+                        Участвую! (${gv.participants || 0})
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('tasks-list');
+            if (!state.tasks || state.tasks.length === 0) {
+                container.innerHTML = '<div class="task-card" style="text-align: center;"><p style="color: rgba(255,255,255,0.6);">Заданий пока нет</p></div>';
+                return;
+            }
+            
+            container.innerHTML = state.tasks.map(task => `
+                <div class="task-card">
+                    <div class="task-header">
+                        <h4>📋 ${task.title}</h4>
+                        <span class="task-reward">+${task.reward} pts</span>
+                    </div>
+                    <p style="color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 12px;">${task.description}</p>
+                    ${task.status === 'available' ? `
+                        <button class="btn btn-primary" onclick="startTask(${task.id})">Приступить</button>
+                    ` : task.status === 'pending' ? `
+                        <button class="btn btn-secondary" disabled>⏳ На проверке</button>
+                    ` : `
+                        <button class="btn btn-secondary" disabled>✅ Выполнено</button>
+                    `}
+                </div>
+            `).join('');
+        }
+
+        function updateVerificationStatus(type, verified) {
+            const statusEl = document.getElementById(`${type}-status`);
+            const verifiedEl = document.getElementById(`${type}-verified`);
+            
+            if (verified) {
+                statusEl.textContent = 'Подтверждено';
+                verifiedEl.className = 'verification-status verified';
+                verifiedEl.innerHTML = '<i class="ri-check-line"></i>';
+            } else {
+                statusEl.textContent = 'Не привязан';
+                verifiedEl.className = 'verification-status unverified';
+                verifiedEl.innerHTML = '<i class="ri-close-line"></i>';
+            }
+        }
+
+        function checkAdminAccess() {
+            const adminNavItem = document.querySelector('.nav-item[data-page="admin"]');
+            if (state.user?.is_admin) {
+                if (!adminNavItem) {
+                    const nav = document.querySelector('.bottom-nav');
+                    const newItem = document.createElement('div');
+                    newItem.className = 'nav-item';
+                    newItem.dataset.page = 'admin';
+                    newItem.innerHTML = `<i class="ri-shield-keyhole-line nav-icon"></i><span class="nav-label">Админка</span>`;
+                    newItem.onclick = () => navigateTo('admin');
+                    nav.appendChild(newItem);
+                }
+            } else if (adminNavItem) {
+                adminNavItem.remove();
+            }
+        }
+
+        // ==================== MODALS ====================
+        function showModal(modalType) {
+            const modalBody = document.getElementById('modal-body');
+            const modalOverlay = document.getElementById('modal-overlay');
+            
+            let content = '';
+            
+            switch(modalType) {
+                case 'buy-animal':
+                    content = `
+                        <div class="modal-title">🛒 Магазин животных</div>
+                        <div class="animal-shop-grid">
+                            ${state.farmShop.animals.map(animal => {
+                                const owned = state.animals.find(a => a.key === animal.key);
+                                return `
+                                    <div class="shop-item ${owned ? 'owned' : ''}" onclick="buyAnimal('${animal.key}')">
+                                        <div style="font-size: 32px;">${animal.emoji}</div>
+                                        <div style="font-weight: 600; font-size: 13px; margin: 8px 0;">${animal.name}</div>
+                                        <div style="color: #10b981; font-size: 11px;">+${animal.income}/час</div>
+                                        <div style="color: #fbbf24; font-weight: 700; font-size: 12px; margin-top: 4px;">${animal.price.toLocaleString()} pts</div>
+                                        ${owned ? '<div style="color: #10b981; font-size: 11px; margin-top: 4px;">✅ Владеете</div>' : ''}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        <button class="btn btn-secondary" style="margin-top: 16px;" onclick="closeModal()">Закрыть</button>
+                    `;
+                    break;
+                    
+                case 'buy-protection':
+                    content = `
+                        <div class="modal-title">🛡 Магазин защиты</div>
+                        <div class="protection-grid">
+                            ${state.farmShop.protection.map(item => {
+                                const owned = state.protection.find(p => p.key === item.key);
+                                return `
+                                    <div class="shop-item ${owned ? 'owned' : ''}" style="text-align: left;" onclick="buyProtection('${item.key}')">
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <div style="font-size: 32px;">${item.emoji}</div>
+                                            <div style="flex: 1;">
+                                                <div style="font-weight: 600;">${item.name}</div>
+                                                <div style="color: #10b981; font-size: 12px;">-${Math.round(item.bonus * 100)}% шанс кражи</div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <div style="color: #fbbf24; font-weight: 700;">${item.price.toLocaleString()} pts</div>
+                                                ${owned ? '<div style="color: #10b981; font-size: 11px;">✅ Куплено</div>' : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        <button class="btn btn-secondary" style="margin-top: 16px;" onclick="closeModal()">Закрыть</button>
+                    `;
+                    break;
+                    
+                case 'create-pvp':
+                    content = `
+                        <div class="modal-title">⚔️ Создать вызов</div>
+                        <div class="input-group">
+                            <label class="input-label">Сумма ставки (pts)</label>
+                            <input type="number" class="input-field" id="pvp-bet" placeholder="Минимум 10" min="10">
+                        </div>
+                        <button class="btn btn-primary" onclick="createPvp()">
+                            <i class="ri-sword-line"></i>
+                            Создать битву
+                        </button>
+                        <button class="btn btn-secondary" style="margin-top: 12px;" onclick="closeModal()">Отмена</button>
+                    `;
+                    break;
+                    
+                case 'verify-insta':
+                    content = `
+                        <div class="modal-title">📸 Привязать Instagram</div>
+                        <div class="input-group">
+                            <label class="input-label">Ваш ник в Instagram</label>
+                            <input type="text" class="input-field" id="insta-nick" placeholder="username">
+                        </div>
+                        <button class="btn btn-primary" onclick="verifySocial('insta')">Отправить на проверку</button>
+                        <button class="btn btn-secondary" style="margin-top: 12px;" onclick="closeModal()">Отмена</button>
+                    `;
+                    break;
+                    
+                case 'verify-tiktok':
+                    content = `
+                        <div class="modal-title">🎥 Привязать TikTok</div>
+                        <div class="input-group">
+                            <label class="input-label">Ваш ник в TikTok</label>
+                            <input type="text" class="input-field" id="tiktok-nick" placeholder="username">
+                        </div>
+                        <button class="btn btn-primary" onclick="verifySocial('tiktok')">Отправить на проверку</button>
+                        <button class="btn btn-secondary" style="margin-top: 12px;" onclick="closeModal()">Отмена</button>
+                    `;
+                    break;
+                    
+                case 'edit-name':
+                    content = `
+                        <div class="modal-title">👤 Изменить имя</div>
+                        <div class="input-group">
+                            <label class="input-label">Новое имя</label>
+                            <input type="text" class="input-field" id="edit-name-input" value="${state.user?.name || ''}">
+                        </div>
+                        <button class="btn btn-primary" onclick="updateProfile('name')">Сохранить</button>
+                        <button class="btn btn-secondary" style="margin-top: 12px;" onclick="closeModal()">Отмена</button>
+                    `;
+                    break;
+                    
+                case 'guide':
+                    content = `
+                        <div class="modal-title">📖 Инструкция</div>
+                        <div style="max-height: 400px; overflow-y: auto; font-size: 14px; line-height: 1.6;">
+                            <p style="margin-bottom: 12px;"><b>🍦 ГИД ПОЛЬЗОВАТЕЛЯ «ПЛОМБИР»</b></p>
+                            <p style="margin-bottom: 12px;"><b>1. ЛИЧНЫЙ ПРОФИЛЬ</b><br>Ваш уникальный ID, ранг и прогресс до следующего уровня.</p>
+                            <p style="margin-bottom: 12px;"><b>2. ФЕРМА</b><br>Покупайте животных для пассивного дохода. Защищайте ферму от грабителей!</p>
+                            <p style="margin-bottom: 12px;"><b>3. АРЕНА (PvP)</b><br>Сражайтесь с другими игроками за рейтинг. Победитель забирает всё!</p>
+                            <p style="margin-bottom: 12px;"><b>4. ЗАДАНИЯ</b><br>Выполняйте задания и получайте PTS.</p>
+                            <p style="margin-bottom: 12px;"><b>5. КУБИК</b><br>Бросайте раз в 24 часа. Выпала 1? Забирайте 100 PTS!</p>
+                        </div>
+                        <button class="btn btn-secondary" style="margin-top: 16px;" onclick="closeModal()">Понятно</button>
+                    `;
+                    break;
+                    
+                default:
+                    content = `<div class="modal-title">ℹ️ В разработке</div><p style="text-align: center; color: rgba(255,255,255,0.6);">Эта функция скоро появится!</p><button class="btn btn-secondary" style="margin-top: 16px;" onclick="closeModal()">Закрыть</button>`;
+            }
+            
+            modalBody.innerHTML = content;
+            modalOverlay.classList.add('active');
+            
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+            }
+        }
+
+        function closeModal(event) {
+            if (!event || event.target.id === 'modal-overlay') {
+                document.getElementById('modal-overlay').classList.remove('active');
+            }
+        }
+
+        // ==================== ACTIONS ====================
+        async function buyAnimal(animalKey) {
+            const animal = state.farmShop.animals.find(a => a.key === animalKey);
+            if (!animal) return;
+            
+            const result = await apiCall('/farm/buy-animal', 'POST', { animal_key: animalKey });
+            if (result) {
+                showNotification(`✅ ${animal.name} куплен!`, 'success');
+                await loadFarmData();
+                await loadUserData();
+                renderUserProfile();
+                renderFarmAnimals();
+                closeModal();
+            }
+        }
+
+        async function buyProtection(protectionKey) {
+            const result = await apiCall('/farm/buy-protection', 'POST', { item_key: protectionKey });
+            if (result) {
+                const item = state.farmShop.protection.find(p => p.key === protectionKey);
+                showNotification(`✅ ${item?.name} активирован!`, 'success');
+                await loadFarmData();
+                await loadUserData();
+                renderUserProfile();
+                renderFarmAnimals();
+                closeModal();
+            }
+        }
+
+        async function createPvp() {
+            const bet = parseInt(document.getElementById('pvp-bet').value);
+            if (!bet || bet < 10) {
+                showNotification('❌ Минимальная ставка 10 PTS!', 'error');
+                return;
+            }
+            
+            const result = await apiCall('/pvp/create', 'POST', { bet });
+            if (result) {
+                showNotification('✅ Вызов создан!', 'success');
+                await loadUserData();
+                await loadPvpOffers();
+                renderUserProfile();
+                renderPvpOffers();
+                closeModal();
+            }
+        }
+
+        async function acceptPvp(battleId) {
+            const result = await apiCall('/pvp/accept', 'POST', { battle_id: battleId });
+            if (result) {
+                showNotification(result.message || 'Битва завершена!', result.winner ? 'success' : 'error');
+                await loadUserData();
+                await loadPvpOffers();
+                renderUserProfile();
+                renderPvpOffers();
+            }
+        }
+
+        async function rollDice() {
+            const btn = document.getElementById('dice-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div> Бросаем...';
+            
+            const result = await apiCall('/dice/roll', 'POST');
+            
+            if (result) {
+                showNotification(`🎲 Выпало ${result.value}! +${result.points} PTS`, 'success');
+                await loadUserData();
+                renderUserProfile();
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = '<i class="ri-time-line"></i> Доступно через 24ч';
+        }
+
+        async function verifySocial(platform) {
+            const nick = document.getElementById(`${platform}-nick`).value.trim();
+            if (!nick) {
+                showNotification('❌ Введите ник!', 'error');
+                return;
+            }
+            
+            const result = await apiCall('/social/verify', 'POST', { platform, nick });
+            if (result) {
+                showNotification('✅ Отправлено на проверку!', 'success');
+                closeModal();
+            }
+        }
+
+        async function verifyPhone() {
+            if (window.Telegram?.WebApp) {
+                window.Telegram.WebApp.showPopup({
+                    title: 'Подтверждение телефона',
+                    message: 'Отправить ваш номер телефона?',
+                    buttons: [{ type: 'ok', text: 'Отправить' }, { type: 'cancel', text: 'Отмена' }]
+                }, async (btn) => {
+                    if (btn === 'ok') {
+                        const result = await apiCall('/social/verify-phone', 'POST');
+                        if (result) {
+                            showNotification('✅ Телефон подтверждён! +20 PTS', 'success');
+                            await loadUserData();
+                            renderUserProfile();
+                        }
+                    }
+                });
+            }
+        }
+
+        async function updateProfile(field) {
+            const value = document.getElementById(`edit-${field}-input`).value.trim();
+            if (!value) {
+                showNotification('❌ Введите значение!', 'error');
+                return;
+            }
+            
+            const result = await apiCall('/profile/update', 'POST', { field, value });
+            if (result) {
+                showNotification('✅ Данные обновлены!', 'success');
+                await loadUserData();
+                renderUserProfile();
+                closeModal();
+            }
+        }
+
+        async function startTask(taskId) {
+            const result = await apiCall('/tasks/start', 'POST', { task_id: taskId });
+            if (result) {
+                showNotification('✅ Задание отправлено на проверку!', 'success');
+                await loadTasks();
+                renderTasks();
+            }
+        }
+
+        async function joinGiveaway(giveawayId) {
+            const result = await apiCall('/giveaways/join', 'POST', { giveaway_id: giveawayId });
+            if (result) {
+                showNotification('✅ Вы участвуете в розыгрыше!', 'success');
+                await loadGiveaways();
+                renderGiveaways();
+            }
+        }
+
+        async function activatePromo() {
+            const code = document.getElementById('promo-input').value.trim().toUpperCase();
+            if (!code) {
+                showNotification('❌ Введите промокод!', 'error');
+                return;
+            }
+            
+            const result = await apiCall('/promo/activate', 'POST', { code });
+            if (result) {
+                showNotification(`✅ Промокод активирован! +${result.reward} PTS`, 'success');
+                await loadUserData();
+                renderUserProfile();
+            } else {
+                showNotification('❌ Неверный или истёкший код', 'error');
+            }
+            
+            document.getElementById('promo-input').value = '';
+        }
+
+        function togglePvpNotifications() {
+            apiCall('/pvp/toggle-notifications', 'POST');
+            showNotification(
+                document.getElementById('pvp-notifications').checked ? '✅ Уведомления включены' : '🔕 Уведомления выключены',
+                'success'
+            );
+        }
+
+        function showNotifications() {
+            showNotification('🔔 Нет новых уведомлений', 'success');
+        }
+
+        async function exportDatabase() {
+            showNotification('📊 Экспорт начат...', 'success');
+            const result = await apiCall('/admin/export', 'POST');
+            if (result) {
+                showNotification('✅ Файл отправлен админу', 'success');
+            }
+        }
+
+        // ==================== NOTIFICATIONS ====================
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const text = document.getElementById('notification-text');
+            
+            text.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                if (type === 'success') {
+                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                } else {
+                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+                }
+            }
+            
+            setTimeout(() => notification.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>
