@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Уютная изба стилиста 🏡🌾</title>
+    <style>
+        body {
+            background-color: #f7f3ed;
+            color: #4a3b32;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e6dfd5;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+            color: #5c4033;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #8c7365;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .menu-buttons, .gender-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            background-color: #7b5b48;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #5c4033;
+        }
+        button.secondary {
+            background-color: #dcd0c0;
+            color: #4a3b32;
+        }
+        button.secondary:hover {
+            background-color: #c8b9a6;
+        }
+        .card {
+            background: #fdfbf7;
+            border: 1px dashed #c8b9a6;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #5c4033;
+        }
+        .card p {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+        .hidden {
+            display: none;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: #7b5b48;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 15px;
+            padding: 0;
+        }
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="app">
+    <div id="main-menu">
+        <h1>🏡 Уютная изба стилиста</h1>
+        <p class="subtitle">Выбирай режим работы и подбирай трендовые образы в деревенском вайбе</p>
+        <div class="menu-buttons" style="flex-direction: column;">
+            <button onclick="showScreen('fast-look-screen')">🌾 Подобрать быстрый лук</button>
+            <button class="secondary" onclick="showScreen('photo-screen')">📸 Подобрать по фото (Архив)</button>
+        </div>
+    </div>
+
+    <div id="fast-look-screen" class="hidden">
+        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ На главную</button>
+        <h1>🌾 Быстрый подбор лука</h1>
+        <p class="subtitle">Для кого сотворим образ на этот раз?</p>
+        <div class="gender-buttons">
+            <button onclick="generateLook('girls')">👒 Девочкам</button>
+            <button onclick="generateLook('boys')">🧢 Мальчикам</button>
+        </div>
+
+        <div id="result-card" class="card">
+            <h3 id="look-style"></h3>
+            <p id="look-top"></p>
+            <p id="look-bottom"></p>
+            <p id="look-shoes"></p>
+            <p id="look-accessories"></p>
+            <div style="margin-top: 15px; text-align: center;">
+                <button onclick="generateLook(currentCategory)">🔄 Сгенерировать еще</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="photo-screen" class="hidden">
+        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ На главную</button>
+        <h1>📸 Режим подбора по фото</h1>
+        <p class="subtitle">Архивная функция загрузки селфи сохранена на месте.</p>
+        <div style="text-align: center; padding: 20px; border: 2px dashed #c8b9a6; border-radius: 8px;">
+            <p>Загрузите ваше фото для анализа:</p>
+            <input type="file" accept="image/*" style="margin-top: 10px;" onchange="alert('Фото загружено! (Архивный режим работает в штатном режиме).')">
+        </div>
+    </div>
+</div>
+
+<script>
+    const girlsLooks = [
+        {
+            style: "🌾 Деревенский шик (Rustic Cottagecore)",
+            top: "Льняная белая блузка с объемными рукавами и вышивкой",
+            bottom: "Длинная свободная юбка из хлопка песочного цвета",
+            shoes: "Кожаные плетеные сандалии или удобные эспадрильи",
+            accessories: "Соломенная шляпа с лентой и сумка-шоппер из ротанга"
+        },
+        {
+            style: "🌻 Уютный оверсайз (Cozy Village)",
+            top: "Вязаный кремовый кардиган крупной вязки",
+            bottom: "Широкие винтажные джинсы с высокой посадкой",
+            shoes: "Базовые белые кеды",
+            accessories: "Винтажный кулон на цепочке и тканевый ободок"
+        },
+        {
+            style: "🪵 Лесная романтика",
+            top: "Клетчатая рубашка оверсайз (накинутая поверх базового топа)",
+            bottom: "Плотные черные леггинсы или трикотажные брюки клеш",
+            shoes: "Грубые ботинки на шнуровке",
+            accessories: "Маленький рюкзак из эко-кожи и массивное кольцо"
+        }
+    ];
+
+    const boysLooks = [
+        {
+            style: "🪵 Уютный кэжуал (Rustic Comfort)",
+            top: "Свободная фланелевая рубашка в клетку",
+            bottom: "Прямые свободные брюки цвета хаки",
+            shoes: "Замшевые челси или плотные кроссовки",
+            accessories: "Кожаный браслет и стильные часы с ремешком"
+        },
+        {
+            style: "🌾 Деревенский стритстайл",
+            top: "Однотонное плотное худи оверсайз бежевого оттенка",
+            bottom: "Широкие карго-брюки с накладными карманами",
+            shoes: "Массивные кроссовки в ретро-стиле",
+            accessories: "Текстильная кепка-бейсболка и поясная сумка"
+        },
+        {
+            style: "🌻 Утренний променад по лугу",
+            top: "Вязаный джемпер с фактурным узором",
+            bottom: "Классические прямые джинсы темного синего цвета",
+            shoes: "Кожаные кеды",
+            accessories: "Шоппер из плотного хлопка и солнцезащитные очки"
+        }
+    ];
+
+    let currentCategory = 'girls';
+
+    function showScreen(screenId) {
+        document.getElementById('main-menu').classList.add('hidden');
+        document.getElementById('fast-look-screen').classList.add('hidden');
+        document.getElementById('photo-screen').classList.add('hidden');
+        
+        document.getElementById(screenId).classList.remove('hidden');
+    }
+
+    function generateLook(category) {
+        currentCategory = category;
+        const looks = category === 'girls' ? girlsLooks : boysLooks;
+        const look = looks[Math.floor(Math.random() * looks.length)];
+
+        document.getElementById('look-style').innerText = `🎨 Стиль: ${look.style}`;
+        document.getElementById('look-top').innerText = `🧥 Верх: ${look.top}`;
+        document.getElementById('look-bottom').innerText = `👖 Низ: ${look.bottom}`;
+        document.getElementById('look-shoes').innerText = `👟 Обувь: ${look.shoes}`;
+        document.getElementById('look-accessories').innerText = `👜 Аксессуары: ${look.accessories}`;
+
+        document.getElementById('result-card').style.display = 'block';
+    }
+</script>
+</body>
+</html>
