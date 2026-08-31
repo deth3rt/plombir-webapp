@@ -1,21 +1,21 @@
-# Let's generate the complete single HTML file with light theme, 3x4 aspect ratio card design, 50-100 random hilarious captions, and instant generation without selfie upload.
-html_content = '''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ПLОМБИР | Из города в деревню</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #f4f6f8;
+            --bg-main: #f8fafc;
             --card-bg: #ffffff;
             --border-color: #e2e8f0;
             --accent-green: #65a30d;
-            --accent-green-bg: rgba(101, 163, 13, 0.12);
+            --accent-green-bg: rgba(101, 163, 13, 0.1);
             --text-dark: #0f172a;
             --text-muted: #64748b;
+            --shadow-subtle: 0 20px 40px -15px rgba(15, 23, 42, 0.07);
         }
 
         * {
@@ -34,14 +34,16 @@ html_content = '''<!DOCTYPE html>
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 12px;
+            padding: 16px;
+            overflow-x: hidden;
         }
 
         .app-wrapper {
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         .screen {
@@ -49,21 +51,27 @@ html_content = '''<!DOCTYPE html>
             display: flex;
             flex-direction: column;
             align-items: center;
-            animation: fadeIn 0.25s ease-out forwards;
+            animation: screenIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         .screen.hidden {
             display: none;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes screenIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .header-box {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
+            animation: floatHeader 4s ease-in-out infinite;
+        }
+
+        @keyframes floatHeader {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
         }
 
         .top-badge {
@@ -72,14 +80,15 @@ html_content = '''<!DOCTYPE html>
             color: var(--accent-green);
             font-size: 11px;
             font-weight: 900;
-            padding: 4px 10px;
-            border-radius: 6px;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(101, 163, 13, 0.2);
         }
 
         h1 {
-            font-size: 1.7rem;
+            font-size: 1.8rem;
             font-weight: 900;
             line-height: 1.15;
             color: var(--text-dark);
@@ -88,54 +97,75 @@ html_content = '''<!DOCTYPE html>
 
         .instruction {
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             color: var(--text-muted);
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
             margin-bottom: 16px;
             text-align: center;
+            text-transform: uppercase;
         }
 
         .choice-container {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
             width: 100%;
         }
 
         .choice-btn {
             background: var(--card-bg);
             border: 2px solid var(--border-color);
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 20px;
+            padding: 22px 20px;
             display: flex;
             align-items: center;
             gap: 16px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: left;
             width: 100%;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(101, 163, 13, 0.05), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s;
+        }
+
+        .choice-btn:hover::after {
+            transform: translateX(100%);
         }
 
         .choice-btn:active {
             border-color: var(--accent-green);
-            transform: scale(0.98);
+            transform: scale(0.97);
         }
 
         .emoji {
-            font-size: 2rem;
+            font-size: 2.2rem;
             background: #f8fafc;
-            padding: 10px 14px;
-            border-radius: 12px;
+            padding: 12px 16px;
+            border-radius: 14px;
             border: 1px solid var(--border-color);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .choice-btn:hover .emoji {
+            transform: scale(1.1) rotate(6deg);
         }
 
         .btn-text {
             display: block;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: 900;
             color: var(--text-dark);
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .btn-sub {
@@ -145,23 +175,30 @@ html_content = '''<!DOCTYPE html>
             font-weight: 700;
         }
 
-        /* 3x4 Aspect Ratio Card Styling for Result */
+        /* Уменьшенный контейнер под 3x4 картинки со стильной тенью */
         .result-card-container {
-            width: 100%;
+            width: 82%;
+            max-width: 290px;
             background: var(--card-bg);
             border: 2px solid var(--border-color);
-            border-radius: 20px;
+            border-radius: 22px;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
-            margin-bottom: 16px;
+            box-shadow: var(--shadow-subtle);
+            margin: 0 auto 16px auto;
             display: flex;
             flex-direction: column;
+            animation: cardPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes cardPop {
+            0% { opacity: 0; transform: scale(0.9) rotate(-1deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
         }
 
         .image-aspect-wrapper {
             width: 100%;
             aspect-ratio: 3 / 4;
-            background: #e2e8f0;
+            background: #f1f5f9;
             position: relative;
             overflow: hidden;
         }
@@ -171,21 +208,32 @@ html_content = '''<!DOCTYPE html>
             height: 100%;
             object-fit: cover;
             display: block;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .image-aspect-wrapper:hover img {
+            transform: scale(1.04);
         }
 
         .card-caption-box {
-            padding: 16px;
+            padding: 14px 16px;
             background: var(--card-bg);
             border-top: 1px solid var(--border-color);
             text-align: center;
         }
 
         #vibeText {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 900;
             color: var(--text-dark);
-            line-height: 1.4;
+            line-height: 1.35;
             letter-spacing: -0.2px;
+            animation: textFade 0.3s ease-out;
+        }
+
+        @keyframes textFade {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .main-action-btn {
@@ -196,17 +244,22 @@ html_content = '''<!DOCTYPE html>
             font-weight: 900;
             font-size: 0.95rem;
             padding: 16px;
-            border-radius: 14px;
+            border-radius: 16px;
             border: none;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(101, 163, 13, 0.25);
+            box-shadow: 0 10px 25px -5px rgba(101, 163, 13, 0.4);
             letter-spacing: 0.5px;
             margin-bottom: 8px;
-            transition: transform 0.1s;
+            transition: all 0.2s ease;
+        }
+
+        .main-action-btn:hover {
+            filter: brightness(1.05);
         }
 
         .main-action-btn:active {
-            transform: scale(0.98);
+            transform: scale(0.97);
+            box-shadow: 0 5px 15px -3px rgba(101, 163, 13, 0.3);
         }
 
         .secondary-action-btn {
@@ -217,14 +270,15 @@ html_content = '''<!DOCTYPE html>
             font-weight: 900;
             font-size: 0.9rem;
             padding: 14px;
-            border-radius: 14px;
+            border-radius: 16px;
             border: 2px solid var(--border-color);
             cursor: pointer;
-            transition: background 0.1s;
+            transition: all 0.2s ease;
         }
 
         .secondary-action-btn:active {
             background: #f1f5f9;
+            transform: scale(0.97);
         }
 
         .result-actions {
@@ -232,6 +286,45 @@ html_content = '''<!DOCTYPE html>
             display: flex;
             flex-direction: column;
             gap: 8px;
+        }
+
+        /* Экран рандомной загрузки / анимации */
+        .loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+            gap: 20px;
+        }
+
+        .spinner-box {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--accent-green);
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 0.95rem;
+            font-weight: 900;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-align: center;
+            min-height: 24px;
+            animation: pulseText 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseText {
+            from { opacity: 0.6; }
+            to { opacity: 1; }
         }
     </style>
 </head>
@@ -241,25 +334,33 @@ html_content = '''<!DOCTYPE html>
         <!-- ЭКРАН 1: ВЫБОР ПОЛА -->
         <section id="screen-gender" class="screen active">
             <div class="header-box">
-                <span class="top-badge">#PLMBR</span>
+                <span class="top-badge">#PLMBR 2026</span>
                 <h1>ИЗ ГОРОДА<br>В ДЕРЕВНЮ</h1>
             </div>
             <p class="instruction">ВЫБЕРИ СВОЮ КАТЕГОРИЮ</p>
             <div class="choice-container">
-                <button class="choice-btn" onclick="generateLook('boys')">
+                <button class="choice-btn" onclick="startGeneration('boys')">
                     <span class="emoji">🚜</span>
                     <div>
                         <span class="btn-text">ПАРЕНЬ</span>
                         <span class="btn-sub">Спорт-шик х Огород</span>
                     </div>
                 </button>
-                <button class="choice-btn" onclick="generateLook('girls')">
+                <button class="choice-btn" onclick="startGeneration('girls')">
                     <span class="emoji">🌾</span>
                     <div>
                         <span class="btn-text">ДЕВУШКА</span>
                         <span class="btn-sub">Сельский Гламур</span>
                     </div>
                 </button>
+            </div>
+        </section>
+
+        <!-- ЭКРАН С ЗАГРУЗКОЙ (АНИМАЦИЯ) -->
+        <section id="screen-loading" class="screen hidden">
+            <div class="loading-screen">
+                <div class="spinner-box"></div>
+                <p id="loadingStatus" class="loading-text">Заряжаем деревенский вайб...</p>
             </div>
         </section>
 
@@ -286,7 +387,7 @@ html_content = '''<!DOCTYPE html>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // 75 уникальных веселых вайб-фраз
+        // 80 уникальных рандомных вайб-фраз
         const funnyVibes = [
             "В этом луке тебя будут бояться даже местные гуси.",
             "Стопроцентное попадание в тренды сельской дискотеки 2026 года.",
@@ -305,7 +406,7 @@ html_content = '''<!DOCTYPE html>
             "В таком виде можно смело заходить в местный ларек без очереди.",
             "Этот лук кричит: «Я контролирую поставки парного молока».",
             "В этом прикиде ты выглядишь опаснее любого комбайна.",
-            "Прямое попадание в элиту деревецкого подиума.",
+            "Прямое попадание в элиту деревенского подиума.",
             "В этом образе ты будешь звездой каждого вечернего костра.",
             "Стиль, от которого у агрономов идут мурашки по коже.",
             "В таком луке не стыдно и перед кабанами покрасоваться.",
@@ -340,7 +441,7 @@ html_content = '''<!DOCTYPE html>
             "В этом луке ты выглядишь так, будто сам спроектировал этот огород.",
             "В таком виде тебя без вопросов выберут старостой деревни.",
             "Элегантный вызов местной моде.",
-            "В этом луке ты будешь неотразим при разгрузке навоза и камаза с дровами.",
+            "В этом луке ты будешь неотразим при разгрузке навоза и КАМАЗа с дровами.",
             "Вайб абсолютного превосходства над сорняками.",
             "В этом костюме ты готов к покорению любых сельских горизонтов.",
             "Стиль настоящего бати на отдыхе.",
@@ -362,45 +463,69 @@ html_content = '''<!DOCTYPE html>
             "В этом прикиде ты будешь выглядеть опаснее стаи бродячих собак.",
             "В таком виде тебя точно не заблудят в трех березах.",
             "Чистокровный сельский шик для уверенных в себе.",
-            "В этом луке ты готов к любым неожиданностям на сельской дороге."
+            "В этом луке ты готов к любым неожиданностям на сельской дороге.",
+            "В таком прикиде от тебя будут шарахаться даже местные гусаки.",
+            "Этот образ гарантирует, что тебя испугается даже сторожевой пес.",
+            "В этом луке тебя точно будут обходить стороной самые злые бабки у подъезда.",
+            "Чистый страх для вредителей и уважение для соседей.",
+            "В таком виде лучше не появляться в поле — коровы сбегут от зависти."
         ];
 
+        // Мальчики: от look1 до look18
         let boysImages = [];
-        for (let i = 1; i <= 18; i++) {
+        for (let i = 1; i <= 19; i++) {
             boysImages.push(`boys/look${i}.jpg`);
         }
 
-        // Примеры путей для девочек (можно расширять)
-        let girlsImages = [
-            "girls/look1.jpg",
-            "girls/look2.jpg",
-            "girls/look3.jpg",
-            "girls/look4.png",
-            "girls/look5.png",
-            "girls/look6.jpg"
+        // Девочки: от glook1 до glook20 (поддерживаем разные форматы или дефолтные расширения, сделаем универсально или через .jpg/.png)
+        let girlsImages = [];
+        for (let i = 1; i <= 20; i++) {
+            girlsImages.push(`girl/glook${i}.jpg`);
+        }
+
+        const loadingPhrases = [
+            "Выпускаем гусей на прогулку...",
+            "Калибруем уровень сельского гламура...",
+            "Смешиваем спорт-шик и грядки...",
+            "Подбираем самый опасный лук...",
+            "Заряжаем батарейки трактора..."
         ];
 
         let currentGender = '';
         let currentLookSrc = '';
         let currentVibe = '';
 
-        function generateLook(gender) {
+        function startGeneration(gender) {
             currentGender = gender;
-            const list = gender === 'boys' ? boysImages : girlsImages;
             
-            // Рандомный выбор лука из папки
-            currentLookSrc = list[Math.floor(Math.random() * list.length)];
-            
-            // Рандомный выбор смешного текста
-            currentVibe = funnyVibes[Math.floor(Math.random() * funnyVibes.length)];
-
-            // Подставляем данные в интерфейс
-            document.getElementById('resultImg').src = currentLookSrc;
-            document.getElementById('vibeText').textContent = currentVibe;
-
-            // Переключаем экраны
+            // Переключаем на экран загрузки
             document.getElementById('screen-gender').classList.add('hidden');
-            document.getElementById('screen-result').classList.remove('hidden');
+            document.getElementById('screen-loading').classList.remove('hidden');
+
+            // Рандомные фразы для анимации загрузки
+            const statusEl = document.getElementById('loadingStatus');
+            let step = 0;
+            statusEl.textContent = loadingPhrases[Math.floor(Math.random() * loadingPhrases.length)];
+
+            const interval = setInterval(() => {
+                step++;
+                statusEl.textContent = loadingPhrases[step % loadingPhrases.length];
+            }, 400);
+
+            // Имитируем плавный рандомный подбор (1.2 секунды анимации)
+            setTimeout(() => {
+                clearInterval(interval);
+                
+                const list = gender === 'boys' ? boysImages : girlsImages;
+                currentLookSrc = list[Math.floor(Math.random() * list.length)];
+                currentVibe = funnyVibes[Math.floor(Math.random() * funnyVibes.length)];
+
+                document.getElementById('resultImg').src = currentLookSrc;
+                document.getElementById('vibeText').textContent = currentVibe;
+
+                document.getElementById('screen-loading').classList.add('hidden');
+                document.getElementById('screen-result').classList.remove('hidden');
+            }, 1200);
         }
 
         function resetApp() {
@@ -416,14 +541,9 @@ html_content = '''<!DOCTYPE html>
                     vibe: currentVibe
                 }));
             } else {
-                alert(`Образ выбран!\n\nТекст: "${currentVibe}"\nФайл: ${currentLookSrc}\n\n(В Telegram боте данные отправятся в чат автоматически)`);
+                alert(`Образ успешно сгенерирован!\n\nТекст: "${currentVibe}"\nФайл: ${currentLookSrc}`);
             }
         }
     </script>
 </body>
 </html>
-'''
-
-with open('index.html', 'w', encoding='utf-8') as f:
-    f.write(html_content)
-print("File successfully created!")
