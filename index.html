@@ -38,7 +38,7 @@
             overflow-x: hidden;
         }
 
-        /* Отдельный правый блок для колонки */
+        /* Колонка строго в правом верхнем углу */
         .right-control-box {
             position: fixed;
             top: 20px;
@@ -65,13 +65,13 @@
             transform: scale(0.9);
         }
 
-        /* Бегающая курица (живет в левом верхнем углу, смещается через JS) */
+        /* Курица бегает слева */
         .left-chicken-container {
             position: fixed;
             top: 20px;
             left: 20px;
             z-index: 100;
-            pointer-events: none; /* чтобы контейнер не мешал кликам вне курицы */
+            pointer-events: none;
         }
 
         #chickenBtn {
@@ -383,12 +383,12 @@
     </style>
 </head>
 <body>
-    <!-- Левый контейнер, в котором бегает курица -->
+    <!-- Курица слева -->
     <div class="left-chicken-container">
         <button class="top-icon-btn" id="chickenBtn" onclick="touchChicken()" title="Потрогать курицу">🐔</button>
     </div>
 
-    <!-- Отдельный правый блок для колонки -->
+    <!-- Колонка строго справа -->
     <div class="right-control-box">
         <button class="top-icon-btn" id="musicBtn" onclick="toggleMusic()" title="Музыка">🔇</button>
     </div>
@@ -583,20 +583,17 @@
             }
         }
 
-        // Логика бегающей курицы (от левого края экрана до правого блока с колонкой)
+        // Анимация бега курицы до блока с колонкой
         const chickenBtn = document.getElementById('chickenBtn');
         const chickenAudio = document.getElementById('chickenAudio');
         chickenAudio.volume = 0.4;
 
         let chickenPos = 0;
-        let chickenDirection = 1; // 1 — вправо, -1 — влево
+        let chickenDirection = 1; 
         const chickenSpeed = 1.2;
 
         function updateChickenRun() {
             const musicRect = musicBox.getBoundingClientRect();
-            const chickenRect = chickenBtn.getBoundingClientRect();
-            
-            // Максимальный правый отступ: правый край экрана минус левый отступ контейнера минус ширина курицы и отступ перед колонкой
             const maxRight = musicRect.left - 20 - chickenBtn.offsetWidth - 8;
             const minLeft = 0;
 
@@ -619,7 +616,7 @@
         requestAnimationFrame(updateChickenRun);
 
         function touchChicken() {
-            chickenDirection *= -1; // сменяем направление при клике
+            chickenDirection *= -1; 
 
             chickenBtn.classList.remove('chicken-jump');
             void chickenBtn.offsetWidth;
