@@ -535,8 +535,6 @@
         <button class="top-icon-btn" id="musicBtn" onclick="toggleMusic()" title="Музыка">🔇</button>
     </div>
 
-    <div id="villageToast" class="village-toast">🚜 Трактор заведен, но картошка еще не созрела!</div>
-
     <div class="app-wrapper">
         
         <section id="screen-gender" class="screen active">
@@ -544,12 +542,6 @@
                 <span class="top-badge">#PLMBR 2026 EDITION</span>
                 <h1>ИЗ ГОРОДА<br>В ДЕРЕВНЮ</h1>
             </div>
-            
-            <!-- Счётчик на деревянной плашке -->
-            <div class="wooden-plaque" style="font-size: 0.85rem; padding: 10px; margin-bottom: 18px;">
-                🔥 Собрали луков: <span id="globalCounter">890</span> чел.
-            </div>
-
             <p class="instruction">ВЫБЕРИ СВОЮ КАТЕГОРИЮ</p>
             <div class="choice-container">
                 <button class="choice-btn" onclick="startGeneration('boys')">
@@ -566,7 +558,7 @@
                         <span class="btn-sub">Сельский Гламур</span>
                     </div>
                 </button>
-                <button class="funny-menu-btn" onclick="triggerVillageAction()">
+                <button class="funny-menu-btn" onclick="triggerTractoristSound()">
                     <span class="emoji">🪗</span>
                     <div>
                         <span class="btn-text">ПОЗВАТЬ ТРАКТОРИСТА</span>
@@ -602,10 +594,12 @@
 
     </div>
 
-    <!-- Фоновая музыка: изменена папка и файл на music/dance.mp3 -->
+    <!-- Фоновая музыка -->
     <audio id="bgAudio" src="music/dance.mp3" preload="auto" loop></audio>
     <!-- Звук курицы -->
     <audio id="chickenAudio" src="music/chiken.mp3" preload="auto"></audio>
+    <!-- Аудиоэлемент для тракториста (рандом от 1 до 21) -->
+    <audio id="tractoristAudio" preload="auto"></audio>
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -648,46 +642,6 @@
                 btn.innerHTML = `🍅 БРОСИТЬ ПОМИДОРЫ (<span id="clicksLeft">${left}</span>)`;
             }
         }
-
-        // Таймерный счётчик на деревянной плашке к 18.09.2026
-        function initTimedCounter() {
-            const counterEl = document.getElementById('globalCounter');
-            if (!counterEl) return;
-
-            const startDate = new Date('2026-09-01T00:00:00').getTime();
-            const targetDate = new Date('2026-09-18T18:00:00').getTime();
-            const targetValue = 890;
-
-            function updateCounter() {
-                const now = new Date().getTime();
-                
-                if (now >= targetDate) {
-                    counterEl.textContent = targetValue;
-                    return;
-                }
-
-                if (now <= startDate) {
-                    counterEl.textContent = 100;
-                    return;
-                }
-
-                const totalDuration = targetDate - startDate;
-                const elapsed = now - startDate;
-                const progress = elapsed / totalDuration;
-
-                const startValue = 100;
-                const currentValue = Math.floor(startValue + (targetValue - startValue) * progress);
-                
-                counterEl.textContent = currentValue;
-            }
-
-            updateCounter();
-            setInterval(updateCounter, 1000);
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            initTimedCounter();
-        });
 
         // Логика бега курицы: мгновенный разворот без прыжка + звук
         let chickenX = window.innerWidth / 2;
@@ -809,19 +763,6 @@
             "Блеск в глазах и грязь на кроссовках — классика неувядающего стиля."
         ];
 
-        const villagePhrases = [
-            "🚜 Тракторист дядя Вася ушел в отрыв, ждите до понедельника!",
-            "🪗 Гармонь порвали, трактор заглох в луже у сельского клуба.",
-            "🐓 Петух прокричал тревогу, трактор срочно выехал пахать асфальт!",
-            "🍻 Тракторист занят крайне важным делом за гаражами.",
-            "🌾 Солярка полностью кончилась, все идут пешком до магазина за квасом.",
-            "⚙️ У трактора отвалился мост, механизатор чинит его изолентой и матюками.",
-            "💨 Тракторист завел мотор так громко, что проснулась вся соседняя область.",
-            "🛠️ Трактор снова в поле, а водитель ищет потерянный в пахоте телефон.",
-            "🚜 Дядя Вася поехал за запчастями и пропал в неизвестном направлении на три дня.",
-            "🔥 Трактор дымит сильнее паровоза, зато пашет со скоростью света!"
-        ];
-
         let boysImages = [];
         for (let i = 1; i <= 18; i++) {
             boysImages.push(`boys/look${i}.jpg`);
@@ -842,7 +783,7 @@
             "Заряжаем батарейки трактора..."
         ];
 
-        let currentGender = 'boys'; // Задано по умолчанию, чтобы кнопка «выбрать другой образ» не ломалась
+        let currentGender = 'boys'; 
         let currentLookSrc = '';
 
         function getRandomUniqueLook(list, currentSrc) {
@@ -873,15 +814,13 @@
             }
         }
 
-        function triggerVillageAction() {
-            const toast = document.getElementById('villageToast');
-            const randomPhrase = villagePhrases[Math.floor(Math.random() * villagePhrases.length)];
-            toast.textContent = randomPhrase;
-            
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3500);
+        // Рандомный выбор звука от 1.mp3 до 21.mp3 при нажатии на кнопку тракториста
+        function triggerTractoristSound() {
+            const randomNum = Math.floor(Math.random() * 21) + 1;
+            const tractoristAudio = document.getElementById('tractoristAudio');
+            tractoristAudio.src = `music/${randomNum}.mp3`;
+            tractoristAudio.currentTime = 0;
+            tractoristAudio.play().catch(e => console.log("Звук тракториста заблокирован:", e));
         }
 
         function throwTomatoes(event) {
