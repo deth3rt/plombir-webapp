@@ -36,6 +36,7 @@
             align-items: center;
             padding: 16px;
             overflow-x: hidden;
+            position: relative;
         }
 
         /* Колонка строго в правом верхнем углу */
@@ -88,7 +89,7 @@
 
         @keyframes chickenJumpEffect {
             0% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-10px) scale(1.35) rotate(15deg); }
+            50% { transform: translateY(-12px) scale(1.4) rotate(15deg); }
             100% { transform: translateY(0) scale(1); }
         }
 
@@ -241,6 +242,7 @@
             display: flex;
             flex-direction: column;
             animation: cardPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            position: relative;
         }
 
         @keyframes cardPop {
@@ -262,10 +264,6 @@
             object-fit: cover;
             display: block;
             transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .image-aspect-wrapper:hover img {
-            transform: scale(1.04);
         }
 
         .card-caption-box {
@@ -335,6 +333,31 @@
             transform: scale(0.97);
         }
 
+        /* Кнопка «Бросить помидор» */
+        .tomato-action-btn {
+            width: 100%;
+            background: #ef4444;
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 0.9rem;
+            padding: 14px;
+            border-radius: 16px;
+            border: 2px solid #b91c1c;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tomato-action-btn:active {
+            transform: scale(0.97);
+            background: #dc2626;
+        }
+
         .result-actions {
             width: 100%;
             display: flex;
@@ -379,6 +402,48 @@
             from { opacity: 0.6; }
             to { opacity: 1; }
         }
+
+        /* Сплеты и летящие помидоры */
+        .flying-tomato {
+            position: fixed;
+            font-size: 2.5rem;
+            z-index: 999;
+            pointer-events: none;
+            animation: tomatoFly 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes tomatoFly {
+            0% { transform: scale(0.3) rotate(0deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: scale(1.5) rotate(360deg); opacity: 0; }
+        }
+
+        .splat {
+            position: fixed;
+            font-size: 3.5rem;
+            z-index: 998;
+            pointer-events: none;
+            animation: splatAnim 0.8s ease-out forwards;
+        }
+
+        @keyframes splatAnim {
+            0% { transform: scale(0.2); opacity: 1; }
+            30% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        /* Анимация встряски карточки при попадании */
+        .shake-card {
+            animation: shakeEffect 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shakeEffect {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px) rotate(-2deg); }
+            40% { transform: translateX(8px) rotate(2deg); }
+            60% { transform: translateX(-6px) rotate(-1deg); }
+            80% { transform: translateX(6px) rotate(1deg); }
+        }
     </style>
 </head>
 <body>
@@ -407,14 +472,14 @@
             <p class="instruction">ВЫБЕРИ СВОЮ КАТЕГОРИЮ</p>
             <div class="choice-container">
                 <button class="choice-btn" onclick="startGeneration('boys')">
-                    <span class="emoji">👨‍🎓</span>
+                    <span class="emoji">👨‍🌾</span>
                     <div>
                         <span class="btn-text">ПАРЕНЬ</span>
                         <span class="btn-sub">Спорт-шик х Огород</span>
                     </div>
                 </button>
                 <button class="choice-btn" onclick="startGeneration('girls')">
-                    <span class="emoji">👩‍🎓</span>
+                    <span class="emoji">👩‍🌾</span>
                     <div>
                         <span class="btn-text">ДЕВУШКА</span>
                         <span class="btn-sub">Сельский Гламур</span>
@@ -433,7 +498,7 @@
 
         <!-- ЭКРАН 2: РЕЗУЛЬТАТ -->
         <section id="screen-result" class="screen hidden">
-            <div class="result-card-container">
+            <div class="result-card-container" id="resultCard">
                 <div class="image-aspect-wrapper">
                     <img id="resultImg" src="" alt="Твой лук">
                 </div>
@@ -443,7 +508,8 @@
             </div>
             
             <div class="result-actions">
-                <div class="wooden-plaque">★19.09 | ИЗ ГОРОДА В ДЕРЕВНЮ ★</div>
+                <div class="wooden-plaque">★ PLMBR VIBE STUDIO ★</div>
+                <button class="tomato-action-btn" onclick="throwTomato(event)">🍅 БРОСИТЬ ПОМИДОР</button>
                 <button class="secondary-action-btn" onclick="resetApp()">ВЫБРАТЬ ДРУГОЙ ОБРАЗ</button>
             </div>
         </section>
@@ -582,7 +648,7 @@
             }
         }
 
-        // Движение птицы туда-обратно с сохранением текущей позиции при клике
+        // Идеальное бесшовное движение птицы на месте клика
         const chickenBtn = document.getElementById('chickenBtn');
         const chickenAudio = document.getElementById('chickenAudio');
         chickenAudio.volume = 0.4;
@@ -615,16 +681,84 @@
         requestAnimationFrame(updateChickenRun);
 
         function touchChicken() {
-            chickenDirection *= -1; // Меняем направление на месте
+            // Мгновенно меняем направление бега на противоположное в текущей точке
+            chickenDirection *= -1;
 
+            // Обновляем визуальный поворот сразу, чтобы избежать рывков
+            const scaleX = chickenDirection === 1 ? 1 : -1;
+            chickenBtn.style.transform = `translateX(${chickenPos}px) scaleX(${scaleX})`;
+
+            // Анимация подпрыгивания
             chickenBtn.classList.remove('chicken-jump');
             void chickenBtn.offsetWidth;
             chickenBtn.classList.add('chicken-jump');
 
+            // Воспроизведение звука
             chickenAudio.currentTime = 0;
             chickenAudio.play().catch(e => {
                 console.log("Звук не воспроизвелся:", e);
             });
+        }
+
+        // Анимация броска помидора
+        function throwTomato(event) {
+            const card = document.getElementById('resultCard');
+            const cardRect = card.getBoundingClientRect();
+            
+            // Координаты цели (центр карточки лука)
+            const targetX = cardRect.left + cardRect.width / 2;
+            const targetY = cardRect.top + cardRect.height / 2;
+
+            // Стартовая точка (кнопка помидора)
+            const btnRect = event.target.getBoundingClientRect();
+            const startX = btnRect.left + btnRect.width / 2;
+            const startY = btnRect.top + btnRect.height / 2;
+
+            // Создаем летящий помидор
+            const tomato = document.createElement('div');
+            tomato.className = 'flying-tomato';
+            tomato.textContent = '🍅';
+            tomato.style.left = `${startX - 20}px`;
+            tomato.style.top = `${startY - 20}px`;
+            document.body.appendChild(tomato);
+
+            // Анимация полета через JS ключевые кадры
+            const animation = tomato.animate([
+                { transform: `translate(0, 0) scale(0.5) rotate(0deg)`, opacity: 1 },
+                { transform: `translate(${targetX - startX}px, ${targetY - startY}px) scale(1.2) rotate(360deg)`, opacity: 1 }
+            ], {
+                duration: 350,
+                easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)'
+            });
+
+            animation.onfinish = () => {
+                tomato.remove();
+
+                // Эффект кляксы в месте попадания
+                const splat = document.createElement('div');
+                splat.className = 'splat';
+                splat.textContent = '💥';
+                splat.style.left = `${targetX - 30}px`;
+                splat.style.top = `${targetY - 30}px`;
+                document.body.appendChild(splat);
+                setTimeout(() => splat.remove(), 800);
+
+                // Тряска карточки
+                card.classList.remove('shake-card');
+                void card.offsetWidth;
+                card.classList.add('shake-card');
+
+                // Смена вайба и картинки на новые при попадании
+                setTimeout(() => {
+                    const list = currentGender === 'boys' ? boysImages : girlsImages;
+                    let newImg = list[Math.floor(Math.random() * list.length)];
+                    let newVibe = funnyVibes[Math.floor(Math.random() * funnyVibes.length)];
+
+                    const imgElement = document.getElementById('resultImg');
+                    imgElement.src = newImg;
+                    document.getElementById('vibeText').textContent = newVibe;
+                }, 150);
+            };
         }
 
         function startGeneration(gender) {
