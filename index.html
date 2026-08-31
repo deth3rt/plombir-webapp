@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+# Let's generate the complete single HTML file with light theme, 3x4 aspect ratio card design, 50-100 random hilarious captions, and instant generation without selfie upload.
+html_content = '''<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -8,13 +9,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #121215;
-            --card-bg: #1b1b22;
-            --border-color: #2e2e3a;
-            --accent-green: #c8e66e;
-            --accent-red: #ff4d4d;
-            --text-light: #f5f5f7;
-            --text-muted: #8e8e99;
+            --bg-main: #f4f6f8;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --accent-green: #65a30d;
+            --accent-green-bg: rgba(101, 163, 13, 0.12);
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
         }
 
         * {
@@ -22,11 +23,12 @@
             margin: 0;
             padding: 0;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-main);
-            color: var(--text-light);
+            color: var(--text-dark);
             font-family: 'Montserrat', sans-serif;
             min-height: 100vh;
             display: flex;
@@ -37,7 +39,7 @@
 
         .app-wrapper {
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             display: flex;
             flex-direction: column;
         }
@@ -55,7 +57,7 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
+            from { opacity: 0; transform: translateY(4px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -66,7 +68,7 @@
 
         .top-badge {
             display: inline-block;
-            background: rgba(200, 230, 110, 0.15);
+            background: var(--accent-green-bg);
             color: var(--accent-green);
             font-size: 11px;
             font-weight: 900;
@@ -77,18 +79,11 @@
         }
 
         h1 {
-            font-size: 1.8rem;
+            font-size: 1.7rem;
             font-weight: 900;
-            line-height: 1.1;
-            letter-spacing: 0.5px;
-        }
-
-        h2 {
-            font-size: 1.3rem;
-            font-weight: 900;
-            margin-bottom: 16px;
-            text-align: center;
-            letter-spacing: 0.5px;
+            line-height: 1.15;
+            color: var(--text-dark);
+            letter-spacing: 0.3px;
         }
 
         .instruction {
@@ -119,6 +114,7 @@
             transition: all 0.2s ease;
             text-align: left;
             width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
         }
 
         .choice-btn:active {
@@ -128,16 +124,17 @@
 
         .emoji {
             font-size: 2rem;
-            background: #252530;
+            background: #f8fafc;
             padding: 10px 14px;
             border-radius: 12px;
+            border: 1px solid var(--border-color);
         }
 
         .btn-text {
             display: block;
             font-size: 1.1rem;
             font-weight: 900;
-            color: var(--text-light);
+            color: var(--text-dark);
             margin-bottom: 2px;
         }
 
@@ -148,121 +145,53 @@
             font-weight: 700;
         }
 
-        .upload-desc {
-            font-size: 12px;
-            color: var(--text-muted);
-            text-align: center;
-            margin-bottom: 20px;
-            line-height: 1.4;
-            padding: 0 10px;
-        }
-
-        .file-upload-box {
+        /* 3x4 Aspect Ratio Card Styling for Result */
+        .result-card-container {
             width: 100%;
-            height: 160px;
             background: var(--card-bg);
-            border: 2px dashed var(--border-color);
-            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+            margin-bottom: 16px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            margin-bottom: 20px;
-            transition: border-color 0.2s;
         }
 
-        .file-upload-box input {
-            display: none;
-        }
-
-        #uploadLabelText {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text-light);
-        }
-
-        .preview-avatar-container {
+        .image-aspect-wrapper {
             width: 100%;
-            text-align: center;
-            margin-bottom: 20px;
-            cursor: pointer;
-        }
-
-        #avatarPreviewImg {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--accent-green);
-            margin-bottom: 6px;
-        }
-
-        .change-photo-text {
-            display: block;
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        .loader-spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid var(--border-color);
-            border-top: 4px solid var(--accent-green);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 40px auto 16px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        #loading-status-text {
-            font-size: 12px;
-            color: var(--text-muted);
-            text-align: center;
-            font-weight: 700;
-        }
-
-        .error-banner {
-            background: rgba(255, 77, 77, 0.15);
-            border: 1px solid var(--accent-red);
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            color: #ff9999;
-            text-align: center;
-            margin-bottom: 14px;
-            line-height: 1.4;
-        }
-
-        .canvas-wrapper {
-            width: 100%;
-            max-height: 65vh;
-            border-radius: 16px;
+            aspect-ratio: 3 / 4;
+            background: #e2e8f0;
+            position: relative;
             overflow: hidden;
-            border: 2px solid var(--border-color);
-            margin-bottom: 16px;
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
-        canvas {
+        .image-aspect-wrapper img {
             width: 100%;
-            height: auto;
-            max-height: 65vh;
-            object-fit: contain;
+            height: 100%;
+            object-fit: cover;
             display: block;
+        }
+
+        .card-caption-box {
+            padding: 16px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        #vibeText {
+            font-size: 0.95rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            line-height: 1.4;
+            letter-spacing: -0.2px;
         }
 
         .main-action-btn {
             width: 100%;
             background: var(--accent-green);
-            color: #121215;
+            color: #ffffff;
             font-family: 'Montserrat', sans-serif;
             font-weight: 900;
             font-size: 0.95rem;
@@ -270,29 +199,39 @@
             border-radius: 14px;
             border: none;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(200, 230, 110, 0.2);
+            box-shadow: 0 6px 20px rgba(101, 163, 13, 0.25);
             letter-spacing: 0.5px;
             margin-bottom: 8px;
+            transition: transform 0.1s;
+        }
+
+        .main-action-btn:active {
+            transform: scale(0.98);
         }
 
         .secondary-action-btn {
             width: 100%;
             background: var(--card-bg);
-            color: var(--text-light);
+            color: var(--text-dark);
             font-family: 'Montserrat', sans-serif;
             font-weight: 900;
             font-size: 0.9rem;
             padding: 14px;
             border-radius: 14px;
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--border-color);
             cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .secondary-action-btn:active {
+            background: #f1f5f9;
         }
 
         .result-actions {
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
     </style>
 </head>
@@ -307,54 +246,37 @@
             </div>
             <p class="instruction">ВЫБЕРИ СВОЮ КАТЕГОРИЮ</p>
             <div class="choice-container">
-                <button class="choice-btn" onclick="selectGender('boys')">
+                <button class="choice-btn" onclick="generateLook('boys')">
                     <span class="emoji">🚜</span>
-                    <span class="btn-text">ПАРЕНЬ</span>
-                    <span class="btn-sub">Спорт-шик х Огород</span>
+                    <div>
+                        <span class="btn-text">ПАРЕНЬ</span>
+                        <span class="btn-sub">Спорт-шик х Огород</span>
+                    </div>
                 </button>
-                <button class="choice-btn" onclick="selectGender('girls')">
+                <button class="choice-btn" onclick="generateLook('girls')">
                     <span class="emoji">🌾</span>
-                    <span class="btn-text">ДЕВУШКА</span>
-                    <span class="btn-sub">Сельский Гламур</span>
+                    <div>
+                        <span class="btn-text">ДЕВУШКА</span>
+                        <span class="btn-sub">Сельский Гламур</span>
+                    </div>
                 </button>
             </div>
         </section>
 
-        <!-- ЭКРАН 2: ЗАГРУЗКА СЕЛФИ -->
-        <section id="screen-upload" class="screen hidden">
-            <h2>ТВОЕ ФОТО</h2>
-            <p class="upload-desc">Загрузи селфи, чтобы нейросеть примерила на тебя этот легендарный лук</p>
-            
-            <label class="file-upload-box" id="dropZone">
-                <input type="file" id="selfieInput" accept="image/*" onchange="handleImageUpload(event)">
-                <span id="uploadLabelText">📸 Выбрать или сделать селфи</span>
-            </label>
-
-            <div class="preview-avatar-container hidden" id="avatarPreviewContainer">
-                <img id="avatarPreviewImg" src="" alt="Твое фото">
-                <span class="change-photo-text">Нажми, чтобы сменить фото</span>
-            </div>
-
-            <button id="generateBtn" class="main-action-btn hidden" onclick="startGeneration()">ПРИМЕРИТЬ ЛУК</button>
-        </section>
-
-        <!-- ЭКРАН 3: АНИМАЦИЯ ПРИМЕРКИ -->
-        <section id="screen-loading" class="screen hidden">
-            <div class="loader-spinner"></div>
-            <p id="loading-status-text">Пытаемся натянуть твоё лицо на эскиз...</p>
-        </section>
-
-        <!-- ЭКРАН 4: РЕЗУЛЬТАТ С ОШИБКОЙ И ГОТОВОЙ КАРТИНКОЙ -->
+        <!-- ЭКРАН 2: РЕЗУЛЬТАТ -->
         <section id="screen-result" class="screen hidden">
-            <div class="error-banner">
-                ⚠️ <strong>ОШИБКА НЕЙРОСЕТИ:</strong> Сорян, не смогли натянуть твоё лицо на эскиз! Зато подобрали идеальный готовый образ.
+            <div class="result-card-container">
+                <div class="image-aspect-wrapper">
+                    <img id="resultImg" src="" alt="Твой лук">
+                </div>
+                <div class="card-caption-box">
+                    <p id="vibeText">Загружаем вайб...</p>
+                </div>
             </div>
-            <div class="canvas-wrapper">
-                <canvas id="posterCanvas"></canvas>
-            </div>
+            
             <div class="result-actions">
-                <button class="main-action-btn" onclick="sharePosterToBot()">ПОДЕЛИТЬСЯ В ЧАТЕ</button>
-                <button class="secondary-action-btn" onclick="goToUploadAgain()">ПОПРОБОВАТЬ ЕЩЁ РАЗ</button>
+                <button class="main-action-btn" onclick="shareToTelegram()">ОТПРАВИТЬ В ЧАТ</button>
+                <button class="secondary-action-btn" onclick="resetApp()">ВЫБРАТЬ ДРУГОЙ ОБРАЗ</button>
             </div>
         </section>
 
@@ -364,173 +286,144 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Автоматически генерируем списки для мальчиков от look1 до look18 (можешь миксовать .jpg и .png в папке)
-        const boysImages = [];
-        for (let i = 1; i <= 19; i++) {
-            // Если какие-то файлы PNG, можно заменить расширение здесь или держать их все как .jpg/.png
-            boysImages.push(`boys/look${i}.jpg`); 
+        // 75 уникальных веселых вайб-фраз
+        const funnyVibes = [
+            "В этом луке тебя будут бояться даже местные гуси.",
+            "Стопроцентное попадание в тренды сельской дискотеки 2026 года.",
+            "В таких трениках можно смело идти отжимать семечки у трактористов.",
+            "Соседи по даче начнут здороваться с тобой первыми и шепотом.",
+            "Этот прикид излучает уверенность человека, который сам починил забор.",
+            "В этом костюме ты выглядишь как хозяин всей картошки на районе.",
+            "Стиль истинного барона клубники и укропа.",
+            "Местные собаки перестанут лаять и начнут уважительно кивать.",
+            "В этом наряде ты легко затмишь председателя сельсовета.",
+            "Осторожно: в этом луке повышается риск внезапного сбора урожая.",
+            "Спортивки проверены пахотой, кроссовки заряжены на успех.",
+            "В этом тебя точно возьмут главным на вечерний покос травы.",
+            "Вайб человека, у которого всегда есть изолента и запасной ремень генератора.",
+            "Элегантность доярки высшей категории.",
+            "В таком виде можно смело заходить в местный ларек без очереди.",
+            "Этот лук кричит: «Я контролирую поставки парного молока».",
+            "В этом прикиде ты выглядишь опаснее любого комбайна.",
+            "Прямое попадание в элиту деревецкого подиума.",
+            "В этом образе ты будешь звездой каждого вечернего костра.",
+            "Стиль, от которого у агрономов идут мурашки по коже.",
+            "В таком луке не стыдно и перед кабанами покрасоваться.",
+            "Уровень аутентичности: 100%. Гуси признают в тебе вожака.",
+            "В этом ты будешь самым модным на сенокосе.",
+            "Этот лук создан для побед в номинации «Лучший картофельный барон».",
+            "В этом прикиде можно смело открывать дискотеку в клубе при заводе.",
+            "Спортивная куртка плюс огородный вайб — чисто высокая мода.",
+            "В этом луке ты выглядишь так, будто держишь в страхе всю птицефабрику.",
+            "Эстетика утренней росы и вечернего пива у магазина.",
+            "В этом костюме тебе подчинятся все грядки в радиусе пяти километров.",
+            "Стиль «Свой парень на районе и в поле».",
+            "В таком образе даже бурьян испугается расти на твоем участке.",
+            "Чистокровный деревенский люкс.",
+            "В этом луке ты готов к захвату сельского престола.",
+            "Образ для тех, кто понимает толк в хороших граблях.",
+            "В этом прикиде ты будешь выглядеть внушительнее любого огородного пугала.",
+            "Вайб успешного фермера, выигравшего грант на теплицу.",
+            "В таком виде тебя точно пригласят на закрытую сходку пасечников.",
+            "Этот наряд излучает мощь старого доброго мотоцикла «Урал».",
+            "Стиль: «Вышел из электрички и сразу навел порядок».",
+            "В этом тебя точно зауважают трактористы со стажем.",
+            "Элегантная защита от колорадского жука.",
+            "В этом луке ты выглядишь как человек, у которого всё схвачено на элеваторе.",
+            "В таком костюме можно смело инспектировать чужие огурцы.",
+            "Чистый деревенский гламур без фильтров.",
+            "В этом луке ты непобедим в спорах за лучший урожай моркови.",
+            "Вайб безмятежного лета у бабушки с вай-фаем.",
+            "В таком прикиде можно смело идти на свидание к доярке.",
+            "Этот образ гарантирует стопроцентный успех у местных знатоков парного молока.",
+            "Стиль «Главный по баням и шашлыкам».",
+            "В этом луке ты выглядишь так, будто сам спроектировал этот огород.",
+            "В таком виде тебя без вопросов выберут старостой деревни.",
+            "Элегантный вызов местной моде.",
+            "В этом луке ты будешь неотразим при разгрузке навоза и камаза с дровами.",
+            "Вайб абсолютного превосходства над сорняками.",
+            "В этом костюме ты готов к покорению любых сельских горизонтов.",
+            "Стиль настоящего бати на отдыхе.",
+            "В таком луке тебя испугаются даже самые наглые комары.",
+            "Этот образ подчеркивает твой статус главного эксперта по мангалу.",
+            "В этом ты будешь выглядеть стильно даже по колено в речной грязи.",
+            "Чистая энергия деревенского шика.",
+            "В этом луке ты выглядишь солиднее председателя.",
+            "В таком виде можно смело выходить на тропу войны с кротами.",
+            "Стиль, проверенный временем, дождом и грязью.",
+            "В этом луке ты неотразим, как спелый арбуз в августе.",
+            "Вайб человека, у которого всегда всё растет само.",
+            "В этом прикиде ты будешь самым крутым парнем на деревенском мостике.",
+            "Образ для тех, кто не боится запачкать кроссовки ради стиля.",
+            "В таком виде тебя примут за своего на любой пасеке.",
+            "Стиль истинного властелина лейек и лопат.",
+            "В этом луке ты выглядишь так, будто держишь под контролем весь поселок.",
+            "Элегантный ретро-вайб с акцентом на тяжелый труд и отдых.",
+            "В этом прикиде ты будешь выглядеть опаснее стаи бродячих собак.",
+            "В таком виде тебя точно не заблудят в трех березах.",
+            "Чистокровный сельский шик для уверенных в себе.",
+            "В этом луке ты готов к любым неожиданностям на сельской дороге."
+        ];
+
+        let boysImages = [];
+        for (let i = 1; i <= 18; i++) {
+            boysImages.push(`boys/look${i}.jpg`);
         }
 
-        // Для девочек (пример путей, можешь расширить аналогично до скольки нужно)
-        const girlsImages = [
+        // Примеры путей для девочек (можно расширять)
+        let girlsImages = [
             "girls/look1.jpg",
             "girls/look2.jpg",
             "girls/look3.jpg",
             "girls/look4.png",
-            "girls/look5.png"
+            "girls/look5.png",
+            "girls/look6.jpg"
         ];
 
-        const pregeneratedArts = {
-            boys: boysImages,
-            girls: girlsImages
-        };
+        let currentGender = '';
+        let currentLookSrc = '';
+        let currentVibe = '';
 
-        const loadingPhrases = [
-            "Пытаемся натянуть твоё лицо на эскиз...",
-            "Нейросеть спотыкается о твои сланцы...",
-            "Слишком крутое лицо, калибруем посадку...",
-            "Финальная сборка деревенского лука..."
-        ];
-
-        let selectedGender = '';
-        let userAvatarDataUrl = '';
-        let currentLookId = '';
-        let chosenArtSrc = '';
-
-        function selectGender(gender) {
-            selectedGender = gender;
+        function generateLook(gender) {
+            currentGender = gender;
+            const list = gender === 'boys' ? boysImages : girlsImages;
             
-            // Выбираем случайную картинку из папки репозитория для выбранного пола
-            const artsList = pregeneratedArts[gender];
-            chosenArtSrc = artsList[Math.floor(Math.random() * artsList.length)];
+            // Рандомный выбор лука из папки
+            currentLookSrc = list[Math.floor(Math.random() * list.length)];
+            
+            // Рандомный выбор смешного текста
+            currentVibe = funnyVibes[Math.floor(Math.random() * funnyVibes.length)];
 
+            // Подставляем данные в интерфейс
+            document.getElementById('resultImg').src = currentLookSrc;
+            document.getElementById('vibeText').textContent = currentVibe;
+
+            // Переключаем экраны
             document.getElementById('screen-gender').classList.add('hidden');
-            document.getElementById('screen-upload').classList.remove('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
         }
 
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    userAvatarDataUrl = e.target.result;
-                    document.getElementById('avatarPreviewImg').src = userAvatarDataUrl;
-                    document.getElementById('dropZone').classList.add('hidden');
-                    document.getElementById('avatarPreviewContainer').classList.remove('hidden');
-                    document.getElementById('generateBtn').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        document.getElementById('avatarPreviewContainer').addEventListener('click', () => {
-            document.getElementById('selfieInput').value = '';
-            document.getElementById('dropZone').classList.remove('hidden');
-            document.getElementById('avatarPreviewContainer').classList.add('hidden');
-            document.getElementById('generateBtn').classList.add('hidden');
-        });
-
-        function startGeneration() {
-            document.getElementById('screen-upload').classList.add('hidden');
-            document.getElementById('screen-loading').classList.remove('hidden');
-
-            currentLookId = `PLMBR-${Math.floor(1000 + Math.random() * 9000)}`;
-
-            let step = 0;
-            const statusEl = document.getElementById('loading-status-text');
-            
-            const interval = setInterval(() => {
-                statusEl.textContent = loadingPhrases[step % loadingPhrases.length];
-                step++;
-            }, 800);
-
-            setTimeout(() => {
-                clearInterval(interval);
-                document.getElementById('screen-loading').classList.add('hidden');
-                document.getElementById('screen-result').classList.remove('hidden');
-                renderCanvasPoster();
-            }, 3000);
-        }
-
-        async function renderCanvasPoster() {
-            const canvas = document.getElementById('posterCanvas');
-            const ctx = canvas.getContext('2d');
-
-            // Загружаем твою картинку из репозитория
-            const artImg = new Image();
-            artImg.crossOrigin = "anonymous";
-            artImg.src = chosenArtSrc;
-            
-            await new Promise((resolve) => {
-                artImg.onload = resolve;
-                artImg.onerror = resolve; // Если картинка не найдена, скрипт не упадет
-            });
-
-            // Адаптируем размер холста под реальное разрешение загруженной картинки (чтобы она не сжималась и не мылилась)
-            if (artImg.complete && artImg.naturalWidth !== 0) {
-                canvas.width = artImg.naturalWidth;
-                canvas.height = artImg.naturalHeight;
-                ctx.drawImage(artImg, 0, 0);
-            } else {
-                // Запасной вариант, если файла по какой-то причине нет
-                canvas.width = 1000;
-                canvas.height = 1400;
-                ctx.fillStyle = "#1b1b22";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-
-            // Масштабируем элементы интерфейса (шрифты и отступы) пропорционально размеру картинки
-            const scale = canvas.width / 1000;
-
-            // Брендинг и ID на холсте
-            ctx.fillStyle = "#c8e66e";
-            ctx.font = `900 ${Math.round(44 * scale)}px Montserrat, sans-serif`;
-            ctx.fillText("ПLОМБИР", Math.round(60 * scale), Math.round(95 * scale));
-
-            ctx.fillStyle = "#f5f5f7";
-            ctx.font = `700 ${Math.round(32 * scale)} 'Space Mono', monospace`;
-            ctx.textAlign = "right";
-            ctx.fillText(currentLookId, canvas.width - Math.round(60 * scale), Math.round(95 * scale));
-            ctx.textAlign = "left";
-
-            // Текст PLMBR LOOK сверху
-            ctx.save();
-            ctx.fillStyle = "rgba(200, 230, 110, 0.95)";
-            ctx.font = `900 ${Math.round(32 * scale)}px 'Space Mono', monospace`;
-            ctx.shadowColor = "#000";
-            ctx.shadowBlur = Math.round(12 * scale);
-            ctx.fillText("⚡ PLMBR LOOK ⚡", Math.round(60 * scale), Math.round(160 * scale));
-            ctx.restore();
-
-            // Тонкая рамка по краям
-            ctx.strokeStyle = "#2e2e3a";
-            ctx.lineWidth = Math.round(12 * scale);
-            ctx.strokeRect(0, 0, canvas.width, canvas.height);
-        }
-
-        function goToUploadAgain() {
+        function resetApp() {
             document.getElementById('screen-result').classList.add('hidden');
-            document.getElementById('screen-upload').classList.remove('hidden');
+            document.getElementById('screen-gender').classList.remove('hidden');
         }
 
-        function sharePosterToBot() {
-            const canvas = document.getElementById('posterCanvas');
-            canvas.toBlob(function(blob) {
-                const reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = function() {
-                    const base64data = reader.result;
-                    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                        tg.sendData(JSON.stringify({
-                            look_id: currentLookId,
-                            image: base64data
-                        }));
-                    } else {
-                        alert(`Постер ${currentLookId} успешно сформирован и адаптирован! Отправляется в чат бота.`);
-                    }
-                };
-            }, 'image/png', 0.95);
+        function shareToTelegram() {
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                tg.sendData(JSON.stringify({
+                    gender: currentGender,
+                    image: currentLookSrc,
+                    vibe: currentVibe
+                }));
+            } else {
+                alert(`Образ выбран!\n\nТекст: "${currentVibe}"\nФайл: ${currentLookSrc}\n\n(В Telegram боте данные отправятся в чат автоматически)`);
+            }
         }
     </script>
 </body>
 </html>
+'''
+
+with open('index.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+print("File successfully created!")
