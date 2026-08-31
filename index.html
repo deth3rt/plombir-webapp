@@ -38,6 +38,30 @@
             overflow-x: hidden;
         }
 
+        /* Кнопка управления музыкой в углу */
+        .music-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .music-toggle-btn:active {
+            transform: scale(0.9);
+        }
+
         .app-wrapper {
             width: 100%;
             max-width: 380px;
@@ -235,30 +259,32 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .main-action-btn {
+        /* Стильная деревянная плашка вместо кнопки отправки */
+        .wooden-plaque {
             width: 100%;
-            background: var(--accent-green);
-            color: #ffffff;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 900;
+            background: linear-gradient(135deg, #85522b 0%, #5e371b 100%);
+            border: 3px solid #3c220f;
+            color: #ffebb9;
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
             font-size: 0.95rem;
-            padding: 16px;
-            border-radius: 16px;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 10px 25px -5px rgba(101, 163, 13, 0.4);
-            letter-spacing: 0.5px;
+            padding: 14px;
+            border-radius: 14px;
+            text-align: center;
+            letter-spacing: 2px;
+            box-shadow: inset 0 2px 5px rgba(255,255,255,0.15), 0 8px 20px -4px rgba(94, 55, 27, 0.4);
             margin-bottom: 8px;
-            transition: all 0.2s ease;
+            text-transform: uppercase;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
         }
 
-        .main-action-btn:hover {
-            filter: brightness(1.05);
-        }
-
-        .main-action-btn:active {
-            transform: scale(0.97);
-            box-shadow: 0 5px 15px -3px rgba(101, 163, 13, 0.3);
+        .wooden-plaque::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px);
         }
 
         .secondary-action-btn {
@@ -327,6 +353,10 @@
     </style>
 </head>
 <body>
+    <!-- Кнопка музыки (по умолчанию перечеркнутый динамик) -->
+    <button class="music-toggle-btn" id="musicBtn" onclick="toggleMusic()">🔇</button>
+    <audio id="bgAudio" src="music/dance.mp3" loop></audio>
+
     <div class="app-wrapper">
         
         <!-- ЭКРАН 1: ВЫБОР ПОЛА -->
@@ -354,7 +384,7 @@
             </div>
         </section>
 
-        <!-- ЭКРАН С ЗАГРУЗКОЙ (АНИМАЦИЯ) -->
+        <!-- ЭКРАН С ЗАГРУЗКОЙ -->
         <section id="screen-loading" class="screen hidden">
             <div class="loading-screen">
                 <div class="spinner-box"></div>
@@ -374,7 +404,7 @@
             </div>
             
             <div class="result-actions">
-                <button class="main-action-btn" onclick="shareToTelegram()">ОТПРАВИТЬ В ЧАТ</button>
+                <div class="wooden-plaque">★ PLMBR VIBE STUDIO ★</div>
                 <button class="secondary-action-btn" onclick="resetApp()">ВЫБРАТЬ ДРУГОЙ ОБРАЗ</button>
             </div>
         </section>
@@ -468,14 +498,12 @@
             "В таком виде лучше не появляться в поле — коровы сбегут от зависти."
         ];
 
-        // Мальчики: от look1 до look18 (поддерживают .jpg / .png)
         let boysImages = [];
         for (let i = 1; i <= 18; i++) {
             boysImages.push(`boys/look${i}.jpg`);
             boysImages.push(`boys/look${i}.png`);
         }
 
-        // Девочки: от glook1 до glook20 (поддерживают оба формата .jpg и .png)
         let girlsImages = [];
         for (let i = 1; i <= 20; i++) {
             girlsImages.push(`girl/glook${i}.jpg`);
@@ -493,6 +521,26 @@
         let currentGender = '';
         let currentLookSrc = '';
         let currentVibe = '';
+
+        // Управление музыкой
+        const audio = document.getElementById('bgAudio');
+        const musicBtn = document.getElementById('musicBtn');
+        let isMusicPlaying = false;
+
+        function toggleMusic() {
+            if (isMusicPlaying) {
+                audio.pause();
+                musicBtn.textContent = "🔇";
+                isMusicPlaying = false;
+            } else {
+                audio.play().then(() => {
+                    musicBtn.textContent = "🔊";
+                    isMusicPlaying = true;
+                }).catch(e => {
+                    console.log("Автозапуск заблокирован или файл не найден:", e);
+                });
+            }
+        }
 
         function startGeneration(gender) {
             currentGender = gender;
@@ -519,7 +567,6 @@
                 const imgElement = document.getElementById('resultImg');
                 imgElement.src = currentLookSrc;
                 
-                // Обработка если файл не найден в конкретном расширении (автопереключение на альтернативное)
                 imgElement.onerror = function() {
                     if (currentLookSrc.endsWith('.jpg')) {
                         currentLookSrc = currentLookSrc.replace('.jpg', '.png');
@@ -539,18 +586,6 @@
         function resetApp() {
             document.getElementById('screen-result').classList.add('hidden');
             document.getElementById('screen-gender').classList.remove('hidden');
-        }
-
-        function shareToTelegram() {
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                tg.sendData(JSON.stringify({
-                    gender: currentGender,
-                    image: currentLookSrc,
-                    vibe: currentVibe
-                }));
-            } else {
-                alert(`Образ успешно сгенерирован!\n\nТекст: "${currentVibe}"\nФайл: ${currentLookSrc}`);
-            }
         }
     </script>
 </body>
