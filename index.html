@@ -148,40 +148,6 @@
             font-weight: 700;
         }
 
-        .items-list {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 24px;
-        }
-
-        .item-row {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .item-icon {
-            font-size: 1.4rem;
-        }
-
-        .item-name {
-            font-size: 0.9rem;
-            font-weight: 900;
-            display: block;
-        }
-
-        .item-desc {
-            font-size: 11px;
-            color: var(--text-muted);
-            display: block;
-        }
-
         .upload-desc {
             font-size: 12px;
             color: var(--text-muted);
@@ -260,18 +226,36 @@
             font-weight: 700;
         }
 
+        .error-banner {
+            background: rgba(255, 77, 77, 0.15);
+            border: 1px solid var(--accent-red);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #ff9999;
+            text-align: center;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+
         .canvas-wrapper {
             width: 100%;
+            max-height: 65vh;
             border-radius: 16px;
             overflow: hidden;
             border: 2px solid var(--border-color);
             margin-bottom: 16px;
             background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         canvas {
             width: 100%;
             height: auto;
+            max-height: 65vh;
+            object-fit: contain;
             display: block;
         }
 
@@ -288,6 +272,7 @@
             cursor: pointer;
             box-shadow: 0 6px 20px rgba(200, 230, 110, 0.2);
             letter-spacing: 0.5px;
+            margin-bottom: 8px;
         }
 
         .secondary-action-btn {
@@ -301,19 +286,20 @@
             border-radius: 14px;
             border: 1px solid var(--border-color);
             cursor: pointer;
-            margin-top: 10px;
         }
 
         .result-actions {
             width: 100%;
             display: flex;
             flex-direction: column;
+            gap: 6px;
         }
     </style>
 </head>
 <body>
     <div class="app-wrapper">
         
+        <!-- ЭКРАН 1: ВЫБОР ПОЛА -->
         <section id="screen-gender" class="screen active">
             <div class="header-box">
                 <span class="top-badge">#PLMBR</span>
@@ -334,15 +320,10 @@
             </div>
         </section>
 
-        <section id="screen-preview" class="screen hidden">
-            <h2 id="preview-category-title">ТВОЙ ЛУК</h2>
-            <div class="items-list" id="itemsListContainer"></div>
-            <button class="main-action-btn" onclick="goToPhotoUpload()">ПРИМЕРИТЬ ЭТОТ ОБРАЗ</button>
-        </section>
-
+        <!-- ЭКРАН 2: ЗАГРУЗКА СЕЛФИ -->
         <section id="screen-upload" class="screen hidden">
             <h2>ТВОЕ ФОТО</h2>
-            <p class="upload-desc">Загрузи селфи, чтобы мы внедрили твое лицо в готовый славянский постер</p>
+            <p class="upload-desc">Загрузи селфи, чтобы нейросеть примерила на тебя этот легендарный лук</p>
             
             <label class="file-upload-box" id="dropZone">
                 <input type="file" id="selfieInput" accept="image/*" onchange="handleImageUpload(event)">
@@ -354,21 +335,26 @@
                 <span class="change-photo-text">Нажми, чтобы сменить фото</span>
             </div>
 
-            <button id="generateBtn" class="main-action-btn hidden" onclick="startGenerationProcess()">СОЗДАТЬ ПОСТЕР</button>
+            <button id="generateBtn" class="main-action-btn hidden" onclick="startGeneration()">ПРИМЕРИТЬ ЛУК</button>
         </section>
 
+        <!-- ЭКРАН 3: АНИМАЦИЯ ПРИМЕРКИ -->
         <section id="screen-loading" class="screen hidden">
             <div class="loader-spinner"></div>
-            <p id="loading-status-text">Стряхиваем пыль с олимпийки...</p>
+            <p id="loading-status-text">Пытаемся натянуть твоё лицо на эскиз...</p>
         </section>
 
+        <!-- ЭКРАН 4: РЕЗУЛЬТАТ С ОШИБКОЙ И ГОТОВОЙ КАРТИНКОЙ -->
         <section id="screen-result" class="screen hidden">
+            <div class="error-banner">
+                ⚠️ <strong>ОШИБКА НЕЙРОСЕТИ:</strong> Сорян, не смогли натянуть твоё лицо на эскиз! Зато подобрали идеальный готовый образ.
+            </div>
             <div class="canvas-wrapper">
                 <canvas id="posterCanvas"></canvas>
             </div>
             <div class="result-actions">
-                <button class="main-action-btn" onclick="sendPosterToBot()">ПОДЕЛИТЬСЯ В ЧАТЕ</button>
-                <button class="secondary-action-btn" onclick="resetApp()">ДРУГОЙ ЛУК</button>
+                <button class="main-action-btn" onclick="sharePosterToBot()">ПОДЕЛИТЬСЯ В ЧАТЕ</button>
+                <button class="secondary-action-btn" onclick="goToUploadAgain()">ПОПРОБОВАТЬ ЕЩЁ РАЗ</button>
             </div>
         </section>
 
@@ -378,64 +364,47 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        const database = {
-            boys: {
-                title: "ГОРОДСКОЙ ПАРЕНЬ НА СЕЛЕ",
-                items: [
-                    { icon: "👕", name: "ТЕНЬЯШКА", desc: "классика деревни" },
-                    { icon: "🩳", name: "СПОРТИВНЫЕ ШОРТЫ", desc: "удобно и по-нашему" },
-                    { icon: "👟", name: "БЕЛЫЕ НОСКИ", desc: "с уважением к стилю" },
-                    { icon: "🩴", name: "СЛАНЦЫ", desc: "деревенский вайб" },
-                    { icon: "🧢", name: "БАНДИТСКИЙ КЕРАМИК", desc: "для своих пацанов" },
-                    { icon: "⛓", name: "ЦЕПЬ", desc: "на стиле" }
-                ]
-            },
-            girls: {
-                title: "ДЕРЕВЕНСКИЙ ГЛАМУР",
-                items: [
-                    { icon: "👗", name: "ВИНТАЖНЫЙ САРАФАН", desc: "а-ля рюсс" },
-                    { icon: "👒", name: "СОЛОМЕННАЯ ШЛЯПА", desc: "от солнца и сглаза" },
-                    { icon: "🩴", name: "СЛАНЦЫ С ЦВЕТОЧКАМИ", desc: "люкс" },
-                    { icon: "🕶", name: "ОЧКИ С РЫЦАРСКИМ ОТБЛЕСКОМ", desc: "стиль 90-х" }
-                ]
-            }
+        // Автоматически генерируем списки для мальчиков от look1 до look18 (можешь миксовать .jpg и .png в папке)
+        const boysImages = [];
+        for (let i = 1; i <= 19; i++) {
+            // Если какие-то файлы PNG, можно заменить расширение здесь или держать их все как .jpg/.png
+            boysImages.push(`boys/look${i}.jpg`); 
+        }
+
+        // Для девочек (пример путей, можешь расширить аналогично до скольки нужно)
+        const girlsImages = [
+            "girls/look1.jpg",
+            "girls/look2.jpg",
+            "girls/look3.jpg",
+            "girls/look4.png",
+            "girls/look5.png"
+        ];
+
+        const pregeneratedArts = {
+            boys: boysImages,
+            girls: girlsImages
         };
 
         const loadingPhrases = [
-            "Стряхиваем пыль с олимпийки...",
-            "Проверяем карманы на наличие семечек...",
-            "Натираем сланцы до зеркального блеска...",
-            "Интегрируем славянский вайб в реальность...",
-            "Финальные штрихи подиумного лука..."
+            "Пытаемся натянуть твоё лицо на эскиз...",
+            "Нейросеть спотыкается о твои сланцы...",
+            "Слишком крутое лицо, калибруем посадку...",
+            "Финальная сборка деревенского лука..."
         ];
 
         let selectedGender = '';
-        let currentItems = [];
         let userAvatarDataUrl = '';
         let currentLookId = '';
+        let chosenArtSrc = '';
 
         function selectGender(gender) {
             selectedGender = gender;
-            currentItems = database[gender].items;
+            
+            // Выбираем случайную картинку из папки репозитория для выбранного пола
+            const artsList = pregeneratedArts[gender];
+            chosenArtSrc = artsList[Math.floor(Math.random() * artsList.length)];
 
             document.getElementById('screen-gender').classList.add('hidden');
-            document.getElementById('screen-preview').classList.remove('hidden');
-            document.getElementById('preview-category-title').textContent = database[gender].title;
-
-            const container = document.getElementById('itemsListContainer');
-            container.innerHTML = currentItems.map(item => `
-                <div class="item-row">
-                    <span class="item-icon">${item.icon}</span>
-                    <div class="item-info">
-                        <span class="item-name">${item.name}</span>
-                        <span class="item-desc">${item.desc}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function goToPhotoUpload() {
-            document.getElementById('screen-preview').classList.add('hidden');
             document.getElementById('screen-upload').classList.remove('hidden');
         }
 
@@ -461,7 +430,7 @@
             document.getElementById('generateBtn').classList.add('hidden');
         });
 
-        function startGenerationProcess() {
+        function startGeneration() {
             document.getElementById('screen-upload').classList.add('hidden');
             document.getElementById('screen-loading').classList.remove('hidden');
 
@@ -480,84 +449,71 @@
                 document.getElementById('screen-loading').classList.add('hidden');
                 document.getElementById('screen-result').classList.remove('hidden');
                 renderCanvasPoster();
-            }, 2800);
+            }, 3000);
         }
 
         async function renderCanvasPoster() {
             const canvas = document.getElementById('posterCanvas');
             const ctx = canvas.getContext('2d');
 
-            canvas.width = 1000;
-            canvas.height = 1400;
-
-            ctx.fillStyle = "#121215";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = "#1b1b22";
-            ctx.fillRect(60, 200, 880, 820);
-
-            if (userAvatarDataUrl) {
-                const userImg = new Image();
-                userImg.src = userAvatarDataUrl;
-                await new Promise((resolve) => userImg.onload = resolve);
-                
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(160, 280, 70, 0, Math.PI * 2, true);
-                ctx.closePath();
-                ctx.clip();
-                ctx.drawImage(userImg, 90, 210, 140, 140);
-                ctx.restore();
-
-                ctx.strokeStyle = "#c8e66e";
-                ctx.lineWidth = 6;
-                ctx.beginPath();
-                ctx.arc(160, 280, 70, 0, Math.PI * 2, true);
-                ctx.stroke();
-            }
-
-            ctx.fillStyle = "#c8e66e";
-            ctx.font = "900 42px Montserrat, sans-serif";
-            ctx.fillText("ПLОМБИР", 60, 100);
-
-            ctx.fillStyle = "#8e8e99";
-            ctx.font = "700 20px Montserrat, sans-serif";
-            ctx.fillText("ИЗ ГОРОДА В ДЕРЕВНЮ", 60, 135);
-
-            ctx.fillStyle = "#f5f5f7";
-            ctx.font = "700 32px 'Space Mono', monospace";
-            ctx.textAlign = "right";
-            ctx.fillText(currentLookId, canvas.width - 60, 115);
-            ctx.textAlign = "left";
-
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "900 24px Montserrat, sans-serif";
-            ctx.fillText("ТВОЙ ЛУК:", 60, 1080);
-
-            let startY = 1120;
-            currentItems.forEach(item => {
-                ctx.fillStyle = "#8e8e99";
-                ctx.font = "700 18px 'Space Mono', monospace";
-                ctx.fillText(`• ${item.name} (${item.desc})`, 60, startY);
-                startY += 35;
+            // Загружаем твою картинку из репозитория
+            const artImg = new Image();
+            artImg.crossOrigin = "anonymous";
+            artImg.src = chosenArtSrc;
+            
+            await new Promise((resolve) => {
+                artImg.onload = resolve;
+                artImg.onerror = resolve; // Если картинка не найдена, скрипт не упадет
             });
 
+            // Адаптируем размер холста под реальное разрешение загруженной картинки (чтобы она не сжималась и не мылилась)
+            if (artImg.complete && artImg.naturalWidth !== 0) {
+                canvas.width = artImg.naturalWidth;
+                canvas.height = artImg.naturalHeight;
+                ctx.drawImage(artImg, 0, 0);
+            } else {
+                // Запасной вариант, если файла по какой-то причине нет
+                canvas.width = 1000;
+                canvas.height = 1400;
+                ctx.fillStyle = "#1b1b22";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Масштабируем элементы интерфейса (шрифты и отступы) пропорционально размеру картинки
+            const scale = canvas.width / 1000;
+
+            // Брендинг и ID на холсте
+            ctx.fillStyle = "#c8e66e";
+            ctx.font = `900 ${Math.round(44 * scale)}px Montserrat, sans-serif`;
+            ctx.fillText("ПLОМБИР", Math.round(60 * scale), Math.round(95 * scale));
+
+            ctx.fillStyle = "#f5f5f7";
+            ctx.font = `700 ${Math.round(32 * scale)} 'Space Mono', monospace`;
+            ctx.textAlign = "right";
+            ctx.fillText(currentLookId, canvas.width - Math.round(60 * scale), Math.round(95 * scale));
+            ctx.textAlign = "left";
+
+            // Текст PLMBR LOOK сверху
+            ctx.save();
+            ctx.fillStyle = "rgba(200, 230, 110, 0.95)";
+            ctx.font = `900 ${Math.round(32 * scale)}px 'Space Mono', monospace`;
+            ctx.shadowColor = "#000";
+            ctx.shadowBlur = Math.round(12 * scale);
+            ctx.fillText("⚡ PLMBR LOOK ⚡", Math.round(60 * scale), Math.round(160 * scale));
+            ctx.restore();
+
+            // Тонкая рамка по краям
             ctx.strokeStyle = "#2e2e3a";
-            ctx.lineWidth = 12;
+            ctx.lineWidth = Math.round(12 * scale);
             ctx.strokeRect(0, 0, canvas.width, canvas.height);
         }
 
-        function resetApp() {
+        function goToUploadAgain() {
             document.getElementById('screen-result').classList.add('hidden');
-            document.getElementById('screen-gender').classList.remove('hidden');
-            document.getElementById('selfieInput').value = '';
-            document.getElementById('dropZone').classList.remove('hidden');
-            document.getElementById('avatarPreviewContainer').classList.add('hidden');
-            document.getElementById('generateBtn').classList.add('hidden');
-            userAvatarDataUrl = '';
+            document.getElementById('screen-upload').classList.remove('hidden');
         }
 
-        function sendPosterToBot() {
+        function sharePosterToBot() {
             const canvas = document.getElementById('posterCanvas');
             canvas.toBlob(function(blob) {
                 const reader = new FileReader();
@@ -570,7 +526,7 @@
                             image: base64data
                         }));
                     } else {
-                        alert(`Постер ${currentLookId} успешно сформирован! В Telegram он отправится в чат одной кнопкой.`);
+                        alert(`Постер ${currentLookId} успешно сформирован и адаптирован! Отправляется в чат бота.`);
                     }
                 };
             }, 'image/png', 0.95);
