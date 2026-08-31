@@ -39,6 +39,23 @@
             position: relative;
         }
 
+        /* Бегающая курица сверху */
+        .running-chicken {
+            position: fixed;
+            top: 15px;
+            left: 0;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 101;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: chickenRun 8s linear infinite alternate;
+        }
+
+        @keyframes chickenRun {
+            0% { transform: translateX(-20px) scaleX(1); }
+            100% { transform: translateX(calc(100vw - 40px)) scaleX(1); }
+        }
+
         .right-control-box {
             position: fixed;
             top: 20px;
@@ -202,7 +219,6 @@
             font-weight: 700;
         }
 
-        /* Деревенская кнопка в главном меню */
         .funny-menu-btn {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             border: 2px solid #b45309;
@@ -235,7 +251,6 @@
             border-color: rgba(255, 255, 255, 0.4);
         }
 
-        /* Тост-уведомление для деревенской кнопки */
         .village-toast {
             position: fixed;
             bottom: 30px;
@@ -438,25 +453,45 @@
             to { opacity: 1; }
         }
 
+        /* Улучшенная анимация полета и взрыва помидоров */
         .flying-tomato {
             position: fixed;
-            font-size: 2rem;
+            font-size: 2.2rem;
             z-index: 999;
             pointer-events: none;
+            filter: drop-shadow(0 10px 8px rgba(0,0,0,0.25));
         }
 
         .splat {
             position: fixed;
-            font-size: 2.8rem;
+            font-size: 3.2rem;
             z-index: 998;
             pointer-events: none;
-            animation: splatAnim 0.6s ease-out forwards;
+            animation: advancedSplatAnim 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            filter: drop-shadow(0 5px 5px rgba(239, 68, 68, 0.4));
         }
 
-        @keyframes splatAnim {
-            0% { transform: scale(0.2); opacity: 1; }
-            30% { transform: scale(1.3); opacity: 1; }
-            100% { transform: scale(1); opacity: 0; }
+        @keyframes advancedSplatAnim {
+            0% { transform: scale(0.1) rotate(0deg); opacity: 0; }
+            20% { transform: scale(1.5) rotate(15deg); opacity: 1; }
+            50% { transform: scale(1.1) rotate(-10deg); opacity: 1; }
+            100% { transform: scale(1.3) rotate(0deg); opacity: 0; }
+        }
+
+        .juice-drop {
+            position: fixed;
+            width: 8px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            z-index: 997;
+            pointer-events: none;
+            animation: dropSplash 0.5s ease-out forwards;
+        }
+
+        @keyframes dropSplash {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0.3); opacity: 0; }
         }
 
         .shake-card {
@@ -473,16 +508,17 @@
     </style>
 </head>
 <body>
+    <!-- Бегающая курица -->
+    <div class="running-chicken" id="runningChicken" onclick="hitChicken()">🐔</div>
+
     <div class="right-control-box">
         <button class="top-icon-btn" id="musicBtn" onclick="toggleMusic()" title="Музыка">🔇</button>
     </div>
 
-    <!-- Всплывающее окно для деревенской кнопки -->
     <div id="villageToast" class="village-toast">🚜 Трактор заведен, но картошка еще не созрела!</div>
 
     <div class="app-wrapper">
         
-        <!-- ЭКРАН 1: ВЫБОР ПОЛА И НОВАЯ КНОПКА -->
         <section id="screen-gender" class="screen active">
             <div class="header-box">
                 <span class="top-badge">#PLMBR 2026</span>
@@ -504,7 +540,6 @@
                         <span class="btn-sub">Сельский Гламур</span>
                     </div>
                 </button>
-                <!-- Новая смешная деревенская кнопка -->
                 <button class="funny-menu-btn" onclick="triggerVillageAction()">
                     <span class="emoji">🪗</span>
                     <div>
@@ -515,7 +550,6 @@
             </div>
         </section>
 
-        <!-- ЭКРАН С ЗАГРУЗКОЙ -->
         <section id="screen-loading" class="screen hidden">
             <div class="loading-screen">
                 <div class="spinner-box"></div>
@@ -523,7 +557,6 @@
             </div>
         </section>
 
-        <!-- ЭКРАН 2: РЕЗУЛЬТАТ -->
         <section id="screen-result" class="screen hidden">
             <div class="result-card-container" id="resultCard">
                 <div class="image-aspect-wrapper">
@@ -542,6 +575,8 @@
         </section>
 
     </div>
+
+    <audio id="chickenAudio" src="music/chiken.mp3" preload="auto"></audio>
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -577,7 +612,26 @@
             }
         }
 
-        // Полный массив фраз (полный набор)
+        // Интерактив с курицей
+        let chickenDirection = 1;
+        let chickenPos = 0;
+        const chickenEl = document.getElementById('runningChicken');
+        const chickenAudio = document.getElementById('chickenAudio');
+
+        function hitChicken() {
+            // Звук кудахтанья
+            chickenAudio.currentTime = 0;
+            chickenAudio.play().catch(e => console.log("Аудио курицы заблокировано:", e));
+
+            // Прыжок и разворот
+            chickenEl.style.transform = `translateY(-30px) scaleX(${chickenDirection * -1})`;
+            chickenDirection *= -1;
+
+            setTimeout(() => {
+                chickenEl.style.transform = `translateY(0px) scaleX(${chickenDirection})`;
+            }, 300);
+        }
+
         const funnyVibes = [
             "В этом луке тебя будут бояться даже местные гуси.",
             "Стопроцентное попадание в тренды сельской дискотеки 2026 года.",
@@ -661,6 +715,20 @@
             "В таком виде лучше не появляться в поле — коровы сбегут от зависти."
         ];
 
+        // Расширенные и проверенные фразы про тракториста без ошибок
+        const villagePhrases = [
+            "🚜 Тракторист дядя Вася ушел в отрыв, ждите до понедельника!",
+            "🪗 Гармонь порвали, трактор заглох в луже у сельского клуба.",
+            "🐓 Петух прокричал тревогу, трактор срочно выехал пахать асфальт!",
+            "🍻 Тракторист занят крайне важным делом за гаражами.",
+            "🌾 Солярка полностью кончилась, все идут пешком до магазина за квасом.",
+            "⚙️ У трактора отвалился мост, механизатор чинит его изолентой и матюками.",
+            "💨 Тракторист завел мотор так громко, что проснулась вся соседняя область.",
+            "🛠️ Трактор снова в поле, а водитель ищет потерянный в пахоте телефон.",
+            "🚜 Дядя Вася поехал за запчастями и пропал в неизвестном направлении на три дня.",
+            "🔥 Трактор дымит сильнее паровоза, зато пашет со скоростью света!"
+        ];
+
         let boysImages = [];
         for (let i = 1; i <= 18; i++) {
             boysImages.push(`boys/look${i}.jpg`);
@@ -679,15 +747,6 @@
             "Смешиваем спорт-шик и грядки...",
             "Подбираем самый опасный лук...",
             "Заряжаем батарейки трактора..."
-        ];
-
-        // Массив рандомных реплик для деревенской кнопки
-        const villagePhrases = [
-            "🚜 Тракторист дядя Вася ушел в отрыв, ждите до понедельника!",
-            "🪗 Гармонь порвали, трактор заглох в луже у клуба.",
-            "🐓 Петух прокричал тревогу, трактор выехал пахать асфальт!",
-            "🍻 Тракторист занят важным делом за гаражами.",
-            "🌾 Солярка кончилась, все идут пешком до магазина!"
         ];
 
         let currentGender = '';
@@ -712,7 +771,6 @@
             }
         }
 
-        // Функция для деревенской кнопки на главном экране
         function triggerVillageAction() {
             const toast = document.getElementById('villageToast');
             const randomPhrase = villagePhrases[Math.floor(Math.random() * villagePhrases.length)];
@@ -721,7 +779,7 @@
             toast.classList.add('show');
             setTimeout(() => {
                 toast.classList.remove('show');
-            }, 3000);
+            }, 3500);
         }
 
         function throwTomatoes(event) {
@@ -741,7 +799,7 @@
             const startX = btnRect.left + btnRect.width / 2;
             const startY = btnRect.top + btnRect.height / 2;
 
-            const count = Math.floor(Math.random() * 8) + 5;
+            const count = Math.floor(Math.random() * 6) + 5;
             let finishedCount = 0;
 
             for (let i = 0; i < count; i++) {
@@ -750,7 +808,7 @@
                     tomato.className = 'flying-tomato';
                     tomato.textContent = '🍅';
                     
-                    const offsetX = (Math.random() - 0.5) * 60;
+                    const offsetX = (Math.random() - 0.5) * 50;
                     const offsetY = (Math.random() - 0.5) * 20;
                     tomato.style.left = `${startX + offsetX - 15}px`;
                     tomato.style.top = `${startY + offsetY - 15}px`;
@@ -760,23 +818,38 @@
                     const scatterY = targetY + (Math.random() - 0.5) * (cardRect.height * 0.7);
 
                     const animation = tomato.animate([
-                        { transform: `translate(0, 0) scale(0.4) rotate(0deg)`, opacity: 1 },
-                        { transform: `translate(${scatterX - startX}px, ${scatterY - startY}px) scale(1.3) rotate(${Math.random() * 720}deg)`, opacity: 1 }
+                        { transform: `translate(0, 0) scale(0.5) rotate(0deg)`, opacity: 1 },
+                        { transform: `translate(${scatterX - startX}px, ${scatterY - startY}px) scale(1.4) rotate(${Math.random() * 720}deg)`, opacity: 1 }
                     ], {
-                        duration: 400 + Math.random() * 200,
-                        easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)'
+                        duration: 350 + Math.random() * 150,
+                        easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
                     });
 
                     animation.onfinish = () => {
                         tomato.remove();
 
+                        // Взрыв / Клякса
                         const splat = document.createElement('div');
                         splat.className = 'splat';
                         splat.textContent = '💥';
-                        splat.style.left = `${scatterX - 25}px`;
-                        splat.style.top = `${scatterY - 25}px`;
+                        splat.style.left = `${scatterX - 30}px`;
+                        splat.style.top = `${scatterY - 30}px`;
                         document.body.appendChild(splat);
-                        setTimeout(() => splat.remove(), 600);
+                        setTimeout(() => splat.remove(), 700);
+
+                        // Брызги сока
+                        for (let j = 0; j < 4; j++) {
+                            const drop = document.createElement('div');
+                            drop.className = 'juice-drop';
+                            const angle = Math.random() * Math.PI * 2;
+                            const distance = 20 + Math.random() * 40;
+                            drop.style.setProperty('--tx', `${Math.cos(angle) * distance}px`);
+                            drop.style.setProperty('--ty', `${Math.sin(angle) * distance}px`);
+                            drop.style.left = `${scatterX}px`;
+                            drop.style.top = `${scatterY}px`;
+                            document.body.appendChild(drop);
+                            setTimeout(() => drop.remove(), 500);
+                        }
 
                         finishedCount++;
                         if (finishedCount === count) {
@@ -792,7 +865,7 @@
                             document.getElementById('vibeText').textContent = newVibe;
                         }
                     };
-                }, i * 70);
+                }, i * 60);
             }
         }
 
