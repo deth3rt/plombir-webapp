@@ -39,7 +39,6 @@
             position: relative;
         }
 
-        /* Фоновые плавающие элементы для оживления главного экрана */
         .bg-decor {
             position: fixed;
             font-size: 1.5rem;
@@ -54,7 +53,7 @@
             100% { transform: translateY(-15px) rotate(10deg); }
         }
 
-        /* Динамическая бегающая курица */
+        /* Курица без прыжка, мгновенный разворот */
         .running-chicken {
             position: fixed;
             top: 15px;
@@ -63,7 +62,7 @@
             cursor: pointer;
             z-index: 101;
             transform-origin: center;
-            will-change: transform, left;
+            will-change: left;
         }
 
         .right-control-box {
@@ -470,7 +469,6 @@
             to { opacity: 1; }
         }
 
-        /* Улучшенная анимация полета и супер-взрыва помидоров */
         .flying-tomato {
             position: fixed;
             font-size: 2.2rem;
@@ -526,7 +524,6 @@
     </style>
 </head>
 <body>
-    <!-- Фоновые оживляющие элементы главного экрана -->
     <div class="bg-decor" style="top: 10%; left: 8%;">🌾</div>
     <div class="bg-decor" style="top: 25%; right: 10%; animation-delay: 1s;">🚜</div>
     <div class="bg-decor" style="bottom: 15%; left: 12%; animation-delay: 2s;">🪗</div>
@@ -600,6 +597,9 @@
 
     </div>
 
+    <!-- Фоновая музыка -->
+    <audio id="bgAudio" src="music/music.mp3" preload="auto" loop></audio>
+    <!-- Звук курицы -->
     <audio id="chickenAudio" src="music/chiken.mp3" preload="auto"></audio>
 
     <script>
@@ -644,54 +644,42 @@
             }
         }
 
-        // Продвинутое управление бегом курицы с плавной сменой позиции и направлений
+        // Логика бега курицы: мгновенный разворот без прыжка + звук
         let chickenX = window.innerWidth / 2;
         let chickenSpeed = 1.8;
         let chickenDirection = 1; // 1 - вправо, -1 - влево
         const chickenEl = document.getElementById('runningChicken');
         const chickenAudio = document.getElementById('chickenAudio');
-        let isChickenJumping = false;
 
         function updateChickenLoop() {
-            if (!isChickenJumping) {
-                chickenX += chickenSpeed * chickenDirection;
-                const maxX = window.innerWidth - 50;
-                
-                if (chickenX >= maxX) {
-                    chickenX = maxX;
-                    chickenDirection = -1;
-                } else if (chickenX <= 0) {
-                    chickenX = 0;
-                    chickenDirection = 1;
-                }
+            chickenX += chickenSpeed * chickenDirection;
+            const maxX = window.innerWidth - 50;
+            
+            if (chickenX >= maxX) {
+                chickenX = maxX;
+                chickenDirection = -1;
+            } else if (chickenX <= 0) {
+                chickenX = 0;
+                chickenDirection = 1;
             }
             
-            // Отрисовка с учетом направления (исправление разворота)
             const scaleX = chickenDirection === 1 ? -1 : 1;
             chickenEl.style.left = `${chickenX}px`;
-            chickenEl.style.transform = isChickenJumping ? `translateY(-40px) scaleX(${scaleX}) rotate(15deg)` : `translateY(0px) scaleX(${scaleX}) rotate(0deg)`;
+            chickenEl.style.transform = `scaleX(${scaleX})`;
             
             requestAnimationFrame(updateChickenLoop);
         }
         requestAnimationFrame(updateChickenLoop);
 
         function hitChicken() {
-            if (isChickenJumping) return;
-            isChickenJumping = true;
-
             // Звук кудахтанья
             chickenAudio.currentTime = 0;
             chickenAudio.play().catch(e => console.log("Аудио курицы заблокировано:", e));
 
-            // Резкая смена направления бега при клике
+            // Мгновенная смена направления в противоположную сторону без анимаций прыжка
             chickenDirection *= -1;
-
-            setTimeout(() => {
-                isChickenJumping = false;
-            }, 350);
         }
 
-        // Увеличенный пул веселых и точных фраз для образов
         const funnyVibes = [
             "В этом луке тебя будут бояться даже местные гуси.",
             "Стопроцентное попадание в тренды сельской дискотеки 2026 года.",
@@ -779,7 +767,6 @@
             "Блеск в глазах и грязь на кроссовках — классика неувядающего стиля."
         ];
 
-        // Проверенные фразы про тракториста
         const villagePhrases = [
             "🚜 Тракторист дядя Вася ушел в отрыв, ждите до понедельника!",
             "🪗 Гармонь порвали, трактор заглох в луже у сельского клуба.",
@@ -815,6 +802,16 @@
 
         let currentGender = '';
         let currentLookSrc = '';
+
+        // Функция исключения повторения луков подряд
+        function getRandomUniqueLook(list, currentSrc) {
+            if (!list || list.length === 0) return '';
+            if (list.length === 1) return list[0];
+            
+            let filtered = list.filter(item => item !== currentSrc);
+            let randomIndex = Math.floor(Math.random() * filtered.length);
+            return filtered[randomIndex];
+        }
 
         const audio = document.getElementById('bgAudio');
         const musicBtn = document.getElementById('musicBtn');
@@ -892,7 +889,6 @@
                     animation.onfinish = () => {
                         tomato.remove();
 
-                        // Красивый взрыв / Клякса
                         const splat = document.createElement('div');
                         splat.className = 'splat';
                         splat.textContent = '💥';
@@ -901,7 +897,6 @@
                         document.body.appendChild(splat);
                         setTimeout(() => splat.remove(), 700);
 
-                        // Разлет брызг сока
                         for (let j = 0; j < 5; j++) {
                             const drop = document.createElement('div');
                             drop.className = 'juice-drop';
@@ -922,10 +917,11 @@
                             card.classList.add('shake-card');
 
                             const list = currentGender === 'boys' ? boysImages : girlsImages;
-                            let newImg = list[Math.floor(Math.random() * list.length)];
+                            // Берем новый образ без повторения текущего
+                            currentLookSrc = getRandomUniqueLook(list, currentLookSrc);
                             let newVibe = funnyVibes[Math.floor(Math.random() * funnyVibes.length)];
 
-                            document.getElementById('resultImg').src = newImg;
+                            document.getElementById('resultImg').src = currentLookSrc;
                             document.getElementById('vibeText').textContent = newVibe;
                         }
                     };
@@ -952,7 +948,7 @@
                 clearInterval(interval);
                 
                 const list = gender === 'boys' ? boysImages : girlsImages;
-                currentLookSrc = list[Math.floor(Math.random() * list.length)];
+                currentLookSrc = getRandomUniqueLook(list, currentLookSrc);
                 let currentVibe = funnyVibes[Math.floor(Math.random() * funnyVibes.length)];
 
                 const imgElement = document.getElementById('resultImg');
@@ -976,7 +972,6 @@
         }
 
         function resetApp() {
-            // Сбрасываем лимит помидоров при возврате на главный экран
             resetTomatoLimit();
 
             document.getElementById('screen-result').classList.add('hidden');
