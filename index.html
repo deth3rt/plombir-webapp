@@ -65,7 +65,7 @@
             transform: scale(0.9);
         }
 
-        /* Курица бегает слева */
+        /* Бегающая птица слева */
         .left-chicken-container {
             position: fixed;
             top: 20px;
@@ -80,7 +80,6 @@
             left: 0;
             top: 0;
             will-change: transform;
-            transition: transform 0.15s ease;
         }
 
         .chicken-jump {
@@ -88,9 +87,9 @@
         }
 
         @keyframes chickenJumpEffect {
-            0% { transform: scale(1) translateY(0); }
-            50% { transform: scale(1.35) translateY(-8px) rotate(15deg); }
-            100% { transform: scale(1) translateY(0); }
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.35) rotate(15deg); }
+            100% { transform: translateY(0) scale(1); }
         }
 
         .app-wrapper {
@@ -383,9 +382,9 @@
     </style>
 </head>
 <body>
-    <!-- Курица слева -->
+    <!-- Птица слева -->
     <div class="left-chicken-container">
-        <button class="top-icon-btn" id="chickenBtn" onclick="touchChicken()" title="Потрогать курицу">🐔</button>
+        <button class="top-icon-btn" id="chickenBtn" onclick="touchChicken()" title="Потрогать индейку">🦃</button>
     </div>
 
     <!-- Колонка строго справа -->
@@ -408,14 +407,14 @@
             <p class="instruction">ВЫБЕРИ СВОЮ КАТЕГОРИЮ</p>
             <div class="choice-container">
                 <button class="choice-btn" onclick="startGeneration('boys')">
-                    <span class="emoji">🚜</span>
+                    <span class="emoji">👨‍🎓</span>
                     <div>
                         <span class="btn-text">ПАРЕНЬ</span>
                         <span class="btn-sub">Спорт-шик х Огород</span>
                     </div>
                 </button>
                 <button class="choice-btn" onclick="startGeneration('girls')">
-                    <span class="emoji">🌾</span>
+                    <span class="emoji">👩‍🎓</span>
                     <div>
                         <span class="btn-text">ДЕВУШКА</span>
                         <span class="btn-sub">Сельский Гламур</span>
@@ -444,7 +443,7 @@
             </div>
             
             <div class="result-actions">
-                <div class="wooden-plaque">★ PLMBR VIBE STUDIO ★</div>
+                <div class="wooden-plaque">★19.09 | ИЗ ГОРОДА В ДЕРЕВНЮ ★</div>
                 <button class="secondary-action-btn" onclick="resetApp()">ВЫБРАТЬ ДРУГОЙ ОБРАЗ</button>
             </div>
         </section>
@@ -583,7 +582,7 @@
             }
         }
 
-        // Анимация бега курицы до блока с колонкой
+        // Движение птицы туда-обратно с сохранением текущей позиции при клике
         const chickenBtn = document.getElementById('chickenBtn');
         const chickenAudio = document.getElementById('chickenAudio');
         chickenAudio.volume = 0.4;
@@ -616,7 +615,7 @@
         requestAnimationFrame(updateChickenRun);
 
         function touchChicken() {
-            chickenDirection *= -1; 
+            chickenDirection *= -1; // Меняем направление на месте
 
             chickenBtn.classList.remove('chicken-jump');
             void chickenBtn.offsetWidth;
@@ -624,7 +623,7 @@
 
             chickenAudio.currentTime = 0;
             chickenAudio.play().catch(e => {
-                console.log("Звук курицы не воспроизвелся:", e);
+                console.log("Звук не воспроизвелся:", e);
             });
         }
 
