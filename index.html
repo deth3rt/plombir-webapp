@@ -39,7 +39,6 @@
             position: relative;
         }
 
-        /* Колонка строго в правом верхнем углу */
         .right-control-box {
             position: fixed;
             top: 20px;
@@ -64,33 +63,6 @@
 
         .top-icon-btn:active {
             transform: scale(0.9);
-        }
-
-        /* Бегающая птица слева */
-        .left-chicken-container {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
-            pointer-events: none;
-        }
-
-        #chickenBtn {
-            pointer-events: auto;
-            position: absolute;
-            left: 0;
-            top: 0;
-            will-change: transform;
-        }
-
-        .chicken-jump {
-            animation: chickenJumpEffect 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes chickenJumpEffect {
-            0% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-12px) scale(1.4) rotate(15deg); }
-            100% { transform: translateY(0) scale(1); }
         }
 
         .app-wrapper {
@@ -120,7 +92,7 @@
 
         .header-box {
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             animation: floatHeader 4s ease-in-out infinite;
         }
 
@@ -155,7 +127,7 @@
             font-weight: 800;
             color: var(--text-muted);
             letter-spacing: 1.2px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             text-align: center;
             text-transform: uppercase;
         }
@@ -163,7 +135,7 @@
         .choice-container {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
             width: 100%;
         }
 
@@ -171,7 +143,7 @@
             background: var(--card-bg);
             border: 2px solid var(--border-color);
             border-radius: 20px;
-            padding: 22px 20px;
+            padding: 18px 20px;
             display: flex;
             align-items: center;
             gap: 16px;
@@ -203,9 +175,9 @@
         }
 
         .emoji {
-            font-size: 2.2rem;
+            font-size: 2rem;
             background: #f8fafc;
-            padding: 12px 16px;
+            padding: 10px 14px;
             border-radius: 14px;
             border: 1px solid var(--border-color);
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -217,10 +189,10 @@
 
         .btn-text {
             display: block;
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 900;
             color: var(--text-dark);
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
 
         .btn-sub {
@@ -228,6 +200,63 @@
             font-size: 11px;
             color: var(--text-muted);
             font-weight: 700;
+        }
+
+        /* Деревенская кнопка в главном меню */
+        .funny-menu-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border: 2px solid #b45309;
+            color: #ffffff;
+            border-radius: 20px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            width: 100%;
+            box-shadow: 0 10px 20px -5px rgba(217, 119, 6, 0.3);
+            position: relative;
+        }
+
+        .funny-menu-btn:active {
+            transform: scale(0.97);
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+        }
+
+        .funny-menu-btn .btn-text,
+        .funny-menu-btn .btn-sub {
+            color: #ffffff;
+        }
+
+        .funny-menu-btn .emoji {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Тост-уведомление для деревенской кнопки */
+        .village-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #0f172a;
+            color: #ffebb9;
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 2px solid #d97706;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        .village-toast.show {
+            transform: translateX(-50%) translateY(0);
         }
 
         .result-card-container {
@@ -333,7 +362,6 @@
             transform: scale(0.97);
         }
 
-        /* Кнопка «Бросить помидор» */
         .tomato-action-btn {
             width: 100%;
             background: #ef4444;
@@ -356,6 +384,13 @@
         .tomato-action-btn:active {
             transform: scale(0.97);
             background: #dc2626;
+        }
+
+        .tomato-action-btn:disabled {
+            background: #cbd5e1;
+            border-color: #94a3b8;
+            box-shadow: none;
+            cursor: not-allowed;
         }
 
         .result-actions {
@@ -403,27 +438,19 @@
             to { opacity: 1; }
         }
 
-        /* Сплеты и летящие помидоры */
         .flying-tomato {
             position: fixed;
-            font-size: 2.5rem;
+            font-size: 2rem;
             z-index: 999;
             pointer-events: none;
-            animation: tomatoFly 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-        }
-
-        @keyframes tomatoFly {
-            0% { transform: scale(0.3) rotate(0deg); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: scale(1.5) rotate(360deg); opacity: 0; }
         }
 
         .splat {
             position: fixed;
-            font-size: 3.5rem;
+            font-size: 2.8rem;
             z-index: 998;
             pointer-events: none;
-            animation: splatAnim 0.8s ease-out forwards;
+            animation: splatAnim 0.6s ease-out forwards;
         }
 
         @keyframes splatAnim {
@@ -432,7 +459,6 @@
             100% { transform: scale(1); opacity: 0; }
         }
 
-        /* Анимация встряски карточки при попадании */
         .shake-card {
             animation: shakeEffect 0.4s cubic-bezier(.36,.07,.19,.97) both;
         }
@@ -447,23 +473,16 @@
     </style>
 </head>
 <body>
-    <!-- Птица слева -->
-    <div class="left-chicken-container">
-        <button class="top-icon-btn" id="chickenBtn" onclick="touchChicken()" title="Потрогать индейку">🦃</button>
-    </div>
-
-    <!-- Колонка строго справа -->
     <div class="right-control-box">
         <button class="top-icon-btn" id="musicBtn" onclick="toggleMusic()" title="Музыка">🔇</button>
     </div>
 
-    <!-- Аудио элементы -->
-    <audio id="bgAudio" src="music/dance.mp3" loop></audio>
-    <audio id="chickenAudio" src="music/chiken.mp3"></audio>
+    <!-- Всплывающее окно для деревенской кнопки -->
+    <div id="villageToast" class="village-toast">🚜 Трактор заведен, но картошка еще не созрела!</div>
 
     <div class="app-wrapper">
         
-        <!-- ЭКРАН 1: ВЫБОР ПОЛА -->
+        <!-- ЭКРАН 1: ВЫБОР ПОЛА И НОВАЯ КНОПКА -->
         <section id="screen-gender" class="screen active">
             <div class="header-box">
                 <span class="top-badge">#PLMBR 2026</span>
@@ -472,17 +491,25 @@
             <p class="instruction">ВЫБЕРИ СВОЮ КАТЕГОРИЮ</p>
             <div class="choice-container">
                 <button class="choice-btn" onclick="startGeneration('boys')">
-                    <span class="emoji">👨‍🌾</span>
+                    <span class="emoji">🚜</span>
                     <div>
                         <span class="btn-text">ПАРЕНЬ</span>
                         <span class="btn-sub">Спорт-шик х Огород</span>
                     </div>
                 </button>
                 <button class="choice-btn" onclick="startGeneration('girls')">
-                    <span class="emoji">👩‍🌾</span>
+                    <span class="emoji">🌾</span>
                     <div>
                         <span class="btn-text">ДЕВУШКА</span>
                         <span class="btn-sub">Сельский Гламур</span>
+                    </div>
+                </button>
+                <!-- Новая смешная деревенская кнопка -->
+                <button class="funny-menu-btn" onclick="triggerVillageAction()">
+                    <span class="emoji">🪗</span>
+                    <div>
+                        <span class="btn-text">ПОЗВАТЬ ТРАКТОРИСТА</span>
+                        <span class="btn-sub">Срочная помощь бате с похмелья</span>
                     </div>
                 </button>
             </div>
@@ -509,7 +536,7 @@
             
             <div class="result-actions">
                 <div class="wooden-plaque">★ PLMBR VIBE STUDIO ★</div>
-                <button class="tomato-action-btn" onclick="throwTomato(event)">🍅 БРОСИТЬ ПОМИДОР</button>
+                <button class="tomato-action-btn" id="tomatoBtn" onclick="throwTomatoes(event)">🍅 БРОСИТЬ ПОМИДОРЫ (<span id="clicksLeft">10</span>)</button>
                 <button class="secondary-action-btn" onclick="resetApp()">ВЫБРАТЬ ДРУГОЙ ОБРАЗ</button>
             </div>
         </section>
@@ -520,6 +547,37 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
+        const IP_LIMIT_KEY = 'plmbr_tomato_clicks_ip';
+        const MAX_CLICKS = 10;
+
+        function getRemainingClicks() {
+            let data = JSON.parse(localStorage.getItem(IP_LIMIT_KEY));
+            if (!data) {
+                data = { count: 0 };
+                localStorage.setItem(IP_LIMIT_KEY, JSON.stringify(data));
+            }
+            return MAX_CLICKS - data.count;
+        }
+
+        function useClick() {
+            let data = JSON.parse(localStorage.getItem(IP_LIMIT_KEY)) || { count: 0 };
+            data.count += 1;
+            localStorage.setItem(IP_LIMIT_KEY, JSON.stringify(data));
+            return MAX_CLICKS - data.count;
+        }
+
+        function updateTomatoButtonState() {
+            const left = getRemainingClicks();
+            const btn = document.getElementById('tomatoBtn');
+            const span = document.getElementById('clicksLeft');
+            span.textContent = left;
+            if (left <= 0) {
+                btn.disabled = true;
+                btn.textContent = "🍅 ЛИМИТ ПОМИДОРОВ ИСЧЕРПАН";
+            }
+        }
+
+        // Полный массив фраз (полный набор)
         const funnyVibes = [
             "В этом луке тебя будут бояться даже местные гуси.",
             "Стопроцентное попадание в тренды сельской дискотеки 2026 года.",
@@ -623,13 +681,19 @@
             "Заряжаем батарейки трактора..."
         ];
 
+        // Массив рандомных реплик для деревенской кнопки
+        const villagePhrases = [
+            "🚜 Тракторист дядя Вася ушел в отрыв, ждите до понедельника!",
+            "🪗 Гармонь порвали, трактор заглох в луже у клуба.",
+            "🐓 Петух прокричал тревогу, трактор выехал пахать асфальт!",
+            "🍻 Тракторист занят важным делом за гаражами.",
+            "🌾 Солярка кончилась, все идут пешком до магазина!"
+        ];
+
         let currentGender = '';
         let currentLookSrc = '';
-        let currentVibe = '';
 
-        // Музыка
         const audio = document.getElementById('bgAudio');
-        const musicBox = document.querySelector('.right-control-box');
         const musicBtn = document.getElementById('musicBtn');
         let isMusicPlaying = false;
 
@@ -648,117 +712,88 @@
             }
         }
 
-        // Идеальное бесшовное движение птицы на месте клика
-        const chickenBtn = document.getElementById('chickenBtn');
-        const chickenAudio = document.getElementById('chickenAudio');
-        chickenAudio.volume = 0.4;
-
-        let chickenPos = 0;
-        let chickenDirection = 1; 
-        const chickenSpeed = 1.2;
-
-        function updateChickenRun() {
-            const musicRect = musicBox.getBoundingClientRect();
-            const maxRight = musicRect.left - 20 - chickenBtn.offsetWidth - 8;
-            const minLeft = 0;
-
-            chickenPos += chickenSpeed * chickenDirection;
-
-            if (chickenPos >= maxRight) {
-                chickenPos = maxRight;
-                chickenDirection = -1;
-            } else if (chickenPos <= minLeft) {
-                chickenPos = minLeft;
-                chickenDirection = 1;
-            }
-
-            const scaleX = chickenDirection === 1 ? 1 : -1;
-            chickenBtn.style.transform = `translateX(${chickenPos}px) scaleX(${scaleX})`;
-
-            requestAnimationFrame(updateChickenRun);
+        // Функция для деревенской кнопки на главном экране
+        function triggerVillageAction() {
+            const toast = document.getElementById('villageToast');
+            const randomPhrase = villagePhrases[Math.floor(Math.random() * villagePhrases.length)];
+            toast.textContent = randomPhrase;
+            
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
 
-        requestAnimationFrame(updateChickenRun);
+        function throwTomatoes(event) {
+            const remaining = getRemainingClicks();
+            if (remaining <= 0) return;
 
-        function touchChicken() {
-            // Мгновенно меняем направление бега на противоположное в текущей точке
-            chickenDirection *= -1;
+            useClick();
+            updateTomatoButtonState();
 
-            // Обновляем визуальный поворот сразу, чтобы избежать рывков
-            const scaleX = chickenDirection === 1 ? 1 : -1;
-            chickenBtn.style.transform = `translateX(${chickenPos}px) scaleX(${scaleX})`;
-
-            // Анимация подпрыгивания
-            chickenBtn.classList.remove('chicken-jump');
-            void chickenBtn.offsetWidth;
-            chickenBtn.classList.add('chicken-jump');
-
-            // Воспроизведение звука
-            chickenAudio.currentTime = 0;
-            chickenAudio.play().catch(e => {
-                console.log("Звук не воспроизвелся:", e);
-            });
-        }
-
-        // Анимация броска помидора
-        function throwTomato(event) {
             const card = document.getElementById('resultCard');
             const cardRect = card.getBoundingClientRect();
             
-            // Координаты цели (центр карточки лука)
             const targetX = cardRect.left + cardRect.width / 2;
             const targetY = cardRect.top + cardRect.height / 2;
 
-            // Стартовая точка (кнопка помидора)
             const btnRect = event.target.getBoundingClientRect();
             const startX = btnRect.left + btnRect.width / 2;
             const startY = btnRect.top + btnRect.height / 2;
 
-            // Создаем летящий помидор
-            const tomato = document.createElement('div');
-            tomato.className = 'flying-tomato';
-            tomato.textContent = '🍅';
-            tomato.style.left = `${startX - 20}px`;
-            tomato.style.top = `${startY - 20}px`;
-            document.body.appendChild(tomato);
+            const count = Math.floor(Math.random() * 8) + 5;
+            let finishedCount = 0;
 
-            // Анимация полета через JS ключевые кадры
-            const animation = tomato.animate([
-                { transform: `translate(0, 0) scale(0.5) rotate(0deg)`, opacity: 1 },
-                { transform: `translate(${targetX - startX}px, ${targetY - startY}px) scale(1.2) rotate(360deg)`, opacity: 1 }
-            ], {
-                duration: 350,
-                easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)'
-            });
-
-            animation.onfinish = () => {
-                tomato.remove();
-
-                // Эффект кляксы в месте попадания
-                const splat = document.createElement('div');
-                splat.className = 'splat';
-                splat.textContent = '💥';
-                splat.style.left = `${targetX - 30}px`;
-                splat.style.top = `${targetY - 30}px`;
-                document.body.appendChild(splat);
-                setTimeout(() => splat.remove(), 800);
-
-                // Тряска карточки
-                card.classList.remove('shake-card');
-                void card.offsetWidth;
-                card.classList.add('shake-card');
-
-                // Смена вайба и картинки на новые при попадании
+            for (let i = 0; i < count; i++) {
                 setTimeout(() => {
-                    const list = currentGender === 'boys' ? boysImages : girlsImages;
-                    let newImg = list[Math.floor(Math.random() * list.length)];
-                    let newVibe = funnyVibes[Math.floor(Math.random() * funnyVibes.length)];
+                    const tomato = document.createElement('div');
+                    tomato.className = 'flying-tomato';
+                    tomato.textContent = '🍅';
+                    
+                    const offsetX = (Math.random() - 0.5) * 60;
+                    const offsetY = (Math.random() - 0.5) * 20;
+                    tomato.style.left = `${startX + offsetX - 15}px`;
+                    tomato.style.top = `${startY + offsetY - 15}px`;
+                    document.body.appendChild(tomato);
 
-                    const imgElement = document.getElementById('resultImg');
-                    imgElement.src = newImg;
-                    document.getElementById('vibeText').textContent = newVibe;
-                }, 150);
-            };
+                    const scatterX = targetX + (Math.random() - 0.5) * (cardRect.width * 0.7);
+                    const scatterY = targetY + (Math.random() - 0.5) * (cardRect.height * 0.7);
+
+                    const animation = tomato.animate([
+                        { transform: `translate(0, 0) scale(0.4) rotate(0deg)`, opacity: 1 },
+                        { transform: `translate(${scatterX - startX}px, ${scatterY - startY}px) scale(1.3) rotate(${Math.random() * 720}deg)`, opacity: 1 }
+                    ], {
+                        duration: 400 + Math.random() * 200,
+                        easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)'
+                    });
+
+                    animation.onfinish = () => {
+                        tomato.remove();
+
+                        const splat = document.createElement('div');
+                        splat.className = 'splat';
+                        splat.textContent = '💥';
+                        splat.style.left = `${scatterX - 25}px`;
+                        splat.style.top = `${scatterY - 25}px`;
+                        document.body.appendChild(splat);
+                        setTimeout(() => splat.remove(), 600);
+
+                        finishedCount++;
+                        if (finishedCount === count) {
+                            card.classList.remove('shake-card');
+                            void card.offsetWidth;
+                            card.classList.add('shake-card');
+
+                            const list = currentGender === 'boys' ? boysImages : girlsImages;
+                            let newImg = list[Math.floor(Math.random() * list.length)];
+                            let newVibe = funnyVibes[Math.floor(Math.random() * funnyVibes.length)];
+
+                            document.getElementById('resultImg').src = newImg;
+                            document.getElementById('vibeText').textContent = newVibe;
+                        }
+                    };
+                }, i * 70);
+            }
         }
 
         function startGeneration(gender) {
@@ -781,7 +816,7 @@
                 
                 const list = gender === 'boys' ? boysImages : girlsImages;
                 currentLookSrc = list[Math.floor(Math.random() * list.length)];
-                currentVibe = funnyVibes[Math.floor(Math.random() * funnyVibes.length)];
+                let currentVibe = funnyVibes[Math.floor(Math.random() * funnyVibes.length)];
 
                 const imgElement = document.getElementById('resultImg');
                 imgElement.src = currentLookSrc;
@@ -796,6 +831,7 @@
                 };
 
                 document.getElementById('vibeText').textContent = currentVibe;
+                updateTomatoButtonState();
 
                 document.getElementById('screen-loading').classList.add('hidden');
                 document.getElementById('screen-result').classList.remove('hidden');
