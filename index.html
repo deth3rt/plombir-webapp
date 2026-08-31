@@ -175,7 +175,6 @@
             font-weight: 700;
         }
 
-        /* Уменьшенный контейнер под 3x4 картинки со стильной тенью */
         .result-card-container {
             width: 82%;
             max-width: 290px;
@@ -288,7 +287,6 @@
             gap: 8px;
         }
 
-        /* Экран рандомной загрузки / анимации */
         .loading-screen {
             display: flex;
             flex-direction: column;
@@ -387,7 +385,6 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // 80 уникальных рандомных вайб-фраз
         const funnyVibes = [
             "В этом луке тебя будут бояться даже местные гуси.",
             "Стопроцентное попадание в тренды сельской дискотеки 2026 года.",
@@ -471,16 +468,18 @@
             "В таком виде лучше не появляться в поле — коровы сбегут от зависти."
         ];
 
-        // Мальчики: от look1 до look18
+        // Мальчики: от look1 до look18 (поддерживают .jpg / .png)
         let boysImages = [];
-        for (let i = 1; i <= 19; i++) {
+        for (let i = 1; i <= 18; i++) {
             boysImages.push(`boys/look${i}.jpg`);
+            boysImages.push(`boys/look${i}.png`);
         }
 
-        // Девочки: от glook1 до glook20 (поддерживаем разные форматы или дефолтные расширения, сделаем универсально или через .jpg/.png)
+        // Девочки: от glook1 до glook20 (поддерживают оба формата .jpg и .png)
         let girlsImages = [];
         for (let i = 1; i <= 20; i++) {
             girlsImages.push(`girl/glook${i}.jpg`);
+            girlsImages.push(`girl/glook${i}.png`);
         }
 
         const loadingPhrases = [
@@ -498,11 +497,9 @@
         function startGeneration(gender) {
             currentGender = gender;
             
-            // Переключаем на экран загрузки
             document.getElementById('screen-gender').classList.add('hidden');
             document.getElementById('screen-loading').classList.remove('hidden');
 
-            // Рандомные фразы для анимации загрузки
             const statusEl = document.getElementById('loadingStatus');
             let step = 0;
             statusEl.textContent = loadingPhrases[Math.floor(Math.random() * loadingPhrases.length)];
@@ -512,7 +509,6 @@
                 statusEl.textContent = loadingPhrases[step % loadingPhrases.length];
             }, 400);
 
-            // Имитируем плавный рандомный подбор (1.2 секунды анимации)
             setTimeout(() => {
                 clearInterval(interval);
                 
@@ -520,7 +516,19 @@
                 currentLookSrc = list[Math.floor(Math.random() * list.length)];
                 currentVibe = funnyVibes[Math.floor(Math.random() * funnyVibes.length)];
 
-                document.getElementById('resultImg').src = currentLookSrc;
+                const imgElement = document.getElementById('resultImg');
+                imgElement.src = currentLookSrc;
+                
+                // Обработка если файл не найден в конкретном расширении (автопереключение на альтернативное)
+                imgElement.onerror = function() {
+                    if (currentLookSrc.endsWith('.jpg')) {
+                        currentLookSrc = currentLookSrc.replace('.jpg', '.png');
+                    } else {
+                        currentLookSrc = currentLookSrc.replace('.png', '.jpg');
+                    }
+                    imgElement.src = currentLookSrc;
+                };
+
                 document.getElementById('vibeText').textContent = currentVibe;
 
                 document.getElementById('screen-loading').classList.add('hidden');
