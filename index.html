@@ -2,219 +2,579 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Уютная изба стилиста 🏡🌾</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ПLОМБИР | Из города в деревню</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
-        body {
-            background-color: #f7f3ed;
-            color: #4a3b32;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            --bg-main: #121215;
+            --card-bg: #1b1b22;
+            --border-color: #2e2e3a;
+            --accent-green: #c8e66e;
+            --accent-red: #ff4d4d;
+            --text-light: #f5f5f7;
+            --text-muted: #8e8e99;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .app-wrapper {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen {
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            animation: fadeIn 0.25s ease-out forwards;
         }
-        .container {
-            max-width: 600px;
-            width: 100%;
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border: 1px solid #e6dfd5;
-            box-sizing: border-box;
+
+        .screen.hidden {
+            display: none;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-box {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .top-badge {
+            display: inline-block;
+            background: rgba(200, 230, 110, 0.15);
+            color: var(--accent-green);
+            font-size: 11px;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 6px;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
         h1 {
-            text-align: center;
-            color: #5c4033;
-            font-size: 24px;
-            margin-bottom: 10px;
+            font-size: 1.8rem;
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: 0.5px;
         }
-        p.subtitle {
+
+        h2 {
+            font-size: 1.3rem;
+            font-weight: 900;
+            margin-bottom: 16px;
             text-align: center;
-            color: #8c7365;
-            font-size: 14px;
-            margin-bottom: 25px;
+            letter-spacing: 0.5px;
         }
-        .menu-buttons, .gender-buttons {
+
+        .instruction {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .choice-container {
             display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
         }
-        button {
-            background-color: #7b5b48;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        button:hover {
-            background-color: #5c4033;
-        }
-        button.secondary {
-            background-color: #dcd0c0;
-            color: #4a3b32;
-        }
-        button.secondary:hover {
-            background-color: #c8b9a6;
-        }
-        .card {
-            background: #fdfbf7;
-            border: 1px dashed #c8b9a6;
-            border-radius: 12px;
+
+        .choice-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
             padding: 20px;
-            margin-top: 20px;
-            display: none;
-        }
-        .card h3 {
-            margin-top: 0;
-            color: #5c4033;
-        }
-        .card p {
-            margin: 8px 0;
-            line-height: 1.5;
-        }
-        .hidden {
-            display: none;
-        }
-        .back-btn {
-            background: none;
-            border: none;
-            color: #7b5b48;
+            display: flex;
+            align-items: center;
+            gap: 16px;
             cursor: pointer;
-            font-size: 14px;
-            margin-bottom: 15px;
-            padding: 0;
+            transition: all 0.2s ease;
+            text-align: left;
+            width: 100%;
         }
-        .back-btn:hover {
-            text-decoration: underline;
+
+        .choice-btn:active {
+            border-color: var(--accent-green);
+            transform: scale(0.98);
+        }
+
+        .emoji {
+            font-size: 2rem;
+            background: #252530;
+            padding: 10px 14px;
+            border-radius: 12px;
+        }
+
+        .btn-text {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--text-light);
+            margin-bottom: 2px;
+        }
+
+        .btn-sub {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .items-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .item-row {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .item-icon {
+            font-size: 1.4rem;
+        }
+
+        .item-name {
+            font-size: 0.9rem;
+            font-weight: 900;
+            display: block;
+        }
+
+        .item-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        .upload-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            padding: 0 10px;
+        }
+
+        .file-upload-box {
+            width: 100%;
+            height: 160px;
+            background: var(--card-bg);
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: border-color 0.2s;
+        }
+
+        .file-upload-box input {
+            display: none;
+        }
+
+        #uploadLabelText {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        .preview-avatar-container {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        #avatarPreviewImg {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-green);
+            margin-bottom: 6px;
+        }
+
+        .change-photo-text {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .loader-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--accent-green);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 40px auto 16px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #loading-status-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .canvas-wrapper {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid var(--border-color);
+            margin-bottom: 16px;
+            background: #000;
+        }
+
+        canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .main-action-btn {
+            width: 100%;
+            background: var(--accent-green);
+            color: #121215;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 0.95rem;
+            padding: 16px;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(200, 230, 110, 0.2);
+            letter-spacing: 0.5px;
+        }
+
+        .secondary-action-btn {
+            width: 100%;
+            background: var(--card-bg);
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 0.9rem;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .result-actions {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
         }
     </style>
 </head>
 <body>
-
-<div class="container" id="app">
-    <div id="main-menu">
-        <h1>🏡 Уютная изба стилиста</h1>
-        <p class="subtitle">Выбирай режим работы и подбирай трендовые образы в деревенском вайбе</p>
-        <div class="menu-buttons" style="flex-direction: column;">
-            <button onclick="showScreen('fast-look-screen')">🌾 Подобрать быстрый лук</button>
-            <button class="secondary" onclick="showScreen('photo-screen')">📸 Подобрать по фото (Архив)</button>
-        </div>
-    </div>
-
-    <div id="fast-look-screen" class="hidden">
-        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ На главную</button>
-        <h1>🌾 Быстрый подбор лука</h1>
-        <p class="subtitle">Для кого сотворим образ на этот раз?</p>
-        <div class="gender-buttons">
-            <button onclick="generateLook('girls')">👒 Девочкам</button>
-            <button onclick="generateLook('boys')">🧢 Мальчикам</button>
-        </div>
-
-        <div id="result-card" class="card">
-            <h3 id="look-style"></h3>
-            <p id="look-top"></p>
-            <p id="look-bottom"></p>
-            <p id="look-shoes"></p>
-            <p id="look-accessories"></p>
-            <div style="margin-top: 15px; text-align: center;">
-                <button onclick="generateLook(currentCategory)">🔄 Сгенерировать еще</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="photo-screen" class="hidden">
-        <button class="back-btn" onclick="showScreen('main-menu')">⬅️ На главную</button>
-        <h1>📸 Режим подбора по фото</h1>
-        <p class="subtitle">Архивная функция загрузки селфи сохранена на месте.</p>
-        <div style="text-align: center; padding: 20px; border: 2px dashed #c8b9a6; border-radius: 8px;">
-            <p>Загрузите ваше фото для анализа:</p>
-            <input type="file" accept="image/*" style="margin-top: 10px;" onchange="alert('Фото загружено! (Архивный режим работает в штатном режиме).')">
-        </div>
-    </div>
-</div>
-
-<script>
-    const girlsLooks = [
-        {
-            style: "🌾 Деревенский шик (Rustic Cottagecore)",
-            top: "Льняная белая блузка с объемными рукавами и вышивкой",
-            bottom: "Длинная свободная юбка из хлопка песочного цвета",
-            shoes: "Кожаные плетеные сандалии или удобные эспадрильи",
-            accessories: "Соломенная шляпа с лентой и сумка-шоппер из ротанга"
-        },
-        {
-            style: "🌻 Уютный оверсайз (Cozy Village)",
-            top: "Вязаный кремовый кардиган крупной вязки",
-            bottom: "Широкие винтажные джинсы с высокой посадкой",
-            shoes: "Базовые белые кеды",
-            accessories: "Винтажный кулон на цепочке и тканевый ободок"
-        },
-        {
-            style: "🪵 Лесная романтика",
-            top: "Клетчатая рубашка оверсайз (накинутая поверх базового топа)",
-            bottom: "Плотные черные леггинсы или трикотажные брюки клеш",
-            shoes: "Грубые ботинки на шнуровке",
-            accessories: "Маленький рюкзак из эко-кожи и массивное кольцо"
-        }
-    ];
-
-    const boysLooks = [
-        {
-            style: "🪵 Уютный кэжуал (Rustic Comfort)",
-            top: "Свободная фланелевая рубашка в клетку",
-            bottom: "Прямые свободные брюки цвета хаки",
-            shoes: "Замшевые челси или плотные кроссовки",
-            accessories: "Кожаный браслет и стильные часы с ремешком"
-        },
-        {
-            style: "🌾 Деревенский стритстайл",
-            top: "Однотонное плотное худи оверсайз бежевого оттенка",
-            bottom: "Широкие карго-брюки с накладными карманами",
-            shoes: "Массивные кроссовки в ретро-стиле",
-            accessories: "Текстильная кепка-бейсболка и поясная сумка"
-        },
-        {
-            style: "🌻 Утренний променад по лугу",
-            top: "Вязаный джемпер с фактурным узором",
-            bottom: "Классические прямые джинсы темного синего цвета",
-            shoes: "Кожаные кеды",
-            accessories: "Шоппер из плотного хлопка и солнцезащитные очки"
-        }
-    ];
-
-    let currentCategory = 'girls';
-
-    function showScreen(screenId) {
-        document.getElementById('main-menu').classList.add('hidden');
-        document.getElementById('fast-look-screen').classList.add('hidden');
-        document.getElementById('photo-screen').classList.add('hidden');
+    <div class="app-wrapper">
         
-        document.getElementById(screenId).classList.remove('hidden');
-    }
+        <section id="screen-gender" class="screen active">
+            <div class="header-box">
+                <span class="top-badge">#PLMBR</span>
+                <h1>ИЗ ГОРОДА<br>В ДЕРЕВНЮ</h1>
+            </div>
+            <p class="instruction">ВЫБЕРИ СВОЮ КАТЕГОРИЮ</p>
+            <div class="choice-container">
+                <button class="choice-btn" onclick="selectGender('boys')">
+                    <span class="emoji">🚜</span>
+                    <span class="btn-text">ПАРЕНЬ</span>
+                    <span class="btn-sub">Спорт-шик х Огород</span>
+                </button>
+                <button class="choice-btn" onclick="selectGender('girls')">
+                    <span class="emoji">🌾</span>
+                    <span class="btn-text">ДЕВУШКА</span>
+                    <span class="btn-sub">Сельский Гламур</span>
+                </button>
+            </div>
+        </section>
 
-    function generateLook(category) {
-        currentCategory = category;
-        const looks = category === 'girls' ? girlsLooks : boysLooks;
-        const look = looks[Math.floor(Math.random() * looks.length)];
+        <section id="screen-preview" class="screen hidden">
+            <h2 id="preview-category-title">ТВОЙ ЛУК</h2>
+            <div class="items-list" id="itemsListContainer"></div>
+            <button class="main-action-btn" onclick="goToPhotoUpload()">ПРИМЕРИТЬ ЭТОТ ОБРАЗ</button>
+        </section>
 
-        document.getElementById('look-style').innerText = `🎨 Стиль: ${look.style}`;
-        document.getElementById('look-top').innerText = `🧥 Верх: ${look.top}`;
-        document.getElementById('look-bottom').innerText = `👖 Низ: ${look.bottom}`;
-        document.getElementById('look-shoes').innerText = `👟 Обувь: ${look.shoes}`;
-        document.getElementById('look-accessories').innerText = `👜 Аксессуары: ${look.accessories}`;
+        <section id="screen-upload" class="screen hidden">
+            <h2>ТВОЕ ФОТО</h2>
+            <p class="upload-desc">Загрузи селфи, чтобы мы внедрили твое лицо в готовый славянский постер</p>
+            
+            <label class="file-upload-box" id="dropZone">
+                <input type="file" id="selfieInput" accept="image/*" onchange="handleImageUpload(event)">
+                <span id="uploadLabelText">📸 Выбрать или сделать селфи</span>
+            </label>
 
-        document.getElementById('result-card').style.display = 'block';
-    }
-</script>
+            <div class="preview-avatar-container hidden" id="avatarPreviewContainer">
+                <img id="avatarPreviewImg" src="" alt="Твое фото">
+                <span class="change-photo-text">Нажми, чтобы сменить фото</span>
+            </div>
+
+            <button id="generateBtn" class="main-action-btn hidden" onclick="startGenerationProcess()">СОЗДАТЬ ПОСТЕР</button>
+        </section>
+
+        <section id="screen-loading" class="screen hidden">
+            <div class="loader-spinner"></div>
+            <p id="loading-status-text">Стряхиваем пыль с олимпийки...</p>
+        </section>
+
+        <section id="screen-result" class="screen hidden">
+            <div class="canvas-wrapper">
+                <canvas id="posterCanvas"></canvas>
+            </div>
+            <div class="result-actions">
+                <button class="main-action-btn" onclick="sendPosterToBot()">ПОДЕЛИТЬСЯ В ЧАТЕ</button>
+                <button class="secondary-action-btn" onclick="resetApp()">ДРУГОЙ ЛУК</button>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        const database = {
+            boys: {
+                title: "ГОРОДСКОЙ ПАРЕНЬ НА СЕЛЕ",
+                items: [
+                    { icon: "👕", name: "ТЕНЬЯШКА", desc: "классика деревни" },
+                    { icon: "🩳", name: "СПОРТИВНЫЕ ШОРТЫ", desc: "удобно и по-нашему" },
+                    { icon: "👟", name: "БЕЛЫЕ НОСКИ", desc: "с уважением к стилю" },
+                    { icon: "🩴", name: "СЛАНЦЫ", desc: "деревенский вайб" },
+                    { icon: "🧢", name: "БАНДИТСКИЙ КЕРАМИК", desc: "для своих пацанов" },
+                    { icon: "⛓", name: "ЦЕПЬ", desc: "на стиле" }
+                ]
+            },
+            girls: {
+                title: "ДЕРЕВЕНСКИЙ ГЛАМУР",
+                items: [
+                    { icon: "👗", name: "ВИНТАЖНЫЙ САРАФАН", desc: "а-ля рюсс" },
+                    { icon: "👒", name: "СОЛОМЕННАЯ ШЛЯПА", desc: "от солнца и сглаза" },
+                    { icon: "🩴", name: "СЛАНЦЫ С ЦВЕТОЧКАМИ", desc: "люкс" },
+                    { icon: "🕶", name: "ОЧКИ С РЫЦАРСКИМ ОТБЛЕСКОМ", desc: "стиль 90-х" }
+                ]
+            }
+        };
+
+        const loadingPhrases = [
+            "Стряхиваем пыль с олимпийки...",
+            "Проверяем карманы на наличие семечек...",
+            "Натираем сланцы до зеркального блеска...",
+            "Интегрируем славянский вайб в реальность...",
+            "Финальные штрихи подиумного лука..."
+        ];
+
+        let selectedGender = '';
+        let currentItems = [];
+        let userAvatarDataUrl = '';
+        let currentLookId = '';
+
+        function selectGender(gender) {
+            selectedGender = gender;
+            currentItems = database[gender].items;
+
+            document.getElementById('screen-gender').classList.add('hidden');
+            document.getElementById('screen-preview').classList.remove('hidden');
+            document.getElementById('preview-category-title').textContent = database[gender].title;
+
+            const container = document.getElementById('itemsListContainer');
+            container.innerHTML = currentItems.map(item => `
+                <div class="item-row">
+                    <span class="item-icon">${item.icon}</span>
+                    <div class="item-info">
+                        <span class="item-name">${item.name}</span>
+                        <span class="item-desc">${item.desc}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function goToPhotoUpload() {
+            document.getElementById('screen-preview').classList.add('hidden');
+            document.getElementById('screen-upload').classList.remove('hidden');
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    userAvatarDataUrl = e.target.result;
+                    document.getElementById('avatarPreviewImg').src = userAvatarDataUrl;
+                    document.getElementById('dropZone').classList.add('hidden');
+                    document.getElementById('avatarPreviewContainer').classList.remove('hidden');
+                    document.getElementById('generateBtn').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        document.getElementById('avatarPreviewContainer').addEventListener('click', () => {
+            document.getElementById('selfieInput').value = '';
+            document.getElementById('dropZone').classList.remove('hidden');
+            document.getElementById('avatarPreviewContainer').classList.add('hidden');
+            document.getElementById('generateBtn').classList.add('hidden');
+        });
+
+        function startGenerationProcess() {
+            document.getElementById('screen-upload').classList.add('hidden');
+            document.getElementById('screen-loading').classList.remove('hidden');
+
+            currentLookId = `PLMBR-${Math.floor(1000 + Math.random() * 9000)}`;
+
+            let step = 0;
+            const statusEl = document.getElementById('loading-status-text');
+            
+            const interval = setInterval(() => {
+                statusEl.textContent = loadingPhrases[step % loadingPhrases.length];
+                step++;
+            }, 800);
+
+            setTimeout(() => {
+                clearInterval(interval);
+                document.getElementById('screen-loading').classList.add('hidden');
+                document.getElementById('screen-result').classList.remove('hidden');
+                renderCanvasPoster();
+            }, 2800);
+        }
+
+        async function renderCanvasPoster() {
+            const canvas = document.getElementById('posterCanvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = 1000;
+            canvas.height = 1400;
+
+            ctx.fillStyle = "#121215";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "#1b1b22";
+            ctx.fillRect(60, 200, 880, 820);
+
+            if (userAvatarDataUrl) {
+                const userImg = new Image();
+                userImg.src = userAvatarDataUrl;
+                await new Promise((resolve) => userImg.onload = resolve);
+                
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(160, 280, 70, 0, Math.PI * 2, true);
+                ctx.closePath();
+                ctx.clip();
+                ctx.drawImage(userImg, 90, 210, 140, 140);
+                ctx.restore();
+
+                ctx.strokeStyle = "#c8e66e";
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.arc(160, 280, 70, 0, Math.PI * 2, true);
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = "#c8e66e";
+            ctx.font = "900 42px Montserrat, sans-serif";
+            ctx.fillText("ПLОМБИР", 60, 100);
+
+            ctx.fillStyle = "#8e8e99";
+            ctx.font = "700 20px Montserrat, sans-serif";
+            ctx.fillText("ИЗ ГОРОДА В ДЕРЕВНЮ", 60, 135);
+
+            ctx.fillStyle = "#f5f5f7";
+            ctx.font = "700 32px 'Space Mono', monospace";
+            ctx.textAlign = "right";
+            ctx.fillText(currentLookId, canvas.width - 60, 115);
+            ctx.textAlign = "left";
+
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "900 24px Montserrat, sans-serif";
+            ctx.fillText("ТВОЙ ЛУК:", 60, 1080);
+
+            let startY = 1120;
+            currentItems.forEach(item => {
+                ctx.fillStyle = "#8e8e99";
+                ctx.font = "700 18px 'Space Mono', monospace";
+                ctx.fillText(`• ${item.name} (${item.desc})`, 60, startY);
+                startY += 35;
+            });
+
+            ctx.strokeStyle = "#2e2e3a";
+            ctx.lineWidth = 12;
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function resetApp() {
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('screen-gender').classList.remove('hidden');
+            document.getElementById('selfieInput').value = '';
+            document.getElementById('dropZone').classList.remove('hidden');
+            document.getElementById('avatarPreviewContainer').classList.add('hidden');
+            document.getElementById('generateBtn').classList.add('hidden');
+            userAvatarDataUrl = '';
+        }
+
+        function sendPosterToBot() {
+            const canvas = document.getElementById('posterCanvas');
+            canvas.toBlob(function(blob) {
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = function() {
+                    const base64data = reader.result;
+                    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                        tg.sendData(JSON.stringify({
+                            look_id: currentLookId,
+                            image: base64data
+                        }));
+                    } else {
+                        alert(`Постер ${currentLookId} успешно сформирован! В Telegram он отправится в чат одной кнопкой.`);
+                    }
+                };
+            }, 'image/png', 0.95);
+        }
+    </script>
 </body>
 </html>
