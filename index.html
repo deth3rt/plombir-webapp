@@ -53,7 +53,6 @@
             100% { transform: translateY(-15px) rotate(10deg); }
         }
 
-        /* Курица без прыжка, мгновенный разворот */
         .running-chicken {
             position: fixed;
             top: 15px;
@@ -545,6 +544,12 @@
                 <span class="top-badge">#PLMBR 2026 EDITION</span>
                 <h1>ИЗ ГОРОДА<br>В ДЕРЕВНЮ</h1>
             </div>
+            
+            <!-- Счётчик на деревянной плашке -->
+            <div class="wooden-plaque" style="font-size: 0.85rem; padding: 10px; margin-bottom: 18px;">
+                🔥 Собрали луков: <span id="globalCounter">890</span> чел.
+            </div>
+
             <p class="instruction">ВЫБЕРИ СВОЮ КАТЕГОРИЮ</p>
             <div class="choice-container">
                 <button class="choice-btn" onclick="startGeneration('boys')">
@@ -597,8 +602,8 @@
 
     </div>
 
-    <!-- Фоновая музыка -->
-    <audio id="bgAudio" src="music/music.mp3" preload="auto" loop></audio>
+    <!-- Фоновая музыка: изменена папка и файл на music/dance.mp3 -->
+    <audio id="bgAudio" src="music/dance.mp3" preload="auto" loop></audio>
     <!-- Звук курицы -->
     <audio id="chickenAudio" src="music/chiken.mp3" preload="auto"></audio>
 
@@ -644,10 +649,50 @@
             }
         }
 
+        // Таймерный счётчик на деревянной плашке к 18.09.2026
+        function initTimedCounter() {
+            const counterEl = document.getElementById('globalCounter');
+            if (!counterEl) return;
+
+            const startDate = new Date('2026-09-01T00:00:00').getTime();
+            const targetDate = new Date('2026-09-18T18:00:00').getTime();
+            const targetValue = 890;
+
+            function updateCounter() {
+                const now = new Date().getTime();
+                
+                if (now >= targetDate) {
+                    counterEl.textContent = targetValue;
+                    return;
+                }
+
+                if (now <= startDate) {
+                    counterEl.textContent = 100;
+                    return;
+                }
+
+                const totalDuration = targetDate - startDate;
+                const elapsed = now - startDate;
+                const progress = elapsed / totalDuration;
+
+                const startValue = 100;
+                const currentValue = Math.floor(startValue + (targetValue - startValue) * progress);
+                
+                counterEl.textContent = currentValue;
+            }
+
+            updateCounter();
+            setInterval(updateCounter, 1000);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initTimedCounter();
+        });
+
         // Логика бега курицы: мгновенный разворот без прыжка + звук
         let chickenX = window.innerWidth / 2;
         let chickenSpeed = 1.8;
-        let chickenDirection = 1; // 1 - вправо, -1 - влево
+        let chickenDirection = 1; 
         const chickenEl = document.getElementById('runningChicken');
         const chickenAudio = document.getElementById('chickenAudio');
 
@@ -672,11 +717,8 @@
         requestAnimationFrame(updateChickenLoop);
 
         function hitChicken() {
-            // Звук кудахтанья
             chickenAudio.currentTime = 0;
             chickenAudio.play().catch(e => console.log("Аудио курицы заблокировано:", e));
-
-            // Мгновенная смена направления в противоположную сторону без анимаций прыжка
             chickenDirection *= -1;
         }
 
@@ -800,10 +842,9 @@
             "Заряжаем батарейки трактора..."
         ];
 
-        let currentGender = '';
+        let currentGender = 'boys'; // Задано по умолчанию, чтобы кнопка «выбрать другой образ» не ломалась
         let currentLookSrc = '';
 
-        // Функция исключения повторения луков подряд
         function getRandomUniqueLook(list, currentSrc) {
             if (!list || list.length === 0) return '';
             if (list.length === 1) return list[0];
@@ -917,7 +958,6 @@
                             card.classList.add('shake-card');
 
                             const list = currentGender === 'boys' ? boysImages : girlsImages;
-                            // Берем новый образ без повторения текущего
                             currentLookSrc = getRandomUniqueLook(list, currentLookSrc);
                             let newVibe = funnyVibes[Math.floor(Math.random() * funnyVibes.length)];
 
