@@ -38,13 +38,15 @@
             overflow-x: hidden;
         }
 
-        /* Контейнер верхних кнопок управления (справа налево) */
+        /* Верхняя панель управления */
         .top-controls {
             position: fixed;
             top: 20px;
+            left: 20px;
             right: 20px;
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
             z-index: 100;
         }
 
@@ -60,33 +62,29 @@
             font-size: 1.2rem;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease;
         }
 
         .top-icon-btn:active {
             transform: scale(0.9);
         }
 
-        /* Анимация бегающей и подпрыгивающей курицы */
+        /* Бегающая курица с динамическим позиционированием */
         #chickenBtn {
-            animation: chickenRun 3s ease-in-out infinite;
-        }
-
-        @keyframes chickenRun {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-3px) rotate(-6deg); }
-            50% { transform: translateY(0) rotate(0deg); }
-            75% { transform: translateY(-3px) rotate(6deg); }
+            position: absolute;
+            left: 0px;
+            will-change: transform;
+            transition: transform 0.15s ease;
         }
 
         .chicken-jump {
-            animation: chickenJumpEffect 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+            animation: chickenJumpEffect 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         @keyframes chickenJumpEffect {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3) rotate(15deg); }
-            100% { transform: scale(1); }
+            0% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.35) translateY(-8px) rotate(15deg); }
+            100% { transform: scale(1) translateY(0); }
         }
 
         .app-wrapper {
@@ -379,7 +377,7 @@
     </style>
 </head>
 <body>
-    <!-- Блок верхних кнопок: курица слева, музыка справа -->
+    <!-- Верхняя панель: бегающая курица слева, кнопка музыки справа -->
     <div class="top-controls">
         <button class="top-icon-btn" id="chickenBtn" onclick="touchChicken()" title="Потрогать курицу">🐔</button>
         <button class="top-icon-btn" id="musicBtn" onclick="toggleMusic()" title="Музыка">🔇</button>
@@ -574,19 +572,52 @@
             }
         }
 
-        // Интерактив с курицей
+        // Логика бегающей курицы (от левого края до колонки)
+        const chickenBtn = document.getElementById('chickenBtn');
         const chickenAudio = document.getElementById('chickenAudio');
-        chickenAudio.volume = 0.4; // Делаем звук не слишком громким
+        chickenAudio.volume = 0.4;
 
-        function touchChicken() {
-            const chickenBtn = document.getElementById('chickenBtn');
+        let chickenPos = 0;
+        let chickenDirection = 1; // 1 — вправо, -1 — влево
+        const chickenSpeed = 1.2; // скорость бега
+
+        function updateChickenRun() {
+            const musicBtnRect = musicBtn.getBoundingClientRect();
+            const chickenRect = chickenBtn.getBoundingClientRect();
             
-            // Анимация прыжка/поворота
+            // Вычисляем максимальную правую границу (чтобы курица не заезжала под кнопку музыки, а останавливалась перед ней)
+            const maxRight = musicBtn.offsetLeft - chickenBtn.offsetWidth - 12;
+            const minLeft = 0;
+
+            chickenPos += chickenSpeed * chickenDirection;
+
+            // Если добежала до правого или левого края — разворачиваемся
+            if (chickenPos >= maxRight) {
+                chickenPos = maxRight;
+                chickenDirection = -1;
+            } else if (chickenPos <= minLeft) {
+                chickenPos = minLeft;
+                chickenDirection = 1;
+            }
+
+            // Применяем позицию и отражение по горизонтали в зависимости от направления бега
+            const scaleX = chickenDirection === 1 ? 1 : -1;
+            chickenBtn.style.transform = `translateX(${chickenPos}px) scaleX(${scaleX})`;
+
+            requestAnimationFrame(updateChickenRun);
+        }
+
+        // Запуск анимации бега после загрузки страницы
+        requestAnimationFrame(updateChickenRun);
+
+        // Клик по курице: сменить направление, подпрыгнуть и пискнуть
+        function touchChicken() {
+            chickenDirection *= -1; // резко меняем направление
+
             chickenBtn.classList.remove('chicken-jump');
-            void chickenBtn.offsetWidth; // сброс анимации
+            void chickenBtn.offsetWidth;
             chickenBtn.classList.add('chicken-jump');
 
-            // Воспроизведение звука курицы с перематыванием в начало
             chickenAudio.currentTime = 0;
             chickenAudio.play().catch(e => {
                 console.log("Звук курицы не воспроизвелся:", e);
