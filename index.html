@@ -538,30 +538,32 @@
             80% { transform: translateX(6px) rotate(1deg); }
         }
 
-        /* Замени старый класс .tractorist-popup в CSS на этот */
+       /* Замени старый класс .tractorist-popup в CSS на этот */
 
 .tractorist-popup {
     position: fixed;
     bottom: 20px;
-    right: -150px; /* Начинает справа за экраном */
+    right: -400px; /* Изначально спрятан далеко за правым краем */
     width: 200px;
     height: auto;
     z-index: 999;
     pointer-events: none;
-    will-change: transform;
-    transform: scaleX(-1); /* Разворачиваем гифку лицом налево */
+    will-change: transform, right;
+    transform: scaleX(-1); /* Смотрит налево */
+    opacity: 0; /* Полностью невидим, пока не нажали */
 }
 
 .tractorist-popup.walk-across {
+    opacity: 1; /* Появляется при старте анимации */
     animation: walkAcrossScreen 3s linear forwards;
 }
 
 @keyframes walkAcrossScreen {
     0% {
-        right: -150px;
+        right: -400px;
     }
     100% {
-        right: 100vw; /* Уходит полностью за левый край экрана */
+        right: 100vw; /* Идет до левого края и уходит за него */
     }
 }
 .social-links-box {
@@ -929,7 +931,7 @@
             }
         }
 
-       // Обнови функцию triggerTractoristSound() в JS для запуска прохода
+       // Замени функцию triggerTractoristSound() в JS на этот вариант
 function triggerTractoristSound() {
     const randomNum = Math.floor(Math.random() * 21) + 1;
     const tractoristAudio = document.getElementById('tractoristAudio');
@@ -944,9 +946,9 @@ function triggerTractoristSound() {
     // Анимация кнопки меню
     btn.classList.add('tractor-active');
 
-    // Перезапускаем анимацию прохода гифки
+    // Сбрасываем и запускаем анимацию прохода (гифка появится справа и пойдет налево)
     popup.classList.remove('walk-across');
-    void popup.offsetWidth; // Трюк для сброса анимации
+    void popup.offsetWidth; // Перезапуск триггера анимации
     popup.classList.add('walk-across');
     
     // Убираем подсветку кнопки через 3 секунды
@@ -954,7 +956,6 @@ function triggerTractoristSound() {
         btn.classList.remove('tractor-active');
     }, 3000);
 }
-
         function throwTomatoes(event) {
             const remaining = getRemainingClicks();
             if (remaining <= 0) return;
