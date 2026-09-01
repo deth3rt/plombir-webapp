@@ -538,28 +538,31 @@
             80% { transform: translateX(6px) rotate(1deg); }
         }
 
-        .tractorist-popup {
+        /* Замени старый класс .tractorist-popup в CSS на этот */
+
+.tractorist-popup {
     position: fixed;
     bottom: 20px;
-    left: -150px; /* Изначально спрятана за левым краем экрана */
-    width: 240px; /* Размер гифки, можешь поменять под себя */
+    right: -150px; /* Начинает справа за экраном */
+    width: 200px;
     height: auto;
     z-index: 999;
     pointer-events: none;
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-    opacity: 0;
-    will-change: transform, opacity;
+    will-change: transform;
+    transform: scaleX(-1); /* Разворачиваем гифку лицом налево */
 }
 
-.tractorist-popup.show {
-    left: 20px; /* На какое расстояние выезжает от левого края */
-    opacity: 1;
-    animation: tractoristBounce 0.5s ease-in-out infinite alternate;
+.tractorist-popup.walk-across {
+    animation: walkAcrossScreen 3s linear forwards;
 }
 
-@keyframes tractoristBounce {
-    0% { transform: translateY(0) rotate(0deg); }
-    100% { transform: translateY(-8px) rotate(-3deg); }
+@keyframes walkAcrossScreen {
+    0% {
+        right: -150px;
+    }
+    100% {
+        right: 100vw; /* Уходит полностью за левый край экрана */
+    }
 }
 .social-links-box {
     display: flex;
@@ -926,7 +929,7 @@
             }
         }
 
-        // Рандомный выбор звука от 1 до 21 и показ гифки тракториста
+       // Обнови функцию triggerTractoristSound() в JS для запуска прохода
 function triggerTractoristSound() {
     const randomNum = Math.floor(Math.random() * 21) + 1;
     const tractoristAudio = document.getElementById('tractoristAudio');
@@ -936,18 +939,19 @@ function triggerTractoristSound() {
     // Включаем звук
     tractoristAudio.src = `music/${randomNum}.mp3`;
     tractoristAudio.currentTime = 0;
-    tractoristAudio.play().catch(e => console.log("Звук тракториста заблокирован:", e));
+    tractoristAudio.play().catch(e => console.log("Звук заблокирован:", e));
 
     // Анимация кнопки меню
     btn.classList.add('tractor-active');
 
-    // Показываем гифку сбоку
-    popup.classList.add('show');
+    // Перезапускаем анимацию прохода гифки
+    popup.classList.remove('walk-across');
+    void popup.offsetWidth; // Трюк для сброса анимации
+    popup.classList.add('walk-across');
     
-    // Убираем гифку и анимацию кнопки через 3 секунды
+    // Убираем подсветку кнопки через 3 секунды
     setTimeout(() => {
         btn.classList.remove('tractor-active');
-        popup.classList.remove('show');
     }, 3000);
 }
 
