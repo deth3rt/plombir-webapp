@@ -600,10 +600,12 @@
             </div>
             
             <div class="result-actions">
-                <div class="wooden-plaque">🌻 19/09 | ПLОМБИР 🌻</div>
-                <button class="tomato-action-btn" id="tomatoBtn" onclick="throwTomatoes(event)">🍅 БРОСИТЬ ПОМИДОРЫ (<span id="clicksLeft">10</span>)</button>
-                <button class="secondary-action-btn" onclick="resetApp()">ВЫБРАТЬ ДРУГОЙ ОБРАЗ</button>
-            </div>
+    <div class="wooden-plaque">★ PLMBR VIBE STUDIO ★</div>
+    <button class="tomato-action-btn" id="tomatoBtn" onclick="throwTomatoes(event)">🍅 БРОСИТЬ ПОМИДОРЫ (<span id="clicksLeft">10</span>)</button>
+    
+    <!-- Эта кнопка теперь полностью автономна -->
+    <button class="secondary-action-btn" onclick="resetApp()">ВЫБРАТЬ ДРУГОЙ ОБРАЗ</button>
+</div>
         </section>
 
     </div>
@@ -972,11 +974,20 @@
         }
 
         function resetApp() {
-            resetTomatoLimit(); // Сбрасывает лимит помидоров и возвращает кнопку в активное состояние
+    // Принудительно сбрасываем локальный счетчик помидоров
+    localStorage.setItem(IP_LIMIT_KEY, JSON.stringify({ count: 0 }));
 
-            document.getElementById('screen-result').classList.add('hidden');
-            document.getElementById('screen-gender').classList.remove('hidden');
-        }
+    // Находим кнопку помидоров и принудительно возвращаем её в активное состояние
+    const tomatoBtn = document.getElementById('tomatoBtn');
+    if (tomatoBtn) {
+        tomatoBtn.disabled = false;
+        tomatoBtn.innerHTML = `🍅 БРОСИТЬ ПОМИДОРЫ (<span id="clicksLeft">10</span>)`;
+    }
+
+    // Переключаем экраны
+    document.getElementById('screen-result').classList.add('hidden');
+    document.getElementById('screen-gender').classList.remove('hidden');
+}
     </script>
 </body>
 </html>
