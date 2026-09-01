@@ -543,7 +543,6 @@
     <div class="bg-decor" style="bottom: 15%; left: 12%; animation-delay: 2s;">🪗</div>
     <div class="bg-decor" style="bottom: 20%; right: 8%; animation-delay: 1.5s;">🍅</div>
 
-    <!-- Бегающая курица -->
     <div class="running-chicken" id="runningChicken" onclick="hitChicken()">🐔</div>
 
     <div class="right-control-box">
@@ -601,7 +600,7 @@
             </div>
             
             <div class="result-actions">
-                <div class="wooden-plaque">🌻 19/09 | ИЗ ГОРОДА В ДЕРЕВНЮ 🌻</div>
+                <div class="wooden-plaque">🌻 19/09 | ПLОМБИР 🌻</div>
                 <button class="tomato-action-btn" id="tomatoBtn" onclick="throwTomatoes(event)">🍅 БРОСИТЬ ПОМИДОРЫ (<span id="clicksLeft">10</span>)</button>
                 <button class="secondary-action-btn" onclick="resetApp()">ВЫБРАТЬ ДРУГОЙ ОБРАЗ</button>
             </div>
@@ -609,11 +608,8 @@
 
     </div>
 
-    <!-- Фоновая музыка -->
     <audio id="bgAudio" src="music/dance.mp3" preload="auto" loop></audio>
-    <!-- Звук курицы -->
     <audio id="chickenAudio" src="music/chiken.mp3" preload="auto"></audio>
-    <!-- Аудиоэлемент для тракториста (рандом от 1 до 21) -->
     <audio id="tractoristAudio" preload="auto"></audio>
 
     <script>
@@ -843,7 +839,6 @@
 
             btn.classList.add('tractor-active');
             
-            // Убираем анимацию после окончания трека или через 3 секунды
             setTimeout(() => {
                 btn.classList.remove('tractor-active');
             }, 3000);
@@ -977,7 +972,7 @@
         }
 
         function resetApp() {
-            resetTomatoLimit();
+            resetTomatoLimit(); // Сбрасывает лимит помидоров и возвращает кнопку в активное состояние
 
             document.getElementById('screen-result').classList.add('hidden');
             document.getElementById('screen-gender').classList.remove('hidden');
