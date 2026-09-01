@@ -72,15 +72,17 @@
         }
 
         .running-chicken {
-            position: fixed;
-            top: 15px;
-            left: 0;
-            font-size: 2.2rem;
-            cursor: pointer;
-            z-index: 101;
-            transform-origin: center;
-            will-change: left;
-        }
+    position: fixed;
+    top: 15px;
+    left: 0;
+    width: 45px;       /* Задай нужный размер по ширине */
+    height: auto;      /* Высота подстроится автоматически */
+    cursor: pointer;
+    z-index: 101;
+    transform-origin: center;
+    will-change: left;
+    object-fit: contain;
+}
 
         .right-control-box {
             position: fixed;
@@ -608,7 +610,7 @@
     <div class="bg-decor" style="bottom: 15%; left: 12%; animation-delay: 2s;">🪗</div>
     <div class="bg-decor" style="bottom: 20%; right: 8%; animation-delay: 1.5s;">🍅</div>
 
-    <div class="running-chicken" id="runningChicken" onclick="hitChicken()">🐔</div>
+    <img src="etc/go.gif" class="running-chicken" id="runningChicken" onclick="hitChicken()" alt="Гусь">
 
     <div class="right-control-box">
         <button class="top-icon-btn" id="musicBtn" onclick="toggleMusic()" title="Музыка">🔇</button>
