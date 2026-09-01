@@ -538,8 +538,29 @@
             80% { transform: translateX(6px) rotate(1deg); }
         }
 
-        /* Замени стили социальных и билетных кнопок на этот компактный и аккуратный вариант */
+        .tractorist-popup {
+    position: fixed;
+    bottom: 20px;
+    left: -150px; /* Изначально спрятана за левым краем экрана */
+    width: 120px; /* Размер гифки, можешь поменять под себя */
+    height: auto;
+    z-index: 999;
+    pointer-events: none;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+    opacity: 0;
+    will-change: transform, opacity;
+}
 
+.tractorist-popup.show {
+    left: 20px; /* На какое расстояние выезжает от левого края */
+    opacity: 1;
+    animation: tractoristBounce 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes tractoristBounce {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(-8px) rotate(-3deg); }
+}
 .social-links-box {
     display: flex;
     gap: 6px;
@@ -647,7 +668,7 @@
                     </div>
                 </button>
                 <!-- Добавь этот блок внутрь .result-actions прямо под кнопкой «ВЫБРАТЬ ДРУГОЙ ОБРАЗ» -->
-
+<img src="etc/traktoristgo.gif" class="tractorist-popup" id="tractoristPopup" alt="Тракторист">
 <div class="social-links-box">
     <a href="https://www.instagram.com/plombir.grodno/" target="_blank" class="social-btn instagram">📸 Instagram</a>
     <a href="https://t.me/+TeIUCzAX4b5hOTcy" target="_blank" class="social-btn telegram">📢 Telegram</a>
@@ -904,22 +925,30 @@
             }
         }
 
-        // Рандомный выбор звука от 1.mp3 до 21.mp3 и анимация кнопки тракториста
-        function triggerTractoristSound() {
-            const randomNum = Math.floor(Math.random() * 21) + 1;
-            const tractoristAudio = document.getElementById('tractoristAudio');
-            const btn = document.getElementById('tractoristBtn');
+        // Рандомный выбор звука от 1 до 21 и показ гифки тракториста
+function triggerTractoristSound() {
+    const randomNum = Math.floor(Math.random() * 21) + 1;
+    const tractoristAudio = document.getElementById('tractoristAudio');
+    const btn = document.getElementById('tractoristBtn');
+    const popup = document.getElementById('tractoristPopup');
 
-            tractoristAudio.src = `music/${randomNum}.mp3`;
-            tractoristAudio.currentTime = 0;
-            tractoristAudio.play().catch(e => console.log("Звук тракториста заблокирован:", e));
+    // Включаем звук
+    tractoristAudio.src = `music/${randomNum}.mp3`;
+    tractoristAudio.currentTime = 0;
+    tractoristAudio.play().catch(e => console.log("Звук тракториста заблокирован:", e));
 
-            btn.classList.add('tractor-active');
-            
-            setTimeout(() => {
-                btn.classList.remove('tractor-active');
-            }, 3000);
-        }
+    // Анимация кнопки меню
+    btn.classList.add('tractor-active');
+
+    // Показываем гифку сбоку
+    popup.classList.add('show');
+    
+    // Убираем гифку и анимацию кнопки через 3 секунды
+    setTimeout(() => {
+        btn.classList.remove('tractor-active');
+        popup.classList.remove('show');
+    }, 3000);
+}
 
         function throwTomatoes(event) {
             const remaining = getRemainingClicks();
