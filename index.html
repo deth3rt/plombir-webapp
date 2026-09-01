@@ -535,6 +535,55 @@
             60% { transform: translateX(-6px) rotate(-1deg); }
             80% { transform: translateX(6px) rotate(1deg); }
         }
+
+        .social-links-box {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.social-btn {
+    flex: 1;
+    background: var(--card-bg);
+    color: var(--text-dark);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 0.8rem;
+    padding: 12px;
+    border-radius: 14px;
+    border: 2px solid var(--border-color);
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.social-btn:active {
+    background: #f1f5f9;
+    transform: scale(0.97);
+}
+
+.booking-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 0.9rem;
+    padding: 14px;
+    border-radius: 16px;
+    border: 2px solid #1e40af;
+    text-align: center;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    transition: all 0.2s ease;
+    display: block;
+}
+
+.booking-btn:active {
+    transform: scale(0.97);
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+}
+        
     </style>
 </head>
 <body>
@@ -579,6 +628,14 @@
                         <span class="btn-sub"></span>
                     </div>
                 </button>
+                <!-- Добавь этот блок внутрь .result-actions прямо под кнопкой «ВЫБРАТЬ ДРУГОЙ ОБРАЗ» -->
+
+<div class="social-links-box">
+    <a href="https://www.instagram.com/plombir.grodno/" target="_blank" class="social-btn instagram">📸 Instagram</a>
+    <a href="https://t.me/+TeIUCzAX4b5hOTcy" target="_blank" class="social-btn telegram">📢 Telegram</a>
+</div>
+
+<a href="https://t.me/plombirsupport" target="_blank" class="booking-btn">🎟 ЗАБРОНИРОВАТЬ БИЛЕТ</a>
             </div>
         </section>
 
