@@ -1581,11 +1581,10 @@ function renderTicker(shouldScroll = false) {
     });
 
     if (shouldScroll) {
-        // Мгновенно или плавно сдвигаем ползунок в самый конец к новому сообщению
-        container.scrollTo({
-            left: container.scrollWidth,
-            behavior: 'smooth'
-        });
+        // Даем браузеру дорисовать новые карточки, затем резко или плавно сдвигаем до упора вправо
+        setTimeout(() => {
+            container.scrollLeft = container.scrollWidth;
+        }, 50);
     }
 }
 
