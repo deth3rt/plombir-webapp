@@ -644,8 +644,6 @@
     transform: scale(0.98);
 }
 
- /* Обнови стили для карточки галереи, увеличив аватарки и уменьшив текст */
-
 .user-gallery-card {
     background: #ffffff;
     border: 2px solid #e2e8f0;
@@ -671,76 +669,31 @@
 .gallery-slider-container {
     position: relative;
     width: 100%;
-    height: 115px;
+    height: 140px;
     border-radius: 10px;
     overflow: hidden;
     background: #f8fafc;
     border: 1px solid #f1f5f9;
 }
 
-.gallery-slide {
+.event-slide {
     position: absolute;
     inset: 0;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 4px;
     opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.6s ease-in-out;
 }
 
-.gallery-slide.active {
+.event-slide.active {
     opacity: 1;
 }
 
-.gallery-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 4px;
-}
-
-/* Сделали аватарки заметно больше */
-.gallery-avatar, .gallery-look-img {
-    width: 62px;
-    height: 62px;
-    border-radius: 12px;
+.event-img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    border: 2px solid #e2e8f0;
-    background: #ffffff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-}
-
-.gallery-avatar {
-    border-color: #3b82f6;
-}
-
-.gallery-look-img {
-    border-color: #10b981;
-}
-
-.gallery-symbol {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 900;
-    font-size: 0.8rem;
-    color: #cbd5e1;
-}
-
-/* Уменьшили размер подписи */
-.gallery-caption {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
-    font-size: 0.6rem;
-    color: #1e293b;
-    text-align: center;
-    line-height: 1.1;
-    padding: 0 4px;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .gallery-footer-text {
@@ -750,12 +703,6 @@
     color: #64748b;
     margin-top: 6px;
     line-height: 1.2;
-}
-
-.gallery-footer-text a {
-    color: #2563eb;
-    text-decoration: underline;
-    font-weight: 900;
 }
         
     </style>
@@ -776,14 +723,14 @@
         
         <section id="screen-gender" class="screen active">
             <div class="user-gallery-card">
-    <div class="gallery-header">★ УЖЕ В ОБРАЗАХ ★</div>
+    <div class="gallery-header">★ АРХИВ ТУСОВОК ★</div>
     
-    <div class="gallery-slider-container" id="galleryContainer">
-        <!-- Слайды генерируются динамически -->
+    <div class="gallery-slider-container" id="eventGalleryContainer">
+        <!-- Слайды архива подгружаются динамически -->
     </div>
 
     <div class="gallery-footer-text">
-        Хочешь сюда? Кидай свой лук и аватар нашему <a href="https://t.me/plombirsupport" target="_blank">саппорту</a>!
+        Ищи себя на фото в наших альбомах!
     </div>
 </div>
             <div class="header-box">
@@ -1238,69 +1185,38 @@ function triggerTractoristSound() {
     document.getElementById('screen-gender').classList.remove('hidden');
 }
 
-      document.addEventListener("DOMContentLoaded", async () => {
-    const container = document.getElementById('galleryContainer');
+      // Ссылки на твои облачные хранилища сохранены для внутренней структуры
+const eventFolders = [
+    "https://drive.google.com/drive/folders/1bJTjUCBfDILJ8XCMTzZ_80xzRRc3Pozu",
+    "https://disk.yandex.ru/d/kKWnlUMHVACdYQ",
+    "https://disk.yandex.ru/d/cYB5DGSWrQ5MYw",
+    "https://disk.yandex.ru/d/hYY3BAY57htFDw"
+];
+
+// Массив путей к фото для слайдера (закинь лучшие кадры в папку etc/events/ и перечисли их здесь)
+const eventPhotos = [
+    "etc/events/1.jpg",
+    "etc/events/2.jpg",
+    "etc/events/3.jpg",
+    "etc/events/4.jpg",
+    "etc/events/5.jpg"
+];
+
+document.addEventListener("DOMContentLoaded", () => {
+    const container = document.getElementById('eventGalleryContainer');
     if (!container) return;
 
-    let captions = [];
-    let looks = [];
+    // Перемешиваем фото случайным образом при каждом захода на сайт
+    const shuffledPhotos = [...eventPhotos].sort(() => Math.random() - 0.5);
 
-    try {
-        const textRes = await fetch('user/text.txt');
-        const textData = await textRes.text();
-        captions = textData.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    } catch (e) {
-        console.log("text.txt не найден");
-    }
-
-    try {
-        const lookRes = await fetch('user/look.txt');
-        const lookData = await lookRes.text();
-        looks = lookData.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    } catch (e) {
-        console.log("look.txt не найден");
-    }
-
-    const imageFiles = ['1.jpg', '1.png', '1.webp', '2.jpg', '2.png', '2.webp', '3.jpg', '3.png', '3.webp'];
-    let validIndices = [];
-
-    for (let i = 0; i < imageFiles.length; i++) {
-        const baseName = imageFiles[i].split('.')[0];
-        if (!validIndices.includes(baseName)) {
-            const avatarPath = await resolveExistingFile(`user/${baseName}`);
-            if (avatarPath) {
-                validIndices.push(baseName);
-            }
-        }
-    }
-
-    if (validIndices.length === 0) validIndices = ['1'];
-
-    for (let index = 0; index < validIndices.length; index++) {
-        const id = validIndices[index];
+    shuffledPhotos.forEach((src, index) => {
         const slide = document.createElement('div');
-        slide.className = `gallery-slide ${index === 0 ? 'active' : ''}`;
-        
-        const avatarSrc = await resolveExistingFile(`user/${id}`) || `user/${id}.jpg`;
-        const captionText = captions[index] || "«Деревенский стиль 🔥»";
-        
-        let lookName = looks[index] || 'look1';
-        let lookFolder = lookName.startsWith('g') ? 'girl' : 'boys';
-        
-        const lookSrc = await resolveExistingFile(`${lookFolder}/${lookName}`) || `${lookFolder}/${lookName}.jpg`;
-
-        slide.innerHTML = `
-            <div class="gallery-row">
-                <img src="${avatarSrc}" alt="Аватар" class="gallery-avatar">
-                <span class="gallery-symbol">➔</span>
-                <img src="${lookSrc}" alt="Лук" class="gallery-look-img">
-            </div>
-            <div class="gallery-caption">${captionText}</div>
-        `;
+        slide.className = `event-slide ${index === 0 ? 'active' : ''}`;
+        slide.innerHTML = `<img src="${src}" alt="Фото с мероприятия" class="event-img" onerror="this.style.display='none'">`;
         container.appendChild(slide);
-    }
+    });
 
-    const slides = container.querySelectorAll('.gallery-slide');
+    const slides = container.querySelectorAll('.event-slide');
     if (slides.length > 1) {
         let currentSlide = 0;
         setInterval(() => {
@@ -1310,29 +1226,6 @@ function triggerTractoristSound() {
         }, 4000);
     }
 });
-
-function resolveExistingFile(basePath) {
-    return new Promise(resolve => {
-        const exts = ['.jpg', '.png', '.webp'];
-        let currentIndex = 0;
-
-        function tryNext() {
-            if (currentIndex >= exts.length) {
-                resolve(null);
-                return;
-            }
-            const testUrl = basePath + exts[currentIndex];
-            currentIndex++;
-
-            const img = new Image();
-            img.onload = () => resolve(testUrl);
-            img.onerror = () => tryNext();
-            img.src = testUrl;
-        }
-
-        tryNext();
-    });
-}
     </script>
 </body>
 </html>
