@@ -644,65 +644,96 @@
     transform: scale(0.98);
 }
 
-.user-gallery-card {
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 10px;
+.wood-stats-card {
+    background: #854d0e; /* Текстурный деревянный оттенок */
+    background-image: linear-gradient(135deg, #a16207 0%, #713f12 100%);
+    border: 3px solid #451a03;
+    border-radius: 14px;
+    padding: 10px 12px;
     margin: 0 auto 12px auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 6px 16px rgba(69, 26, 3, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.15);
     text-align: center;
     width: 85%;
-    max-width: 280px;
+    max-width: 290px;
     box-sizing: border-box;
 }
 
-.gallery-header {
+.wood-header {
     font-family: 'Montserrat', sans-serif;
     font-weight: 900;
     font-size: 0.65rem;
-    color: #94a3b8;
+    color: #fef08a;
     letter-spacing: 1.5px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
-.gallery-slider-container {
-    position: relative;
-    width: 100%;
-    height: 140px;
-    border-radius: 10px;
-    overflow: hidden;
-    background: #f8fafc;
-    border: 1px solid #f1f5f9;
-}
-
-.event-slide {
-    position: absolute;
-    inset: 0;
+.wood-content-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.6s ease-in-out;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(69, 26, 3, 0.4);
+    border-radius: 10px;
+    padding: 8px;
 }
 
-.event-slide.active {
-    opacity: 1;
+.wood-poster-box {
+    width: 95px;
+    height: 105px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid #fef08a;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
-.event-img {
+.wood-poster-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.gallery-footer-text {
+.wood-stats-box {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    text-align: left;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 8px;
+    border-radius: 6px;
+    border-left: 3px solid #fef08a;
+}
+
+.stat-label {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.5rem;
+    color: #fde047;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 0.75rem;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.wood-footer-text {
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
     font-size: 0.55rem;
-    color: #64748b;
-    margin-top: 6px;
-    line-height: 1.2;
+    color: #fef08a;
+    margin-top: 8px;
+    opacity: 0.9;
 }
         
     </style>
@@ -722,15 +753,34 @@
     <div class="app-wrapper">
         
         <section id="screen-gender" class="screen active">
-            <div class="user-gallery-card">
-    <div class="gallery-header">★ АРХИВ ТУСОВОК ★</div>
+            <div class="wood-stats-card">
+    <div class="wood-header">★ СТАТИСТИКА ПРОЕКТА ★</div>
     
-    <div class="gallery-slider-container" id="eventGalleryContainer">
-        <!-- Слайды архива подгружаются динамически -->
+    <div class="wood-content-row">
+        <!-- Левая часть: Афиша -->
+        <div class="wood-poster-box">
+            <img src="etc/afisha/poster.jpg" alt="Афиша" class="wood-poster-img" onerror="this.src='etc/afisha/poster.png'">
+        </div>
+        
+        <!-- Правая часть: Фейковая статистика -->
+        <div class="wood-stats-box">
+            <div class="stat-item">
+                <span class="stat-label">Сегодня:</span>
+                <span class="stat-value" id="statToday">48</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">За всё время:</span>
+                <span class="stat-value" id="statTotal">1,420</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Помидоров:</span>
+                <span class="stat-value" id="statTomatoes">385</span>
+            </div>
+        </div>
     </div>
 
-    <div class="gallery-footer-text">
-        Ищи себя на фото в наших альбомах!
+    <div class="wood-footer-text">
+        Следи за анонсами и жги на тусовке! 🔥
     </div>
 </div>
             <div class="header-box">
@@ -1185,45 +1235,21 @@ function triggerTractoristSound() {
     document.getElementById('screen-gender').classList.remove('hidden');
 }
 
-      // Ссылки на твои облачные хранилища сохранены для внутренней структуры
-const eventFolders = [
-    "https://drive.google.com/drive/folders/1bJTjUCBfDILJ8XCMTzZ_80xzRRc3Pozu",
-    "https://disk.yandex.ru/d/kKWnlUMHVACdYQ",
-    "https://disk.yandex.ru/d/cYB5DGSWrQ5MYw",
-    "https://disk.yandex.ru/d/hYY3BAY57htFDw"
-];
-
-// Массив путей к фото для слайдера (закинь лучшие кадры в папку etc/events/ и перечисли их здесь)
-const eventPhotos = [
-    "etc/events/1.jpg",
-    "etc/events/2.jpg",
-    "etc/events/3.jpg",
-    "etc/events/4.jpg",
-    "etc/events/5.jpg"
-];
-
+      // Динамическая генерация живых цифр для фейковой статистики при каждом входе
 document.addEventListener("DOMContentLoaded", () => {
-    const container = document.getElementById('eventGalleryContainer');
-    if (!container) return;
+    const todayEl = document.getElementById('statToday');
+    const totalEl = document.getElementById('statTotal');
+    const tomatoesEl = document.getElementById('statTomatoes');
 
-    // Перемешиваем фото случайным образом при каждом захода на сайт
-    const shuffledPhotos = [...eventPhotos].sort(() => Math.random() - 0.5);
+    if (todayEl && totalEl && tomatoesEl) {
+        // Рандомим правдоподобные цифры
+        const randomToday = Math.floor(Math.random() * 25) + 35; // от 35 до 60
+        const randomTotal = Math.floor(Math.random() * 150) + 1350; // от 1350 до 1500
+        const randomTomatoes = Math.floor(Math.random() * 100) + 320; // от 320 до 420
 
-    shuffledPhotos.forEach((src, index) => {
-        const slide = document.createElement('div');
-        slide.className = `event-slide ${index === 0 ? 'active' : ''}`;
-        slide.innerHTML = `<img src="${src}" alt="Фото с мероприятия" class="event-img" onerror="this.style.display='none'">`;
-        container.appendChild(slide);
-    });
-
-    const slides = container.querySelectorAll('.event-slide');
-    if (slides.length > 1) {
-        let currentSlide = 0;
-        setInterval(() => {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }, 4000);
+        todayEl.textContent = randomToday;
+        totalEl.textContent = randomTotal.toLocaleString();
+        tomatoesEl.textContent = randomTomatoes;
     }
 });
     </script>
