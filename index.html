@@ -644,7 +644,9 @@
     transform: scale(0.98);
 }
 
- .user-gallery-card {
+ /* Обнови стили для карточки галереи, увеличив аватарки и уменьшив текст */
+
+.user-gallery-card {
     background: #ffffff;
     border: 2px solid #e2e8f0;
     border-radius: 16px;
@@ -663,13 +665,13 @@
     font-size: 0.65rem;
     color: #94a3b8;
     letter-spacing: 1.5px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .gallery-slider-container {
     position: relative;
     width: 100%;
-    height: 120px;
+    height: 115px;
     border-radius: 10px;
     overflow: hidden;
     background: #f8fafc;
@@ -683,7 +685,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 6px;
+    padding: 4px;
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
 }
@@ -696,14 +698,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    margin-bottom: 6px;
+    gap: 10px;
+    margin-bottom: 4px;
 }
 
+/* Сделали аватарки заметно больше */
 .gallery-avatar, .gallery-look-img {
-    width: 50px;
-    height: 50px;
-    border-radius: 10px;
+    width: 62px;
+    height: 62px;
+    border-radius: 12px;
     object-fit: cover;
     border: 2px solid #e2e8f0;
     background: #ffffff;
@@ -721,17 +724,18 @@
 .gallery-symbol {
     font-family: 'Montserrat', sans-serif;
     font-weight: 900;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: #cbd5e1;
 }
 
+/* Уменьшили размер подписи */
 .gallery-caption {
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     color: #1e293b;
     text-align: center;
-    line-height: 1.2;
+    line-height: 1.1;
     padding: 0 4px;
     max-width: 100%;
     overflow: hidden;
@@ -742,10 +746,10 @@
 .gallery-footer-text {
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     color: #64748b;
-    margin-top: 8px;
-    line-height: 1.3;
+    margin-top: 6px;
+    line-height: 1.2;
 }
 
 .gallery-footer-text a {
@@ -1261,11 +1265,10 @@ function triggerTractoristSound() {
     let validIndices = [];
 
     for (let i = 0; i < imageFiles.length; i++) {
-        const src = `user/${imageFiles[i]}`;
-        const exists = await checkFileExists(src);
-        if (exists) {
-            const baseName = imageFiles[i].split('.')[0];
-            if (!validIndices.includes(baseName)) {
+        const baseName = imageFiles[i].split('.')[0];
+        if (!validIndices.includes(baseName)) {
+            const avatarPath = await resolveExistingFile(`user/${baseName}`);
+            if (avatarPath) {
                 validIndices.push(baseName);
             }
         }
@@ -1273,27 +1276,29 @@ function triggerTractoristSound() {
 
     if (validIndices.length === 0) validIndices = ['1'];
 
-    validIndices.forEach((id, index) => {
+    for (let index = 0; index < validIndices.length; index++) {
+        const id = validIndices[index];
         const slide = document.createElement('div');
         slide.className = `gallery-slide ${index === 0 ? 'active' : ''}`;
         
-        const avatarSrc = findExistingFile(`user/${id}`);
+        const avatarSrc = await resolveExistingFile(`user/${id}`) || `user/${id}.jpg`;
         const captionText = captions[index] || "«Деревенский стиль 🔥»";
         
         let lookName = looks[index] || 'look1';
         let lookFolder = lookName.startsWith('g') ? 'girl' : 'boys';
-        let lookPath = `${lookFolder}/${lookName}.jpg`;
+        
+        const lookSrc = await resolveExistingFile(`${lookFolder}/${lookName}`) || `${lookFolder}/${lookName}.jpg`;
 
         slide.innerHTML = `
             <div class="gallery-row">
                 <img src="${avatarSrc}" alt="Аватар" class="gallery-avatar">
                 <span class="gallery-symbol">➔</span>
-                <img src="${lookPath}" alt="Лук" class="gallery-look-img" onerror="this.src='boys/look1.jpg'">
+                <img src="${lookSrc}" alt="Лук" class="gallery-look-img">
             </div>
             <div class="gallery-caption">${captionText}</div>
         `;
         container.appendChild(slide);
-    });
+    }
 
     const slides = container.querySelectorAll('.gallery-slide');
     if (slides.length > 1) {
@@ -1306,18 +1311,27 @@ function triggerTractoristSound() {
     }
 });
 
-function checkFileExists(url) {
+function resolveExistingFile(basePath) {
     return new Promise(resolve => {
-        const img = new Image();
-        img.onload = () => resolve(true);
-        img.onerror = () => resolve(false);
-        img.src = url;
-    });
-}
+        const exts = ['.jpg', '.png', '.webp'];
+        let currentIndex = 0;
 
-function findExistingFile(basePath) {
-    const exts = ['.jpg', '.png', '.webp'];
-    return `${basePath}.jpg`;
+        function tryNext() {
+            if (currentIndex >= exts.length) {
+                resolve(null);
+                return;
+            }
+            const testUrl = basePath + exts[currentIndex];
+            currentIndex++;
+
+            const img = new Image();
+            img.onload = () => resolve(testUrl);
+            img.onerror = () => tryNext();
+            img.src = testUrl;
+        }
+
+        tryNext();
+    });
 }
     </script>
 </body>
