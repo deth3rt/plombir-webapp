@@ -1073,10 +1073,167 @@
 .village-share-btn:active {
     transform: scale(0.98);
 }
-        
+
+.custom-overlay-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(9, 9, 11, 0.96);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+}
+
+.hidden-screen {
+    opacity: 0;
+    pointer-events: none;
+    display: none !important;
+}
+
+.overlay-card {
+    background: #18181b;
+    border: 3px solid #fcd34d;
+    border-radius: 20px;
+    padding: 30px 20px;
+    width: 85%;
+    max-width: 360px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    position: relative;
+}
+
+.overlay-title {
+    color: #fcd34d;
+    font-size: 1.8rem;
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    margin-bottom: 15px;
+}
+
+.overlay-text {
+    color: #e4e4e7;
+    font-size: 0.95rem;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 25px;
+    line-height: 1.4;
+}
+
+.overlay-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn-yes {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-size: 1rem;
+    font-weight: 900;
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    cursor: pointer;
+    flex: 1;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    transition: transform 0.1s;
+}
+
+.btn-yes:active {
+    transform: scale(0.95);
+}
+
+.btn-no {
+    background: #27272a;
+    color: #a1a1aa;
+    border: 2px solid #3f3f46;
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-size: 1rem;
+    font-weight: 900;
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    cursor: pointer;
+    flex: 1;
+    transition: all 0.2s ease;
+}
+
+.no-notification {
+    margin-top: 15px;
+    background: #ef4444;
+    color: #fff;
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    font-size: 0.95rem;
+    padding: 10px;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    transition: all 0.3s ease;
+}
+
+.hidden-notification {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    display: none;
+}
+
+.preload-main-title {
+    color: #fcd34d;
+    font-size: 2.2rem;
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    margin-bottom: 8px;
+}
+
+.preload-status-text {
+    color: #a1a1aa;
+    font-size: 0.9rem;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 20px;
+}
+
+.preload-video-player {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid #fcd34d;
+}   
     </style>
 </head>
 <body>
+<!-- Стартовый экран (развилка) -->
+<div id="screen-start" class="custom-overlay-screen">
+    <div class="overlay-card">
+        <h1 class="overlay-title">ГОТОВ ВОРВАТЬСЯ?</h1>
+        <p class="overlay-text">Трактор прогрет, клуб «БАЗА» ждет. Готов к лютому движу?</p>
+        
+        <div class="overlay-buttons">
+            <button class="btn-yes" onclick="handleReadyYes()">ДА, ПОГНАЛИ! 🔥</button>
+            <button class="btn-no" onclick="handleReadyNo()">НЕТ 🙅‍♂️</button>
+        </div>
+        
+        <!-- Всплывающая подсказка при нажатии "Нет" -->
+        <div id="noNotification" class="no-notification hidden-notification">ЗНАЕШЬ ЧЕЙ ОТВЕТ :)</div>
+    </div>
+</div>
+
+<!-- Экран загрузки с видео -->
+<div id="screen-preload" class="custom-overlay-screen hidden-screen">
+    <div class="overlay-card">
+        <h2 class="preload-main-title">ПLОМБИР</h2>
+        <p id="loadingStatus" class="preload-status-text">Заводим моторы...</p>
+        
+        <!-- Ваше видео -->
+        <video id="introVideo" class="preload-video-player" autoplay loop muted playsinline>
+            <source src="etc/fabric.mp4" type="video/mp4">
+        </video>
+    </div>
+</div>
+    
+    
     <div class="bg-decor" style="top: 10%; left: 8%;">🌾</div>
     <div class="bg-decor" style="top: 25%; right: 10%; animation-delay: 1s;">🚜</div>
     <div class="bg-decor" style="bottom: 15%; left: 12%; animation-delay: 2s;">🪗</div>
@@ -1843,6 +2000,59 @@ setInterval(() => {
         alert("Не удалось загрузить картинку для отправки.");
     };
 }
+
+// Обработка клика на «НЕТ»
+function handleReadyNo() {
+    const notification = document.getElementById('noNotification');
+    notification.style.display = 'block';
+    
+    // Небольшой таймаут, чтобы анимация появления сработала плавно
+    setTimeout(() => {
+        notification.classList.remove('hidden-notification');
+    }, 10);
+}
+
+// Когда нажимают «ДА»
+function handleReadyYes() {
+    // 1. Убираем стартовый экран, показываем экран загрузки с видео
+    document.getElementById('screen-start').classList.add('hidden-screen');
+    const preloadScreen = document.getElementById('screen-preload');
+    preloadScreen.classList.remove('hidden-screen');
+
+    // 2. Параллельно запускаем фоновую музыку (если она есть)
+    const audio = document.getElementById('bgAudio');
+    if (audio) {
+        audio.play().then(() => {
+            isMusicPlaying = true;
+            const musicBtn = document.getElementById('musicBtn');
+            if (musicBtn) musicBtn.textContent = "🔊";
+            document.body.classList.add('disco-active');
+        }).catch(e => console.log("Музыка ждет клика:", e));
+    }
+
+    // 3. Текст загрузки
+    const statusEl = document.getElementById('loadingStatus');
+    const phrases = [
+        "Калибруем уровень сельского гламура...",
+        "Выпускаем гусей на свободу...",
+        "Протираем фары трактора..."
+    ];
+    
+    let index = 0;
+    const phraseInterval = setInterval(() => {
+        index++;
+        if (phrases[index]) {
+            statusEl.textContent = phrases[index];
+        }
+    }, 800);
+
+    // 4. Завершаем прелоадер и пускаем в приложение
+    setTimeout(() => {
+        clearInterval(phraseInterval);
+        preloadScreen.classList.add('hidden-screen');
+    }, 2600);
+}
+        
     </script>
 </body>
 </html>
