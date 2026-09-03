@@ -1080,10 +1080,10 @@
         </button>
     </div>
 </div>
-            <div class="header-box">
+         <!--    <div class="header-box">
                 <span class="top-badge">ПLОМБИР</span>
                 <h1>ИЗ ГОРОДА<br>В ДЕРЕВНЮ</h1>
-            </div>
+            </div> -->
             <p class="instruction">ВЫБЕРИ СВОЮ КАТЕГОРИЮ</p>
             <div class="choice-container">
                 <button class="choice-btn" onclick="startGeneration('boys')">
@@ -1535,9 +1535,8 @@ function triggerTractoristSound() {
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfabpz-1aTNLnL6WZIXvew5z5BawuqPcbwBL0hdyqJ4z1y9gQv1-e4v14x6x5Dx9V3JA/exec";
 
 let communityMessages = [];
-let lastMessageCount = 0; // Для отслеживания появления новых записей от других пользователей
+let lastMessageCount = 0;
 
-// Частая проверка в фоне (каждые 2 секунды)
 function loadMessagesFromSheet(isInitial = false) {
     fetch(SCRIPT_URL, {
         method: 'POST',
@@ -1546,20 +1545,20 @@ function loadMessagesFromSheet(isInitial = false) {
     .then(res => res.json())
     .then(data => {
         if (data && Array.isArray(data.messages)) {
-            // Если количество сообщений изменилось (кто-то написал или мы сами добавили)
-            if (data.messages.length !== communityMessages.length || JSON.stringify(data.messages) !== JSON.stringify(communityMessages)) {
-                const isNewMessageAdded = data.messages.length > lastMessageCount;
-                communityMessages = data.messages;
+            // Ограничиваем массив только последними 30 сообщениями
+            const allMessages = data.messages;
+            const recentMessages = allMessages.slice(-30);
+
+            if (recentMessages.length !== communityMessages.length || JSON.stringify(recentMessages) !== JSON.stringify(communityMessages)) {
+                const isNewMessageAdded = recentMessages.length > lastMessageCount;
+                communityMessages = recentMessages;
                 lastMessageCount = communityMessages.length;
                 
-                // Рендерим и автоматически сдвигаем ползунок, если прилетело что-то новое
                 renderTicker(isInitial || isNewMessageAdded);
             }
         }
     })
-    .catch(() => {
-        // Тихо пропускаем сетевые сбои в фоне
-    });
+    .catch(() => {});
 }
 
 function renderTicker(shouldScroll = false) {
@@ -1576,12 +1575,12 @@ function renderTicker(shouldScroll = false) {
     communityMessages.forEach(msg => {
         const card = document.createElement('div');
         card.className = 'village-note-card';
+        // Безопасный вывод текста (исключает выполнение HTML/JS инъекций)
         card.textContent = msg;
         track.appendChild(card);
     });
 
     if (shouldScroll) {
-        // Даем браузеру дорисовать новые карточки, затем резко или плавно сдвигаем до упора вправо
         setTimeout(() => {
             container.scrollLeft = container.scrollWidth;
         }, 50);
@@ -1615,6 +1614,38 @@ const badWords = [
   "дерьмо", "говно", "говнюк", "говнище"
 ];
 
+// Функция фильтрации ссылок и HTML-кода
+function isTextAllowed(text) {
+    // 1. Проверка на запрещенный мат
+    if (badWords.some(word => text.toLowerCase().includes(word))) {
+        return "Ээ, дед запрещает такие слова на заборе! 🛑";
+    }
+
+    // 2. Защита от HTML-тегов (<script>, <b>, <div> и т.д.)
+    const htmlTagRegex = /<\/?[a-z][\s\S]*?>/i;
+    if (htmlTagRegex.test(text)) {
+        return "Хватит пытаться сломать забор кодом! 🛑";
+    }
+
+    // 3. Проверка на сторонние ссылки (http, https, www, .com, .ru и т.п.)
+    // Разрешаем только упоминания вроде @bardrop, а любые другие ссылки блокируем
+    const hasForbiddenLink = /https?:\/\/|www\.|\.(com|ru|org|net|io|me|ua|by|info)\b/i.test(text);
+    if (hasForbiddenLink) {
+        // Проверяем, не является ли это просто упоминанием без ссылочной структуры
+        const parts = text.split(/\s+/);
+        for (let part of parts) {
+            // Если слово начинается с @ — это разрешено (например, @bardrop)
+            if (part.startsWith('@')) continue;
+            // Если в слове есть намек на домен или протокол — считаем ссылкой
+            if (/https?:\/\/|www\.|\./i.test(part)) {
+                return "Ссылки на сторонние сайты публиковать нельзя (кроме @ник)! 🛑";
+            }
+        }
+    }
+
+    return null; // Всё чисто
+}
+
 function sendUserMessage() {
     const input = document.getElementById('userMessageInput');
     if (!input) return;
@@ -1625,22 +1656,28 @@ function sendUserMessage() {
         alert("Слишком длинная весточка! До 60 символов.");
         return;
     }
-    if (badWords.some(word => text.toLowerCase().includes(word))) {
-        alert("Ээ, дед запрещает такие слова на заборе! 🛑");
+
+    // Проверяем текст через фильтр безопасности
+    const errorMsg = isTextAllowed(text);
+    if (errorMsg) {
+        alert(errorMsg);
         input.value = "";
         updateCharCounter();
         return;
     }
 
-    // Мгновенное добавление (оптимистичное обновление)
+    // Оптимистичное обновление с учетом среза до 30 штук
     communityMessages.push(text);
+    if (communityMessages.length > 30) {
+        communityMessages.shift(); // Убираем самое старое, если больше 30
+    }
     lastMessageCount = communityMessages.length;
     renderTicker(true);
     
     input.value = "";
     updateCharCounter();
 
-    // Отправка в таблицу в фоне
+    // Отправка в таблицу
     fetch(SCRIPT_URL, {
         method: 'POST',
         body: JSON.stringify({ action: "addMessage", text: text })
@@ -1651,10 +1688,10 @@ function sendUserMessage() {
     });
 }
 
-// Первичная загрузка при открытии страницы (с прокруткой в конец)
+// Запуск при старте
 loadMessagesFromSheet(true);
 
-// Автообновление каждые 2 секунды (чтобы видеть свежие записи от других)
+// Автообновление каждые 2 секунды
 setInterval(() => {
     loadMessagesFromSheet(false);
 }, 2000);
