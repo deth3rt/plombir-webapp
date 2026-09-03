@@ -1535,31 +1535,37 @@ function triggerTractoristSound() {
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfabpz-1aTNLnL6WZIXvew5z5BawuqPcbwBL0hdyqJ4z1y9gQv1-e4v14x6x5Dx9V3JA/exec";
 
 let communityMessages = [];
+let isSending = "false"; // Защита от двойного клика
 
-function loadMessagesFromSheet() {
+// Функция загрузки сообщений (работает в фоновом режиме каждые 7 секунд)
+function loadMessagesFromSheet(isInitial = false) {
     fetch(SCRIPT_URL, {
         method: 'POST',
         body: JSON.stringify({ action: "getMessages" })
     })
     .then(res => res.json())
     .then(data => {
-        if (data && Array.isArray(data.messages) && data.messages.length > 0) {
-            communityMessages = data.messages;
-            renderTicker(true);
-        } else {
-            const track = document.getElementById('tickerTrack');
-            if (track) track.innerHTML = '<div class="village-note-card">Забор пока пуст, чиркни первым!</div>';
+        if (data && Array.isArray(data.messages)) {
+            // Обновляем список, только если появились новые сообщения
+            if (JSON.stringify(data.messages) !== JSON.stringify(communityMessages)) {
+                communityMessages = data.messages;
+                renderTicker(isInitial);
+            }
         }
     })
     .catch(() => {
-        const track = document.getElementById('tickerTrack');
-        if (track) track.innerHTML = '<div class="village-note-card">Связь с хутором оборвалась 📡</div>';
+        // Тихо игнорируем ошибки сети в фоне, чтобы не раздражать пользователя
     });
 }
 
 function renderTicker(scrollToEnd = false) {
     const track = document.getElementById('tickerTrack');
     if (!track) return;
+
+    if (communityMessages.length === 0) {
+        track.innerHTML = '<div class="village-note-card">Забор пока пуст, чиркни первым!</div>';
+        return;
+    }
 
     track.innerHTML = '';
     communityMessages.forEach(msg => {
@@ -1569,14 +1575,14 @@ function renderTicker(scrollToEnd = false) {
         track.appendChild(card);
     });
 
-    if (scrollToEnd && communityMessages.length > 0) {
-        // Смещаем ленту влево, показывая новые вертикальные прямоугольники
-        setTimeout(() => {
-            const container = document.getElementById('tickerContainer');
-            if (container) {
-                container.scrollLeft = container.scrollWidth;
-            }
-        }, 100);
+    if (scrollToEnd) {
+        const container = document.getElementById('tickerContainer');
+        if (container) {
+            container.scrollTo({
+                left: container.scrollWidth,
+                behavior: 'smooth' // Плавная прокрутка к новому сообщению
+            });
+        }
     }
 }
 
@@ -1606,25 +1612,33 @@ function sendUserMessage() {
         return;
     }
 
+    // 1. ОПТИМИСТИЧНОЕ ОБНОВЛЕНИЕ: показываем сразу в интерфейсе
+    communityMessages.push(text);
+    renderTicker(true);
+    
+    // Очищаем поле ввода и счетчик сразу, не дожидаясь ответа сервера
+    input.value = "";
+    updateCharCounter();
+
+    // 2. Отправляем в Google Таблицу в фоне
     fetch(SCRIPT_URL, {
         method: 'POST',
         body: JSON.stringify({ action: "addMessage", text: text })
     })
     .then(res => res.json())
-    .then(data => {
-        if (data && data.success) {
-            communityMessages.push(text);
-            renderTicker(true); // Перерисовывает и смещает ленту к новому вертикальному прямоугольнику
-            input.value = "";
-            updateCharCounter();
-        }
-    })
     .catch(() => {
-        alert("Не удалось прибить записку, попробуй еще раз.");
+        // Если вдруг сеть упала, можно уведомить, но сообщение уже на экране
+        console.error("Ошибка сохранения на сервере");
     });
 }
 
-loadMessagesFromSheet();
+// Запускаем при открытии страницы
+loadMessagesFromSheet(true);
+
+// Фоновое обновление ленты каждые 7 секунд (чтобы видеть сообщения других)
+setInterval(() => {
+    loadMessagesFromSheet(false);
+}, 7000);
     </script>
 </body>
 </html>
