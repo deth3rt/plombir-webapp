@@ -1749,58 +1749,70 @@ setInterval(() => {
     img.src = imgElement.src;
 
     img.onload = () => {
-        // Устанавливаем вертикальный формат под соотношение 3:4 (например, 900x1200 пикселей)
         canvas.width = 900;
         canvas.height = 1200;
 
-        // 1. Заливаем фон подложкой под дерево / старую бумагу на случай отступов
-        ctx.fillStyle = "#fffbeb";
+        // 1. Фон и картинка
+        ctx.fillStyle = "#121212";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // 2. Рисуем картинку образа на весь холст (или с красивыми пропорциями)
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        // 3. Создаем красивую градиентную плашку снизу для информации
-        const gradient = ctx.createLinearGradient(0, 960, 0, 1200);
-        gradient.addColorStop(0, "rgba(45, 26, 3, 0)");
-        gradient.addColorStop(0.3, "rgba(45, 26, 3, 0.85)");
-        gradient.addColorStop(1, "rgba(30, 16, 2, 0.95)");
+        // 2. Стильная темная плашка СВЕРХУ для заголовка
+        const topGrad = ctx.createLinearGradient(0, 0, 0, 160);
+        topGrad.addColorStop(0, "rgba(10, 10, 10, 0.95)");
+        topGrad.addColorStop(1, "rgba(10, 10, 10, 0)");
+        ctx.fillStyle = topGrad;
+        ctx.fillRect(0, 0, canvas.width, 160);
+
+        ctx.fillStyle = "#fcd34d";
+        ctx.font = "900 28px 'Courier New', monospace";
+        ctx.textAlign = "left";
+        ctx.fillText("ПLОМБИР: ИЗ ГОРОДА В ДЕРЕВНЮ", 50, 70);
+
+        // 3. Дерзкая печать ПОД УГЛОМ (19.09)
+        ctx.save();
+        ctx.translate(750, 220);
+        ctx.rotate(-15 * Math.PI / 180); // Поворот на -15 градусов
         
-        ctx.fillStyle = gradient;
+        ctx.strokeStyle = "#ef4444"; // Ярко-красный акцент печатного штампа
+        ctx.lineWidth = 4;
+        ctx.strokeRect(-80, -35, 160, 70);
+
+        ctx.fillStyle = "#ef4444";
+        ctx.font = "900 36px 'Courier New', monospace";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("19.09", 0, 2);
+        ctx.restore();
+
+        // 4. Стильная плашка СНИЗУ для слогана и инстаграма
+        const bottomGrad = ctx.createLinearGradient(0, 960, 0, 1200);
+        bottomGrad.addColorStop(0, "rgba(10, 10, 10, 0)");
+        bottomGrad.addColorStop(0.35, "rgba(10, 10, 10, 0.9)");
+        bottomGrad.addColorStop(1, "rgba(10, 10, 10, 0.98)");
+        ctx.fillStyle = bottomGrad;
         ctx.fillRect(0, 940, canvas.width, 260);
 
-        // 4. Текст: Название проекта / Слоган
-        ctx.fillStyle = "#fcd34d"; // Теплый золотисто-деревенский цвет
-        ctx.font = "bold 32px 'Courier New', monospace";
-        ctx.textAlign = "left";
-        ctx.fillText("ПLОМБИР: ИЗ ГОРОДА В ДЕРЕВНЮ", 60, 1010);
-
-        // 5. Текст: Статус / Действие (мол я иду, все дела)
-        ctx.fillStyle = "#fef3c7";
+        // Текст лука
+        ctx.fillStyle = "#ffffff";
         ctx.font = "bold 26px 'Courier New', monospace";
-        ctx.fillText("ВРЫВАЕМСЯ НА ЛЮТЫЙ ДВИЖ!🔥", 60, 1060);
+        ctx.textAlign = "left";
+        ctx.fillText("Я создал себе лук,", 50, 1035);
+        ctx.fillText("врываемся на лютый движ! 🔥🚜", 50, 1075);
 
-        // 6. Дата и Инстаграм (в одну строку, разделенные точкой или отступом)
-        ctx.fillStyle = "#cbd5e1"; // Светло-серый оттенок для второстепенной инфы
+        // Инстаграм
+        ctx.fillStyle = "#fcd34d";
         ctx.font = "bold 22px 'Courier New', monospace";
-        
-        const dateStr = "19.09.2026";
-        const instaStr = "📸 @plombir.grodno";
-        
-        ctx.fillText(dateStr, 60, 1125);
-        
-        // Выравниваем Instagram по правому краю плашки для баланса
-        ctx.textAlign = "right";
-        ctx.fillText(instaStr, 840, 1125);
+        ctx.fillText("📸 @plombir.grodno", 50, 1135);
 
-        // 7. Превращаем в файл и вызываем шеринг
+        // 5. Экспорт и шеринг
         canvas.toBlob((blob) => {
             const file = new File([blob], "plombir-look-19-09.jpg", { type: "image/jpeg" });
             
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 navigator.share({
-                    title: 'МОЙ ОБРАЗ НА ПLОМБИР',
-                    text: 'Зацени мой прикид🌾',
+                    title: 'Мой образ на ПLОМБИР',
+                    text: 'Зацени мой лук на движ! 🚜🌾',
                     files: [file],
                 }).catch(() => {});
             } else {
