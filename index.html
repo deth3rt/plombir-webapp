@@ -1753,71 +1753,79 @@ setInterval(() => {
         canvas.height = 1200;
 
         // 1. Фон и картинка
-        ctx.fillStyle = "#121212";
+        ctx.fillStyle = "#09090b";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        // 2. Стильная темная плашка СВЕРХУ для заголовка
-        const topGrad = ctx.createLinearGradient(0, 0, 0, 160);
-        topGrad.addColorStop(0, "rgba(10, 10, 10, 0.95)");
-        topGrad.addColorStop(1, "rgba(10, 10, 10, 0)");
+        // 2. Брутальная плашка СВЕРХУ (с неоновым/желтым акцентом)
+        const topGrad = ctx.createLinearGradient(0, 0, 0, 200);
+        topGrad.addColorStop(0, "rgba(9, 9, 11, 0.95)");
+        topGrad.addColorStop(1, "rgba(9, 9, 11, 0)");
         ctx.fillStyle = topGrad;
-        ctx.fillRect(0, 0, canvas.width, 160);
+        ctx.fillRect(0, 0, canvas.width, 200);
 
+        // Главный заголовок (жирный гротеск)
         ctx.fillStyle = "#fcd34d";
-        ctx.font = "900 28px 'Courier New', monospace";
+        ctx.font = "900 32px 'Impact', 'Arial Black', sans-serif";
         ctx.textAlign = "left";
-        ctx.fillText("ПLОМБИР: ИЗ ГОРОДА В ДЕРЕВНЮ", 50, 70);
+        ctx.fillText("ПLОМБИР: ИЗ ГОРОДА В ДЕРЕВНЮ", 45, 65);
 
-        // 3. Дерзкая печать ПОД УГЛОМ (19.09)
+        // Подзаголовок: Ночной клуб "БАЗА" (ул. Победы 35)
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 20px 'Arial Black', sans-serif";
+        ctx.fillText("НОЧНОЙ КЛУБ \"БАЗА\" • УЛ. ПОБЕДЫ 35", 45, 105);
+
+        // 3. Дерзкая печать ПОД УГЛОМ (19.09) в стиле постерного штампа
         ctx.save();
-        ctx.translate(750, 220);
-        ctx.rotate(-15 * Math.PI / 180); // Поворот на -15 градусов
+        ctx.translate(770, 240);
+        ctx.rotate(-12 * Math.PI / 180);
         
-        ctx.strokeStyle = "#ef4444"; // Ярко-красный акцент печатного штампа
-        ctx.lineWidth = 4;
-        ctx.strokeRect(-80, -35, 160, 70);
+        ctx.strokeStyle = "#ef4444";
+        ctx.lineWidth = 6;
+        ctx.strokeRect(-90, -45, 180, 90);
 
         ctx.fillStyle = "#ef4444";
-        ctx.font = "900 36px 'Courier New', monospace";
+        ctx.font = "900 42px 'Impact', 'Arial Black', sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText("19.09", 0, 2);
+        ctx.fillText("19.09", 0, 3);
         ctx.restore();
 
-        // 4. Стильная плашка СНИЗУ для слогана и инстаграма
-        const bottomGrad = ctx.createLinearGradient(0, 960, 0, 1200);
-        bottomGrad.addColorStop(0, "rgba(10, 10, 10, 0)");
-        bottomGrad.addColorStop(0.35, "rgba(10, 10, 10, 0.9)");
-        bottomGrad.addColorStop(1, "rgba(10, 10, 10, 0.98)");
+        // 4. Глубокая плашка СНИЗУ для лука и контактов
+        const bottomGrad = ctx.createLinearGradient(0, 920, 0, 1200);
+        bottomGrad.addColorStop(0, "rgba(9, 9, 11, 0)");
+        bottomGrad.addColorStop(0.3, "rgba(9, 9, 11, 0.92)");
+        bottomGrad.addColorStop(1, "rgba(9, 9, 11, 0.98)");
         ctx.fillStyle = bottomGrad;
-        ctx.fillRect(0, 940, canvas.width, 260);
+        ctx.fillRect(0, 900, canvas.width, 300);
 
-        // Текст лука
+        // Текст лука с жирным начертанием
         ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 26px 'Courier New', monospace";
+        ctx.font = "900 30px 'Impact', 'Arial Black', sans-serif";
         ctx.textAlign = "left";
-        ctx.fillText("Я создал себе лук,", 50, 1035);
-        ctx.fillText("врываемся на лютый движ! 🔥🚜", 50, 1075);
-
-        // Инстаграм
+        ctx.fillText("Я СОЗДАЛ СЕБЕ ЛУК,", 45, 1015);
+        
         ctx.fillStyle = "#fcd34d";
-        ctx.font = "bold 22px 'Courier New', monospace";
-        ctx.fillText("📸 @plombir.grodno", 50, 1135);
+        ctx.fillText("ВРЫВАЕМСЯ НА ЛЮТЫЙ ДВИЖ! 🔥🚜", 45, 1055);
+
+        // Инстаграм аккаунт
+        ctx.fillStyle = "#e2e8f0";
+        ctx.font = "bold 24px 'Arial Black', sans-serif";
+        ctx.fillText("📸 @plombir.grodno", 45, 1125);
 
         // 5. Экспорт и шеринг
         canvas.toBlob((blob) => {
-            const file = new File([blob], "plombir-look-19-09.jpg", { type: "image/jpeg" });
+            const file = new File([blob], "plombir-baza-19-09.jpg", { type: "image/jpeg" });
             
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 navigator.share({
                     title: 'Мой образ на ПLОМБИР',
-                    text: 'Зацени мой лук на движ! 🚜🌾',
+                    text: 'Зацени мой лук. 🚜🔥',
                     files: [file],
                 }).catch(() => {});
             } else {
                 const link = document.createElement('a');
-                link.download = 'plombir-look-19-09.jpg';
+                link.download = 'plombir-baza-19-09.jpg';
                 link.href = URL.createObjectURL(blob);
                 link.click();
             }
