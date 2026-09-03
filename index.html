@@ -1188,7 +1188,7 @@ function triggerTractoristSound() {
     document.getElementById('screen-gender').classList.remove('hidden');
 }
 
-      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwONfNVAeg59HgiwXKD482JUjvA4PunZM1Xl9lGC3nhJNoSY_Y24NawjAq5b-PTdi-Ofw/exec";
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzezHukhSJLf2lxXqY6oPA8CEj7FSB_hYW6eliW2YYt0L6wDlZGDkilwi2dNhX6DPxzXQ/exec";
 
 let communityMessages = [
     "Кто потерял трактор возле клуба? Отзовись 🚜",
@@ -1242,19 +1242,19 @@ function sendUserMessage() {
         return;
     }
 
-    fetch(`${SCRIPT_URL}?action=addMessage&text=${encodeURIComponent(text)}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.success) {
-                communityMessages.push(text);
-                document.getElementById('activeMessage').textContent = text;
-                input.value = "";
-                alert("Объявление залетело на доску! 📌");
-            }
-        })
-        .catch(() => {
-            alert("Ошибка отправки, попробуй еще раз.");
-        });
+    fetch(`${SCRIPT_URL}?action=addMessage&text=${encodeURIComponent(text)}`, {
+        method: 'POST',
+        mode: 'no-cors'
+    })
+    .then(() => {
+        communityMessages.push(text);
+        document.getElementById('activeMessage').textContent = text;
+        input.value = "";
+        alert("Объявление залетело на доску! 📌");
+    })
+    .catch(() => {
+        alert("Ошибка отправки, попробуй еще раз.");
+    });
 }
 
 // Запустите функцию при загрузке страницы (внутри вашего DOMContentLoaded)
