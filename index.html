@@ -1219,12 +1219,28 @@ function triggerTractoristSound() {
         }
 
         // ==========================================
+        // ВОССТАНОВЛЕННЫЕ ФУНКЦИИ (КУРИЦА И ГЕНЕРАЦИЯ)
+        // ==========================================
+
+        function hitChicken() {
+            const chicken = document.getElementById('chicken');
+            if (!chicken) return;
+
+            chicken.classList.add('chicken-hit');
+            setTimeout(() => {
+                chicken.classList.remove('chicken-hit');
+            }, 300);
+
+            // Рандомный звук или реплика курицы (если есть)
+            console.Hog ? console.Hog("Кукдахтер сработал") : null;
+        }
+
+        // ==========================================
         // РАБОТА С ДОСКОЙ ОБЪЯВЛЕНИЙ И GOOGLE APPS SCRIPT
         // ==========================================
 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM3FUE1nJuCqrL9pxbCt5ge33kXbky-zMetwqytPT-4VeD-7Quppp59qonLzLJVBvf_A/exec";
 
-        // Базовый массив дефолтных фраз (если в таблице пусто)
         let communityMessages = [
             "Кто потерял трактор возле клуба? Отзовись 🚜",
             "Гродно гудит, картошка в безопасности 🔥",
@@ -1236,7 +1252,6 @@ function triggerTractoristSound() {
             loadMessagesFromSheet();
         });
 
-        // Загрузка сообщений из Google Таблицы
         function loadMessagesFromSheet() {
             fetch(`${SCRIPT_URL}?action=getMessages`)
                 .then(res => res.json())
@@ -1247,17 +1262,15 @@ function triggerTractoristSound() {
                     startMessageRotation();
                 })
                 .catch(() => {
-                    startMessageRotation(); // Если сеть упала, крутим дефолтные
+                    startMessageRotation();
                 });
         }
 
-        // Рандомная смена сообщений каждые 5 секунд
         function startMessageRotation() {
             const msgEl = document.getElementById('activeMessage');
             if (!msgEl) return;
 
             showRandomMessage();
-
             setInterval(() => {
                 showRandomMessage();
             }, 5000);
@@ -1270,7 +1283,6 @@ function triggerTractoristSound() {
             msgEl.textContent = communityMessages[randomIndex];
         }
 
-        // Простейший фильтр цензуры
         const badWords = ["хуй", "пизд", "еб", "бля", "сука", "епт", "мраз"];
 
         function checkCensorship(text) {
@@ -1278,7 +1290,6 @@ function triggerTractoristSound() {
             return badWords.some(word => lowerText.includes(word));
         }
 
-        // Отправка нового сообщения
         function sendUserMessage() {
             const input = document.getElementById('userMessageInput');
             if (!input) return;
@@ -1297,7 +1308,6 @@ function triggerTractoristSound() {
                 return;
             }
 
-            // Отправляем на сервер Google Apps Script
             fetch(`${SCRIPT_URL}?action=addMessage&text=${encodeURIComponent(text)}`)
                 .then(res => res.json())
                 .then(data => {
