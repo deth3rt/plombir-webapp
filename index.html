@@ -754,19 +754,19 @@
             <img src="etc/afisha/poster.jpg" alt="Афиша" class="wood-poster-img" onerror="this.src='etc/afisha/poster.png'">
         </div>
         
-        <!-- Статистика (справа) -->
+        <!-- Реальная статистика (справа) -->
         <div class="wood-stats-box">
             <div class="stat-item">
                 <span class="stat-label">Сегодня образов:</span>
-                <span class="stat-value" id="statToday">--</span>
+                <span class="stat-value" id="statToday">...</span>
             </div>
             <div class="stat-item">
                 <span class="stat-label">За всё время:</span>
-                <span class="stat-value" id="statTotal">--</span>
+                <span class="stat-value" id="statTotal">...</span>
             </div>
             <div class="stat-item">
                 <span class="stat-label">Помидоров брошено:</span>
-                <span class="stat-value" id="statTomatoes">--</span>
+                <span class="stat-value" id="statTomatoes">...</span>
             </div>
         </div>
     </div>
@@ -1223,59 +1223,44 @@ function triggerTractoristSound() {
     document.getElementById('screen-gender').classList.remove('hidden');
 }
 
-   // Генератор стабильной статистики с привязкой к времени Минска (UTC+3)
+   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRUDfa3U6cYswiyrVt-8Y5ejymyeGEPAFtnrWktnp0wY6tp0W_0Js0LkoKY83TZfAY/exec";
+
 document.addEventListener("DOMContentLoaded", () => {
-    const todayEl = document.getElementById('statToday');
-    const totalEl = document.getElementById('statTotal');
-    const tomatoesEl = document.getElementById('statTomatoes');
-
-    if (!todayEl || !totalEl || !tomatoesEl) return;
-
-    // Получаем текущую дату по Минску (сдвиг 18:00)
-    const now = new Date();
-    const minskTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Minsk" }));
-    
-    // Если еще нет 18:00, считаем что игровой «день» начался вчера в 18:00
-    if (minskTime.getHours() < 18) {
-        minskTime.setDate(minskTime.getDate() - 1);
-    }
-    const dayKey = minskTime.toISOString().slice(0, 10); // Ключ дня вида "2026-03-31"
-
-    // Используем симулятор псевдослучайных чисел на основе даты, чтобы у всех пользователей в этот день были одинаковые цифры
-    function pseudoRandom(seedStr) {
-        let hash = 0;
-        for (let i = 0; i < seedStr.length; i++) {
-            hash = (hash << 5) - hash + seedStr.charCodeAt(i);
-            hash |= 0;
-        }
-        return Math.abs(hash);
-    }
-
-    // Считаем «Сегодня» (от 27 до 84) на основе даты
-    const seedToday = pseudoRandom("today_" + dayKey);
-    const todayCount = 27 + (seedToday % 58);
-
-    // Считаем «За всё время»: база (например, 1200) + накопительный итог по дням с фиксированной даты
-    const baseDate = new Date("2026-03-01"); // старт проекта
-    const diffDays = Math.floor((minskTime - baseDate) / (1000 * 60 * 60 * 24));
-    
-    let totalCount = 1140; // стартовая база до запуска
-    for (let i = 0; i <= Math.max(0, diffDays); i++) {
-        const testDate = new Date(baseDate);
-        testDate.setDate(baseDate.getDate() + i);
-        const testKey = testDate.toISOString().slice(0, 10);
-        const dayVal = 27 + (pseudoRandom("today_" + testKey) % 58);
-        totalCount += dayVal;
-    }
-
-    // Помидоры строго привязаны к сегодняшней цифре умноженной на 9
-    const tomatoesCount = todayCount * 9;
-
-    // Выводим данные на экран
-    todayEl.textContent = todayCount;
-    totalEl.textContent = totalCount.toLocaleString();
-    tomatoesEl.textContent = tomatoesCount.toLocaleString();
+    fetchStats();
 });
+
+function fetchStats() {
+    fetch(`${SCRIPT_URL}?action=get`)
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                document.getElementById('statToday').textContent = data.today || 0;
+                document.getElementById('statTotal').textContent = (data.total || 0).toLocaleString();
+                document.getElementById('statTomatoes').textContent = (data.tomatoes || 0).toLocaleString();
+            }
+        })
+        .catch(err => {
+            console.log("Ошибка загрузки статистики:", err);
+            document.getElementById('statToday').textContent = "-";
+            document.getElementById('statTotal').textContent = "-";
+            document.getElementById('statTomatoes').textContent = "-";
+        });
+}
+
+function recordAction(actionType) {
+    fetch(`${SCRIPT_URL}?action=add&type=${actionType}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.success) {
+                document.getElementById('statToday').textContent = data.today;
+                document.getElementById('statTotal').textContent = data.total.toLocaleString();
+                if (actionType === 'tomato') {
+                    document.getElementById('statTomatoes').textContent = data.tomatoes.toLocaleString();
+                }
+            }
+        })
+        .catch(err => console.log("Ошибка обновления:", err));
+}
     </script>
 </body>
 </html>
