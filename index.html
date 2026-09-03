@@ -644,34 +644,33 @@
     transform: scale(0.98);
 }
 
-        /* Добавь эти стили в секцию <style> */
-
-.user-gallery-card {
+ .user-gallery-card {
     background: #ffffff;
     border: 2px solid #e2e8f0;
-    border-radius: 18px;
-    padding: 14px;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    border-radius: 16px;
+    padding: 10px;
+    margin: 0 auto 12px auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
     text-align: center;
-    width: 100%;
+    width: 85%;
+    max-width: 280px;
     box-sizing: border-box;
 }
 
 .gallery-header {
     font-family: 'Montserrat', sans-serif;
     font-weight: 900;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     color: #94a3b8;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
 }
 
 .gallery-slider-container {
     position: relative;
     width: 100%;
-    height: 160px; /* Высота окошка с фото */
-    border-radius: 12px;
+    height: 120px;
+    border-radius: 10px;
     overflow: hidden;
     background: #f8fafc;
     border: 1px solid #f1f5f9;
@@ -684,41 +683,68 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 6px;
     opacity: 0;
-    transition: opacity 0.6s ease-in-out;
+    transition: opacity 0.5s ease-in-out;
 }
 
 .gallery-slide.active {
     opacity: 1;
 }
 
-.gallery-img {
-    width: 85px;
-    height: 85px;
-    border-radius: 50%;
+.gallery-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.gallery-avatar, .gallery-look-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
     object-fit: cover;
-    border: 3px solid #3b82f6;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-    margin-bottom: 8px;
+    border: 2px solid #e2e8f0;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.gallery-avatar {
+    border-color: #3b82f6;
+}
+
+.gallery-look-img {
+    border-color: #10b981;
+}
+
+.gallery-symbol {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 0.9rem;
+    color: #cbd5e1;
 }
 
 .gallery-caption {
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: #1e293b;
     text-align: center;
     line-height: 1.2;
-    padding: 0 10px;
+    padding: 0 4px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .gallery-footer-text {
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     color: #64748b;
-    margin-top: 10px;
+    margin-top: 8px;
     line-height: 1.3;
 }
 
@@ -743,18 +769,19 @@
     </div>
 
     <div class="app-wrapper">
-        <div class="user-gallery-card">
+        
+        <section id="screen-gender" class="screen active">
+            <div class="user-gallery-card">
     <div class="gallery-header">★ УЖЕ В ОБРАЗАХ ★</div>
     
     <div class="gallery-slider-container" id="galleryContainer">
-        <!-- Слайды будут подгружаться динамически -->
+        <!-- Слайды генерируются динамически -->
     </div>
 
     <div class="gallery-footer-text">
-        Хочешь сюда? Кидай свой лук нашему <a href="https://t.me/plombirsupport" target="_blank">саппорту</a>, и мы добавим твой аватар!
+        Хочешь сюда? Кидай свой лук и аватар нашему <a href="https://t.me/plombirsupport" target="_blank">саппорту</a>!
     </div>
 </div>
-        <section id="screen-gender" class="screen active">
             <div class="header-box">
                 <span class="top-badge">ПLОМБИР</span>
                 <h1>ИЗ ГОРОДА<br>В ДЕРЕВНЮ</h1>
@@ -1212,37 +1239,57 @@ function triggerTractoristSound() {
     if (!container) return;
 
     let captions = [];
+    let looks = [];
+
     try {
-        const response = await fetch('user/text.txt');
-        const text = await response.text();
-        captions = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+        const textRes = await fetch('user/text.txt');
+        const textData = await textRes.text();
+        captions = textData.split('\n').map(l => l.trim()).filter(l => l.length > 0);
     } catch (e) {
-        console.log("Не удалось загрузить text.txt, используются стандартные подписи", e);
+        console.log("text.txt не найден");
     }
 
-    const imageFiles = ['1.jpg', '1.png', '2.jpg', '2.png', '3.jpg', '3.png']; 
-    let validImages = [];
+    try {
+        const lookRes = await fetch('user/look.txt');
+        const lookData = await lookRes.text();
+        looks = lookData.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    } catch (e) {
+        console.log("look.txt не найден");
+    }
+
+    const imageFiles = ['1.jpg', '1.png', '1.webp', '2.jpg', '2.png', '2.webp', '3.jpg', '3.png', '3.webp'];
+    let validIndices = [];
 
     for (let i = 0; i < imageFiles.length; i++) {
         const src = `user/${imageFiles[i]}`;
-        const exists = await checkImageExists(src);
+        const exists = await checkFileExists(src);
         if (exists) {
-            validImages.push(src);
+            const baseName = imageFiles[i].split('.')[0];
+            if (!validIndices.includes(baseName)) {
+                validIndices.push(baseName);
+            }
         }
     }
 
-    if (validImages.length === 0) {
-        validImages = ['user/1.jpg', 'user/2.jpg'];
-    }
+    if (validIndices.length === 0) validIndices = ['1'];
 
-    validImages.forEach((imgSrc, index) => {
+    validIndices.forEach((id, index) => {
         const slide = document.createElement('div');
         slide.className = `gallery-slide ${index === 0 ? 'active' : ''}`;
         
-        const captionText = captions[index] || "«Деревенский вайб на максимум 🔥»";
+        const avatarSrc = findExistingFile(`user/${id}`);
+        const captionText = captions[index] || "«Деревенский стиль 🔥»";
+        
+        let lookName = looks[index] || 'look1';
+        let lookFolder = lookName.startsWith('g') ? 'girl' : 'boys';
+        let lookPath = `${lookFolder}/${lookName}.jpg`;
 
         slide.innerHTML = `
-            <img src="${imgSrc}" alt="Образ пользователя" class="gallery-img">
+            <div class="gallery-row">
+                <img src="${avatarSrc}" alt="Аватар" class="gallery-avatar">
+                <span class="gallery-symbol">➔</span>
+                <img src="${lookPath}" alt="Лук" class="gallery-look-img" onerror="this.src='boys/look1.jpg'">
+            </div>
             <div class="gallery-caption">${captionText}</div>
         `;
         container.appendChild(slide);
@@ -1259,13 +1306,18 @@ function triggerTractoristSound() {
     }
 });
 
-function checkImageExists(url) {
+function checkFileExists(url) {
     return new Promise(resolve => {
         const img = new Image();
         img.onload = () => resolve(true);
         img.onerror = () => resolve(false);
         img.src = url;
     });
+}
+
+function findExistingFile(basePath) {
+    const exts = ['.jpg', '.png', '.webp'];
+    return `${basePath}.jpg`;
 }
     </script>
 </body>
