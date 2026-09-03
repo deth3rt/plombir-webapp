@@ -1757,15 +1757,15 @@ setInterval(() => {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        // 2. Крупная печать С ЛЕВОЙ СТОРОНЫ (под небольшим углом, полупрозрачная)
+        // 2. Крупная печать С ЛЕВОЙ СТОРОНЫ (полупрозрачная)
         ctx.save();
-        ctx.globalAlpha = 0.85; // Легкая полупрозрачность
-        ctx.translate(140, 240); // Сдвигаем влево
-        ctx.rotate(14 * Math.PI / 180); // Поворот в другую сторону для стиля
+        ctx.globalAlpha = 0.85;
+        ctx.translate(140, 240);
+        ctx.rotate(14 * Math.PI / 180);
         
         ctx.strokeStyle = "#ef4444";
         ctx.lineWidth = 8;
-        ctx.strokeRect(-110, -55, 220, 110); // Сделали крупнее
+        ctx.strokeRect(-110, -55, 220, 110);
 
         ctx.fillStyle = "#ef4444";
         ctx.font = "900 52px 'Impact', 'Arial Black', sans-serif";
@@ -1790,25 +1790,35 @@ setInterval(() => {
         ctx.font = "bold 20px 'Arial Black', sans-serif";
         ctx.fillText("НОЧНОЙ КЛУБ \"БАЗА\" • УЛ. ПОБЕДЫ 35", 45, 105);
 
-        // 4. Глубокая плашка СНИЗУ для лука и контактов
-        const bottomGrad = ctx.createLinearGradient(0, 920, 0, 1200);
+        // 4. Опущенная плашка СНИЗУ для лука, контактов и крупного бренда в правом углу
+        const bottomGrad = ctx.createLinearGradient(0, 950, 0, 1200);
         bottomGrad.addColorStop(0, "rgba(9, 9, 11, 0)");
-        bottomGrad.addColorStop(0.3, "rgba(9, 9, 11, 0.92)");
+        bottomGrad.addColorStop(0.35, "rgba(9, 9, 11, 0.92)");
         bottomGrad.addColorStop(1, "rgba(9, 9, 11, 0.98)");
         ctx.fillStyle = bottomGrad;
-        ctx.fillRect(0, 900, canvas.width, 300);
+        ctx.fillRect(0, 930, canvas.width, 270); // Опустили начало плашки ниже, чтобы обувь оставалась видна
 
+        // Текст лука
         ctx.fillStyle = "#ffffff";
-        ctx.font = "900 30px 'Impact', 'Arial Black', sans-serif";
+        ctx.font = "900 28px 'Impact', 'Arial Black', sans-serif";
         ctx.textAlign = "left";
-        ctx.fillText("МОЙ ЛУК ГОТОВ", 45, 1015);
+        ctx.fillText("МОЙ ЛУК ГОТОВ", 45, 1030);
         
         ctx.fillStyle = "#fcd34d";
-        ctx.fillText("ВРЫВАЕМСЯ НА ЛЮТЫЙ ДВИЖ! 🔥🚜", 45, 1055);
+        ctx.fillText("ВРЫВАЕМСЯ НА ЛЮТЫЙ ДВИЖ! 🔥🚜", 45, 1070);
 
         ctx.fillStyle = "#e2e8f0";
-        ctx.font = "bold 24px 'Arial Black', sans-serif";
-        ctx.fillText("📸 @plombir.grodno", 45, 1125);
+        ctx.font = "bold 22px 'Arial Black', sans-serif";
+        ctx.fillText("📸 @plombir.grodno", 45, 1135);
+
+        // Крупный водяной знак ПLОМБИР в самом правом нижнем углу
+        ctx.save();
+        ctx.fillStyle = "rgba(252, 211, 77, 0.25)"; // Полупрозрачный желтый стиль водяного знака
+        ctx.font = "900 64px 'Impact', 'Arial Black', sans-serif";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "bottom";
+        ctx.fillText("ПLОМБИР", 860, 1175);
+        ctx.restore();
 
         // 5. Экспорт и шеринг
         canvas.toBlob((blob) => {
