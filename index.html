@@ -644,6 +644,86 @@
     transform: scale(0.98);
 }
 
+        .wood-board-card {
+    background: #854d0e;
+    background-image: linear-gradient(135deg, #a16207 0%, #713f12 100%);
+    border: 3px solid #451a03;
+    border-radius: 14px;
+    padding: 10px 12px;
+    margin: 0 auto 12px auto;
+    box-shadow: 0 6px 16px rgba(69, 26, 3, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.15);
+    text-align: center;
+    width: 92%;
+    max-width: 420px;
+    box-sizing: border-box;
+}
+
+.board-header {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 0.6rem;
+    color: #fef08a;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.board-message-container {
+    background: rgba(0, 0, 0, 0.25);
+    border: 2px solid rgba(69, 26, 3, 0.5);
+    border-radius: 10px;
+    padding: 10px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.board-msg-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    word-break: break-word;
+}
+
+.board-input-row {
+    display: flex;
+    gap: 6px;
+}
+
+.board-input-row input {
+    flex-grow: 1;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(69, 26, 3, 0.6);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    color: #ffffff;
+    outline: none;
+}
+
+.board-input-row input::placeholder {
+    color: #fde047;
+    opacity: 0.7;
+}
+
+.board-input-row button {
+    background: #fde047;
+    border: 2px solid #ca8a04;
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: transform 0.1s ease;
+}
+
+.board-input-row button:active {
+    transform: scale(0.95);
+}
 
     </style>
 </head>
@@ -662,7 +742,20 @@
     <div class="app-wrapper">
         
         <section id="screen-gender" class="screen active">
-       
+       <div class="wood-board-card">
+    <div class="board-header">★ ДОСКА ОБЪЯВЛЕНИЙ ПLОМБИР ★</div>
+    
+    <!-- Лента случайных сообщений -->
+    <div class="board-message-container" id="boardMessageContainer">
+        <span class="board-msg-text" id="activeMessage">Загружаем народную мудрость... 🚜</span>
+    </div>
+
+    <!-- Поле ввода нового сообщения -->
+    <div class="board-input-row">
+        <input type="text" id="userMessageInput" placeholder="Черкани пару строк..." maxlength="60">
+        <button onclick="sendUserMessage()">✍️</button>
+    </div>
+</div>
             <div class="header-box">
                 <span class="top-badge">ПLОМБИР</span>
                 <h1>ИЗ ГОРОДА<br>В ДЕРЕВНЮ</h1>
@@ -1110,6 +1203,99 @@ function triggerTractoristSound() {
         tomatoBtn.innerHTML = `🍅 БРОСИТЬ ПОМИДОРЫ (<span id="clicksLeft">10</span>)`;
     }
 
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM3FUE1nJuCqrL9pxbCt5ge33kXbky-zMetwqytPT-4VeD-7Quppp59qonLzLJVBvf_A/exec";
+
+// Базовый массив дефолтных фраз (если в таблице пусто)
+let communityMessages = [
+    "Кто потерял трактор возле клуба? Отзовись 🚜",
+    "Гродно гудит, картошка в безопасности 🔥",
+    "Лучший лук делает тот, кто не боится грязи",
+    "Закинул помидор — плюс к карме 🍅"
+];
+
+let currentMsgIndex = 0;
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadMessagesFromSheet();
+});
+
+// Загрузка сообщений из Google Таблицы
+function loadMessagesFromSheet() {
+    fetch(`${SCRIPT_URL}?action=getMessages`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && Array.isArray(data.messages) && data.messages.length > 0) {
+                communityMessages = data.messages;
+            }
+            startMessageRotation();
+        })
+        .catch(() => {
+            startMessageRotation(); // Если сеть упала, крутим дефолтные
+        });
+}
+
+// Рандомная смена сообщений каждые 5 секунд
+function startMessageRotation() {
+    const msgEl = document.getElementById('activeMessage');
+    if (!msgEl) return;
+
+    // Показываем первое случайное
+    showRandomMessage();
+
+    setInterval(() => {
+        showRandomMessage();
+    }, 5000);
+}
+
+function showRandomMessage() {
+    const msgEl = document.getElementById('activeMessage');
+    if (communityMessages.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * communityMessages.length);
+    msgEl.textContent = communityMessages[randomIndex];
+}
+
+// Простейший фильтр цензуры (добавь свои стоп-слова по желанию)
+const badWords = ["хуй", "пизд", "еб", "бля", "сука", "епт", "мраз"];
+
+function checkCensorship(text) {
+    const lowerText = text.toLowerCase();
+    return badWords.some(word => lowerText.includes(word));
+}
+
+// Отправка нового сообщения
+function sendUserMessage() {
+    const input = document.getElementById('userMessageInput');
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    if (text.length > 60) {
+        alert("Слишком длинно! Короче, пацаны не поймут (до 60 символов).");
+        return;
+    }
+
+    // Проверяем на цензуру
+    if (checkCensorship(text)) {
+        alert("Ээ, полегче на поворотах! Давай без матов 🛑");
+        input.value = "";
+        return;
+    }
+
+    // Отправляем на сервер Google Apps Script
+    fetch(`${SCRIPT_URL}?action=addMessage&text=${encodeURIComponent(text)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.success) {
+                communityMessages.push(text); // Добавляем локально в пул
+                document.getElementById('activeMessage').textContent = text; // Сразу выводим
+                input.value = "";
+                alert("Объявление залетело на доску! 📌");
+            }
+        })
+        .catch(() => {
+            alert("Ошибка отправки, попробуй еще раз.");
+        });
+}
     
     </script>
 </body>
