@@ -1757,39 +1757,38 @@ setInterval(() => {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        // 2. Брутальная плашка СВЕРХУ (с неоновым/желтым акцентом)
+        // 2. Крупная печать С ЛЕВОЙ СТОРОНЫ (под небольшим углом, полупрозрачная)
+        ctx.save();
+        ctx.globalAlpha = 0.85; // Легкая полупрозрачность
+        ctx.translate(140, 240); // Сдвигаем влево
+        ctx.rotate(14 * Math.PI / 180); // Поворот в другую сторону для стиля
+        
+        ctx.strokeStyle = "#ef4444";
+        ctx.lineWidth = 8;
+        ctx.strokeRect(-110, -55, 220, 110); // Сделали крупнее
+
+        ctx.fillStyle = "#ef4444";
+        ctx.font = "900 52px 'Impact', 'Arial Black', sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("19.09", 0, 4);
+        ctx.restore();
+
+        // 3. Брутальная плашка СВЕРХУ для заголовков
         const topGrad = ctx.createLinearGradient(0, 0, 0, 200);
         topGrad.addColorStop(0, "rgba(9, 9, 11, 0.95)");
         topGrad.addColorStop(1, "rgba(9, 9, 11, 0)");
         ctx.fillStyle = topGrad;
         ctx.fillRect(0, 0, canvas.width, 200);
 
-        // Главный заголовок (жирный гротеск)
         ctx.fillStyle = "#fcd34d";
         ctx.font = "900 32px 'Impact', 'Arial Black', sans-serif";
         ctx.textAlign = "left";
         ctx.fillText("ПLОМБИР: ИЗ ГОРОДА В ДЕРЕВНЮ", 45, 65);
 
-        // Подзаголовок: Ночной клуб "БАЗА" (ул. Победы 35)
         ctx.fillStyle = "#ffffff";
         ctx.font = "bold 20px 'Arial Black', sans-serif";
         ctx.fillText("НОЧНОЙ КЛУБ \"БАЗА\" • УЛ. ПОБЕДЫ 35", 45, 105);
-
-        // 3. Дерзкая печать ПОД УГЛОМ (19.09) в стиле постерного штампа
-        ctx.save();
-        ctx.translate(770, 240);
-        ctx.rotate(-12 * Math.PI / 180);
-        
-        ctx.strokeStyle = "#ef4444";
-        ctx.lineWidth = 6;
-        ctx.strokeRect(-90, -45, 180, 90);
-
-        ctx.fillStyle = "#ef4444";
-        ctx.font = "900 42px 'Impact', 'Arial Black', sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("19.09", 0, 3);
-        ctx.restore();
 
         // 4. Глубокая плашка СНИЗУ для лука и контактов
         const bottomGrad = ctx.createLinearGradient(0, 920, 0, 1200);
@@ -1799,16 +1798,14 @@ setInterval(() => {
         ctx.fillStyle = bottomGrad;
         ctx.fillRect(0, 900, canvas.width, 300);
 
-        // Текст лука с жирным начертанием
         ctx.fillStyle = "#ffffff";
         ctx.font = "900 30px 'Impact', 'Arial Black', sans-serif";
         ctx.textAlign = "left";
-        ctx.fillText("Я СОЗДАЛ СЕБЕ ЛУК,", 45, 1015);
+        ctx.fillText("Я СОЗДАЛ СЕБЕ ЛУК", 45, 1015);
         
         ctx.fillStyle = "#fcd34d";
         ctx.fillText("ВРЫВАЕМСЯ НА ЛЮТЫЙ ДВИЖ! 🔥🚜", 45, 1055);
 
-        // Инстаграм аккаунт
         ctx.fillStyle = "#e2e8f0";
         ctx.font = "bold 24px 'Arial Black', sans-serif";
         ctx.fillText("📸 @plombir.grodno", 45, 1125);
@@ -1819,8 +1816,8 @@ setInterval(() => {
             
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 navigator.share({
-                    title: 'Мой образ на ПLОМБИР',
-                    text: 'Зацени мой лук. 🚜🔥',
+                    title: 'Мой образ в ПLОМБИР',
+                    text: 'Зацени мой лук на движ в Базе! 🚜🔥',
                     files: [file],
                 }).catch(() => {});
             } else {
