@@ -865,7 +865,127 @@
     transform: scale(0.95);
 }
 
-        
+      .village-board {
+    background: #fef3c7; /* Теплый оттенок старой бумаги / светлого дерева */
+    border: 3px dashed #b45309; /* Деревенская рамка */
+    border-radius: 14px;
+    padding: 14px;
+    margin: 16px 0;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 6px 16px rgba(120, 53, 15, 0.15);
+    font-family: 'Courier New', Courier, monospace; /* Чуть грубоватый шрифт */
+}
+
+.village-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #fde68a;
+    padding-bottom: 6px;
+}
+
+.village-pin {
+    font-size: 1rem;
+}
+
+.village-title {
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: #78350f;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.char-counter {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #92400e;
+}
+
+/* Контейнер ленты (бегущая строка) */
+.village-ticker-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    background: #fffbeb;
+    border: 1.5px solid #fcd34d;
+    border-radius: 8px;
+    padding: 8px 0;
+    margin-bottom: 10px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.village-ticker-track {
+    display: flex;
+    gap: 12px;
+    padding: 0 8px;
+    width: max-content;
+    /* Плавное смещение влево при добавлении / движении */
+    transition: transform 0.5s ease-in-out;
+}
+
+/* Маленькие карточки-записки */
+.village-ticker-item {
+    background: #ffffff;
+    border: 1.5px solid #fef3c7;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.75rem; /* Уменьшенный шрифт */
+    font-weight: 700;
+    color: #451a03;
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.village-form {
+    display: flex;
+    gap: 6px;
+}
+
+.village-input {
+    flex: 1;
+    background: #fffbeb;
+    border: 1.5px solid #d97706;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.75rem;
+    font-family: inherit;
+    font-weight: 700;
+    color: #451a03;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.village-input::placeholder {
+    color: #b45309;
+    opacity: 0.6;
+}
+
+.village-btn {
+    background: #d97706;
+    color: white;
+    border: 1.5px solid #b45309;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: transform 0.1s ease, background 0.2s;
+    flex-shrink: 0;
+}
+
+.village-btn:hover {
+    background: #b45309;
+    transform: scale(1.05);
+}  
         
     </style>
 </head>
@@ -884,22 +1004,26 @@
     <div class="app-wrapper">
         
         <section id="screen-gender" class="screen active">
-            <!-- Стильная доска объявлений с адаптивным текстом и счетчиком -->
-<div class="bulletin-board">
-    <div class="bulletin-header">
-        <div class="bulletin-status">
-            <span class="pulse-dot"></span>
-            <span class="bulletin-title">Доска объявлений</span>
-        </div>
+         <!-- Деревенская доска объявлений с лентой бегущей строки -->
+<div class="village-board">
+    <div class="village-header">
+        <span class="village-pin">📌</span>
+        <span class="village-title">Сельсовет онлайн</span>
         <span class="char-counter" id="charCounter">60</span>
     </div>
-    <div class="bulletin-ticker-wrapper">
-        <div class="bulletin-ticker" id="activeMessage">Подключаемся к эфиру...</div>
+    
+    <!-- Лента сообщений (горизонтальный скролл как бегущая строка) -->
+    <div class="village-ticker-container">
+        <div class="village-ticker-track" id="tickerTrack">
+            <div class="village-ticker-item">Запрягаем коней, подгружаем весточки...</div>
+        </div>
     </div>
-    <div class="bulletin-form">
-        <input type="text" id="userMessageInput" class="bulletin-input" placeholder="Оставить весточку..." maxlength="60" oninput="updateCharCounter()">
-        <button class="bulletin-btn" onclick="sendUserMessage()" title="Отправить">
-            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+
+    <!-- Форма отправки -->
+    <div class="village-form">
+        <input type="text" id="userMessageInput" class="village-input" placeholder="Чиркни пару строк на забор..." maxlength="60" oninput="updateCharCounter()">
+        <button class="village-btn" onclick="sendUserMessage()" title="Прибить гвоздем">
+            🪵
         </button>
     </div>
 </div>
@@ -1358,7 +1482,6 @@ function triggerTractoristSound() {
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfabpz-1aTNLnL6WZIXvew5z5BawuqPcbwBL0hdyqJ4z1y9gQv1-e4v14x6x5Dx9V3JA/exec";
 
 let communityMessages = [];
-let rotationTimer = null;
 
 function loadMessagesFromSheet() {
     fetch(SCRIPT_URL, {
@@ -1369,56 +1492,43 @@ function loadMessagesFromSheet() {
     .then(data => {
         if (data && Array.isArray(data.messages) && data.messages.length > 0) {
             communityMessages = data.messages;
-            startMessageRotation();
+            renderTicker(true); // Рендерим и прокручиваем в самый конец к последнему
         } else {
-            const msgEl = document.getElementById('activeMessage');
-            if (msgEl) msgEl.textContent = "Доска пока пуста. Напишите первыми! ✨";
+            const track = document.getElementById('tickerTrack');
+            if (track) track.innerHTML = '<div class="village-ticker-item">Забор пока пуст, чиркни первым!</div>';
         }
     })
     .catch(() => {
-        const msgEl = document.getElementById('activeMessage');
-        if (msgEl) msgEl.textContent = "Не удалось загрузить весточки 📡";
+        const track = document.getElementById('tickerTrack');
+        if (track) track.innerHTML = '<div class="village-ticker-item">Связь с хутором оборвалась 📡</div>';
     });
 }
 
-function startMessageRotation() {
-    const msgEl = document.getElementById('activeMessage');
-    if (!msgEl || communityMessages.length === 0) return;
-    showRandomMessage();
-    
-    if (rotationTimer) clearInterval(rotationTimer);
-    if (communityMessages.length > 1) {
-        rotationTimer = setInterval(showRandomMessage, 6000);
-    }
-}
+function renderTicker(scrollToEnd = false) {
+    const track = document.getElementById('tickerTrack');
+    if (!track) return;
 
-function showRandomMessage() {
-    const msgEl = document.getElementById('activeMessage');
-    if (!msgEl || communityMessages.length === 0) return;
-    
-    // Плавная анимация смены текста (каскадный вылет вверх и появление)
-    msgEl.classList.add('fade-out');
-    setTimeout(() => {
-        const randomIndex = Math.floor(Math.random() * communityMessages.length);
-        msgEl.textContent = communityMessages[randomIndex];
-        msgEl.classList.remove('fade-out');
-    }, 350);
+    track.innerHTML = '';
+    communityMessages.forEach(msg => {
+        const item = document.createElement('div');
+        item.className = 'village-ticker-item';
+        item.textContent = msg;
+        track.appendChild(item);
+    });
+
+    if (scrollToEnd && communityMessages.length > 0) {
+        // Смещаем ленту влево (показываем самые свежие записи в конце)
+        setTimeout(() => {
+            track.parentElement.scrollLeft = track.parentElement.scrollWidth;
+        }, 100);
+    }
 }
 
 function updateCharCounter() {
     const input = document.getElementById('userMessageInput');
     const counter = document.getElementById('charCounter');
     if (!input || !counter) return;
-    
-    const remaining = 60 - input.value.length;
-    counter.textContent = remaining;
-    
-    counter.classList.remove('warning', 'danger');
-    if (remaining <= 10 && remaining > 5) {
-        counter.classList.add('warning');
-    } else if (remaining <= 5) {
-        counter.classList.add('danger');
-    }
+    counter.textContent = 60 - input.value.length;
 }
 
 const badWords = ["хуй", "пизд", "еб", "бля", "сука"];
@@ -1430,11 +1540,11 @@ function sendUserMessage() {
 
     if (!text) return;
     if (text.length > 60) {
-        alert("Слишком длинно! До 60 символов.");
+        alert("Слишком длинная весточка! До 60 символов.");
         return;
     }
     if (badWords.some(word => text.toLowerCase().includes(word))) {
-        alert("Ээ, давай без матов 🛑");
+        alert("Ээ, дед Захар запрещает такие слова на заборе! 🛑");
         input.value = "";
         updateCharCounter();
         return;
@@ -1448,21 +1558,13 @@ function sendUserMessage() {
     .then(data => {
         if (data && data.success) {
             communityMessages.push(text);
-            const msgEl = document.getElementById('activeMessage');
-            if(msgEl) {
-                msgEl.classList.add('fade-out');
-                setTimeout(() => {
-                    msgEl.textContent = text;
-                    msgEl.classList.remove('fade-out');
-                }, 350);
-            }
+            renderTicker(true); // Перерисовываем и сдвигаем ленту влево к новому сообщению
             input.value = "";
             updateCharCounter();
-            startMessageRotation(); // Перезапуск таймера для новых сообщений
         }
     })
     .catch(() => {
-        alert("Ошибка отправки, попробуй еще раз.");
+        alert("Не удалось прибить записку, попробуй еще раз.");
     });
 }
 
