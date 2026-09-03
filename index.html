@@ -1207,27 +1207,26 @@
 <!-- Стартовый экран (развилка) -->
 <div id="screen-start" class="custom-overlay-screen">
     <div class="overlay-card">
-        <h1 class="overlay-title">ГОТОВ ВОРВАТЬСЯ?</h1>
-        <p class="overlay-text">Трактор прогрет, клуб «БАЗА» ждет. Готов к лютому движу?</p>
+        <h1 class="overlay-title">#PLMBR</h1>
+        <p class="overlay-text">Жигуль прогрет, клуб «БАЗА» ждет. Врываемся?</p>
         
         <div class="overlay-buttons">
             <button class="btn-yes" onclick="handleReadyYes()">ДА, ПОГНАЛИ! 🔥</button>
             <button class="btn-no" onclick="handleReadyNo()">НЕТ 🙅‍♂️</button>
         </div>
         
-        <!-- Всплывающая подсказка при нажатии "Нет" -->
         <div id="noNotification" class="no-notification hidden-notification">ЗНАЕШЬ ЧЕЙ ОТВЕТ :)</div>
     </div>
 </div>
 
-<!-- Экран загрузки с видео -->
+<!-- Экран загрузки с видео и таймером -->
 <div id="screen-preload" class="custom-overlay-screen hidden-screen">
     <div class="overlay-card">
         <h2 class="preload-main-title">ПLОМБИР</h2>
-        <p id="loadingStatus" class="preload-status-text">Заводим моторы...</p>
+        <p id="loadingStatus" class="preload-status-text">Запуск приложения через 15 сек...</p>
         
-        <!-- Ваше видео -->
-        <video id="introVideo" class="preload-video-player" autoplay playsinline>
+        <!-- Видео со звуком (без autoplay, запустится по клику из скрипта) -->
+        <video id="introVideo" class="preload-video-player" playsinline>
             <source src="etc/fabric.mp4" type="video/mp4">
         </video>
     </div>
@@ -2006,47 +2005,54 @@ function handleReadyNo() {
     const notification = document.getElementById('noNotification');
     notification.style.display = 'block';
     
-    // Небольшой таймаут, чтобы анимация появления сработала плавно
     setTimeout(() => {
         notification.classList.remove('hidden-notification');
     }, 10);
 }
 
-// Функция для запуска приложения (вызывается по нажатию «ДА»)
+// Когда нажимают «ДА, ПОГНАЛИ!»
 function handleReadyYes() {
-    // 1. Показываем прелоадер с видео, скрываем стартовый экран
+    // 1. Прячем стартовый экран, показываем прелоадер
     document.getElementById('screen-start').classList.add('hidden-screen');
     const preloadScreen = document.getElementById('screen-preload');
     preloadScreen.classList.remove('hidden-screen');
 
-    // 2. Запускаем видео на прелоадере (оно беззвучное и крутится)
+    // 2. Включаем видео со звуком
     const introVideo = document.getElementById('introVideo');
     if (introVideo) {
-        introVideo.play().catch(e => console.log("Видео запущено", e));
+        introVideo.muted = false; // Звук включен
+        introVideo.currentTime = 0;
+        introVideo.play().catch(e => console.log("Видео заблокировано:", e));
     }
 
-    // 3. Управляем текстом статуса и обратным отсчетом (15 секунд)
+    // 3. Запускаем обратный отсчет от 15 до 0
     const statusEl = document.getElementById('loadingStatus');
     let timeLeft = 15;
     
-    statusEl.textContent = `Врываемся через ${timeLeft} сек...`;
+    statusEl.textContent = `Запуск приложения через ${timeLeft} сек...`;
 
     const countdownInterval = setInterval(() => {
         timeLeft--;
         if (timeLeft > 0) {
-            statusEl.textContent = `Врываемся через ${timeLeft} сек...`;
+            statusEl.textContent = `Запуск приложения через ${timeLeft} сек...`;
         } else {
-            clearInterval(countdownInterval);
-            statusEl.textContent = "Погнали!";
+            statusEl.textContent = "Врываемся!";
         }
     }, 1000);
 
-    // 4. СТРОГО ЧЕРЕЗ 15 СЕКУНД убираем прелоадер и включаем фоновую музыку
+    // 4. Ровно через 15 секунд: выключаем видео, убираем прелоадер, включаем музыку под колонкой
     setTimeout(() => {
         clearInterval(countdownInterval);
+        
+        // Останавливаем прелоадер-видео
+        if (introVideo) {
+            introVideo.pause();
+        }
+        
+        // Скрываем экран прелоадера
         preloadScreen.classList.add('hidden-screen');
 
-        // Вот теперь включается музыка под колонкой!
+        // Включаем фоновый трек приложения (под колонкой)
         const audio = document.getElementById('bgAudio');
         if (audio) {
             audio.play().then(() => {
@@ -2054,9 +2060,9 @@ function handleReadyYes() {
                 const musicBtn = document.getElementById('musicBtn');
                 if (musicBtn) musicBtn.textContent = "🔊";
                 document.body.classList.add('disco-active');
-            }).catch(e => console.log("Аудио заблокировано браузером", e));
+            }).catch(e => console.log("Фоновое аудио не запустилось:", e));
         }
-    }, 15000); // Ровно 15 секунд показа видео
+    }, 15000); // Строго 15 секунд
 }
         
     </script>
