@@ -645,42 +645,42 @@
 }
 
 .wood-stats-card {
-    background: #854d0e; /* Текстурный деревянный оттенок */
+    background: #854d0e;
     background-image: linear-gradient(135deg, #a16207 0%, #713f12 100%);
     border: 3px solid #451a03;
     border-radius: 14px;
-    padding: 10px 12px;
+    padding: 8px 10px;
     margin: 0 auto 12px auto;
     box-shadow: 0 6px 16px rgba(69, 26, 3, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.15);
     text-align: center;
-    width: 85%;
-    max-width: 290px;
+    width: 92%;
+    max-width: 420px; /* Сделали плашку шире */
     box-sizing: border-box;
 }
 
 .wood-header {
     font-family: 'Montserrat', sans-serif;
     font-weight: 900;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     color: #fef08a;
     letter-spacing: 1.5px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .wood-content-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     background: rgba(0, 0, 0, 0.2);
     border: 2px solid rgba(69, 26, 3, 0.4);
     border-radius: 10px;
-    padding: 8px;
+    padding: 6px 10px;
 }
 
 .wood-poster-box {
-    width: 95px;
-    height: 105px;
+    width: 75px;
+    height: 75px; /* Сделали по вертикали уже */
     border-radius: 8px;
     overflow: hidden;
     flex-shrink: 0;
@@ -697,26 +697,27 @@
 .wood-stats-box {
     flex-grow: 1;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    justify-content: space-between; /* Распределяем цифры в ряд для горизонтального формата */
     gap: 6px;
-    text-align: left;
 }
 
 .stat-item {
     background: rgba(255, 255, 255, 0.1);
-    padding: 4px 8px;
+    padding: 6px 8px;
     border-radius: 6px;
-    border-left: 3px solid #fef08a;
+    border-top: 3px solid #fef08a;
+    flex: 1;
+    text-align: center;
 }
 
 .stat-label {
     display: block;
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
-    font-size: 0.5rem;
+    font-size: 0.45rem;
     color: #fde047;
     text-transform: uppercase;
+    margin-bottom: 2px;
 }
 
 .stat-value {
@@ -725,15 +726,6 @@
     font-size: 0.75rem;
     color: #ffffff;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.wood-footer-text {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 0.55rem;
-    color: #fef08a;
-    margin-top: 8px;
-    opacity: 0.9;
 }
         
     </style>
@@ -753,34 +745,30 @@
     <div class="app-wrapper">
         
         <section id="screen-gender" class="screen active">
-            <div class="wood-stats-card">
-    <div class="wood-header">★ СТАТИСТИКА ПРОЕКТА ★</div>
+        <div class="wood-stats-card">
+    <div class="wood-header">★ АФИША И СТАТИСТИКА ПРОЕКТА ★</div>
     
     <div class="wood-content-row">
-        <!-- Левая часть: Афиша -->
+        <!-- Афиша (слева) -->
         <div class="wood-poster-box">
             <img src="etc/afisha/poster.jpg" alt="Афиша" class="wood-poster-img" onerror="this.src='etc/afisha/poster.png'">
         </div>
         
-        <!-- Правая часть: Фейковая статистика -->
+        <!-- Статистика (справа) -->
         <div class="wood-stats-box">
             <div class="stat-item">
-                <span class="stat-label">Сегодня:</span>
-                <span class="stat-value" id="statToday">48</span>
+                <span class="stat-label">Сегодня образов:</span>
+                <span class="stat-value" id="statToday">--</span>
             </div>
             <div class="stat-item">
                 <span class="stat-label">За всё время:</span>
-                <span class="stat-value" id="statTotal">1,420</span>
+                <span class="stat-value" id="statTotal">--</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Помидоров:</span>
-                <span class="stat-value" id="statTomatoes">385</span>
+                <span class="stat-label">Помидоров брошено:</span>
+                <span class="stat-value" id="statTomatoes">--</span>
             </div>
         </div>
-    </div>
-
-    <div class="wood-footer-text">
-        Следи за анонсами и жги на тусовке! 🔥
     </div>
 </div>
             <div class="header-box">
@@ -1235,22 +1223,58 @@ function triggerTractoristSound() {
     document.getElementById('screen-gender').classList.remove('hidden');
 }
 
-      // Динамическая генерация живых цифр для фейковой статистики при каждом входе
+   // Генератор стабильной статистики с привязкой к времени Минска (UTC+3)
 document.addEventListener("DOMContentLoaded", () => {
     const todayEl = document.getElementById('statToday');
     const totalEl = document.getElementById('statTotal');
     const tomatoesEl = document.getElementById('statTomatoes');
 
-    if (todayEl && totalEl && tomatoesEl) {
-        // Рандомим правдоподобные цифры
-        const randomToday = Math.floor(Math.random() * 25) + 35; // от 35 до 60
-        const randomTotal = Math.floor(Math.random() * 150) + 1350; // от 1350 до 1500
-        const randomTomatoes = Math.floor(Math.random() * 100) + 320; // от 320 до 420
+    if (!todayEl || !totalEl || !tomatoesEl) return;
 
-        todayEl.textContent = randomToday;
-        totalEl.textContent = randomTotal.toLocaleString();
-        tomatoesEl.textContent = randomTomatoes;
+    // Получаем текущую дату по Минску (сдвиг 18:00)
+    const now = new Date();
+    const minskTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Minsk" }));
+    
+    // Если еще нет 18:00, считаем что игровой «день» начался вчера в 18:00
+    if (minskTime.getHours() < 18) {
+        minskTime.setDate(minskTime.getDate() - 1);
     }
+    const dayKey = minskTime.toISOString().slice(0, 10); // Ключ дня вида "2026-03-31"
+
+    // Используем симулятор псевдослучайных чисел на основе даты, чтобы у всех пользователей в этот день были одинаковые цифры
+    function pseudoRandom(seedStr) {
+        let hash = 0;
+        for (let i = 0; i < seedStr.length; i++) {
+            hash = (hash << 5) - hash + seedStr.charCodeAt(i);
+            hash |= 0;
+        }
+        return Math.abs(hash);
+    }
+
+    // Считаем «Сегодня» (от 27 до 84) на основе даты
+    const seedToday = pseudoRandom("today_" + dayKey);
+    const todayCount = 27 + (seedToday % 58);
+
+    // Считаем «За всё время»: база (например, 1200) + накопительный итог по дням с фиксированной даты
+    const baseDate = new Date("2026-03-01"); // старт проекта
+    const diffDays = Math.floor((minskTime - baseDate) / (1000 * 60 * 60 * 24));
+    
+    let totalCount = 1140; // стартовая база до запуска
+    for (let i = 0; i <= Math.max(0, diffDays); i++) {
+        const testDate = new Date(baseDate);
+        testDate.setDate(baseDate.getDate() + i);
+        const testKey = testDate.toISOString().slice(0, 10);
+        const dayVal = 27 + (pseudoRandom("today_" + testKey) % 58);
+        totalCount += dayVal;
+    }
+
+    // Помидоры строго привязаны к сегодняшней цифре умноженной на 9
+    const tomatoesCount = todayCount * 9;
+
+    // Выводим данные на экран
+    todayEl.textContent = todayCount;
+    totalEl.textContent = totalCount.toLocaleString();
+    tomatoesEl.textContent = tomatoesCount.toLocaleString();
 });
     </script>
 </body>
