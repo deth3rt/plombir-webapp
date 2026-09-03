@@ -1203,112 +1203,115 @@ function triggerTractoristSound() {
         tomatoBtn.innerHTML = `🍅 БРОСИТЬ ПОМИДОРЫ (<span id="clicksLeft">10</span>)`;
     }
 
-            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM3FUE1nJuCqrL9pxbCt5ge33kXbky-zMetwqytPT-4VeD-7Quppp59qonLzLJVBvf_A/exec";
+        function resetApp() {
+            // Принудительно сбрасываем локальный счетчик помидоров
+            localStorage.setItem(IP_LIMIT_KEY, JSON.stringify({ count: 0 }));
 
-// Базовый массив дефолтных фраз (если в таблице пусто)
-let communityMessages = [
-    "Кто потерял трактор возле клуба? Отзовись 🚜",
-    "Гродно гудит, картошка в безопасности 🔥",
-    "Лучший лук делает тот, кто не боится грязи",
-    "Закинул помидор — плюс к карме 🍅"
-];
-
-let currentMsgIndex = 0;
-
-document.addEventListener("DOMContentLoaded", () => {
-    loadMessagesFromSheet();
-});
-
-// Загрузка сообщений из Google Таблицы
-function loadMessagesFromSheet() {
-    fetch(`${SCRIPT_URL}?action=getMessages`)
-        .then(res => res.json())
-        .then(data => {
-            if (data && Array.isArray(data.messages) && data.messages.length > 0) {
-                communityMessages = data.messages;
+            // Находим кнопку помидоров и принудительно возвращаем её в активное состояние
+            const tomatoBtn = document.getElementById('tomatoBtn');
+            if (tomatoBtn) {
+                tomatoBtn.disabled = false;
+                tomatoBtn.innerHTML = `🍅 БРОСИТЬ ПОМИДОРЫ (<span id="clicksLeft">10</span>)`;
             }
-            startMessageRotation();
-        })
-        .catch(() => {
-            startMessageRotation(); // Если сеть упала, крутим дефолтные
+
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('screen-gender').classList.remove('hidden');
+        }
+
+        // ==========================================
+        // РАБОТА С ДОСКОЙ ОБЪЯВЛЕНИЙ И GOOGLE APPS SCRIPT
+        // ==========================================
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM3FUE1nJuCqrL9pxbCt5ge33kXbky-zMetwqytPT-4VeD-7Quppp59qonLzLJVBvf_A/exec";
+
+        // Базовый массив дефолтных фраз (если в таблице пусто)
+        let communityMessages = [
+            "Кто потерял трактор возле клуба? Отзовись 🚜",
+            "Гродно гудит, картошка в безопасности 🔥",
+            "Лучший лук делает тот, кто не боится грязи",
+            "Закинул помидор — плюс к карме 🍅"
+        ];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadMessagesFromSheet();
         });
-}
 
-// Рандомная смена сообщений каждые 5 секунд
-function startMessageRotation() {
-    const msgEl = document.getElementById('activeMessage');
-    if (!msgEl) return;
+        // Загрузка сообщений из Google Таблицы
+        function loadMessagesFromSheet() {
+            fetch(`${SCRIPT_URL}?action=getMessages`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && Array.isArray(data.messages) && data.messages.length > 0) {
+                        communityMessages = data.messages;
+                    }
+                    startMessageRotation();
+                })
+                .catch(() => {
+                    startMessageRotation(); // Если сеть упала, крутим дефолтные
+                });
+        }
 
-    // Показываем первое случайное
-    showRandomMessage();
+        // Рандомная смена сообщений каждые 5 секунд
+        function startMessageRotation() {
+            const msgEl = document.getElementById('activeMessage');
+            if (!msgEl) return;
 
-    setInterval(() => {
-        showRandomMessage();
-    }, 5000);
-}
+            showRandomMessage();
 
-function showRandomMessage() {
-    const msgEl = document.getElementById('activeMessage');
-    if (communityMessages.length === 0) return;
-    const randomIndex = Math.floor(Math.random() * communityMessages.length);
-    msgEl.textContent = communityMessages[randomIndex];
-}
+            setInterval(() => {
+                showRandomMessage();
+            }, 5000);
+        }
 
-// Простейший фильтр цензуры (добавь свои стоп-слова по желанию)
-const badWords = ["хуй", "пизд", "еб", "бля", "сука", "епт", "мраз"];
+        function showRandomMessage() {
+            const msgEl = document.getElementById('activeMessage');
+            if (!msgEl || communityMessages.length === 0) return;
+            const randomIndex = Math.floor(Math.random() * communityMessages.length);
+            msgEl.textContent = communityMessages[randomIndex];
+        }
 
-function checkCensorship(text) {
-    const lowerText = text.toLowerCase();
-    return badWords.some(word => lowerText.includes(word));
-}
+        // Простейший фильтр цензуры
+        const badWords = ["хуй", "пизд", "еб", "бля", "сука", "епт", "мраз"];
 
-// Отправка нового сообщения
-function sendUserMessage() {
-    const input = document.getElementById('userMessageInput');
-    const text = input.value.trim();
+        function checkCensorship(text) {
+            const lowerText = text.toLowerCase();
+            return badWords.some(word => lowerText.includes(word));
+        }
 
-    if (!text) return;
+        // Отправка нового сообщения
+        function sendUserMessage() {
+            const input = document.getElementById('userMessageInput');
+            if (!input) return;
+            const text = input.value.trim();
 
-    if (text.length > 60) {
-        alert("Слишком длинно! Короче, пацаны не поймут (до 60 символов).");
-        return;
-    }
+            if (!text) return;
 
-    // Проверяем на цензуру
-    if (checkCensorship(text)) {
-        alert("Ээ, полегче на поворотах! Давай без матов 🛑");
-        input.value = "";
-        return;
-    }
+            if (text.length > 60) {
+                alert("Слишком длинно! Короче, пацаны не поймут (до 60 символов).");
+                return;
+            }
 
-    // Отправляем на сервер Google Apps Script
-    fetch(`${SCRIPT_URL}?action=addMessage&text=${encodeURIComponent(text)}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.success) {
-                communityMessages.push(text); // Добавляем локально в пул
-                document.getElementById('activeMessage').textContent = text; // Сразу выводим
+            if (checkCensorship(text)) {
+                alert("Ээ, полегче на поворотах! Давай без матов 🛑");
                 input.value = "";
-                alert("Объявление залетело на доску! 📌");
+                return;
             }
-        })
-        .catch(() => {
-            alert("Ошибка отправки, попробуй еще раз.");
-        });
-}
-            // [ВСТАВИТЬ В САМОМ КОНЦЕ СВОЕГО JS-ФАЙЛА]
 
-// Заглушки для функций, чтобы кнопки и курица снова ожили
-function startGeneration() {
-    console.log("Генерация запущена");
-    // Сюда верни свою старую логику генерации лука/образа
-}
-
-function hitChicken() {
-    console.log("Курица поймана");
-    // Сюда верни свою старую логику клика по курице
-}
-    
+            // Отправляем на сервер Google Apps Script
+            fetch(`${SCRIPT_URL}?action=addMessage&text=${encodeURIComponent(text)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.success) {
+                        communityMessages.push(text); 
+                        document.getElementById('activeMessage').textContent = text; 
+                        input.value = "";
+                        alert("Объявление залетело на доску! 📌");
+                    }
+                })
+                .catch(() => {
+                    alert("Ошибка отправки, попробуй еще раз.");
+                });
+        }
     </script>
 </body>
 </html>
