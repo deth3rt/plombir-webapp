@@ -1735,7 +1735,7 @@ setInterval(() => {
 }, 2000);
 
         function shareGeneratedLook() {
-    const imgElement = document.getElementById('generatedImage');
+    const imgElement = document.getElementById('resultImg');
     if (!imgElement || !imgElement.src) {
         alert("Сначала сгенерируйте образ, чтобы им делиться!");
         return;
@@ -1749,37 +1749,27 @@ setInterval(() => {
     img.src = imgElement.src;
 
     img.onload = () => {
-        // Устанавливаем квадратный формат открытки высокого качества
         canvas.width = 800;
         canvas.height = 800;
 
-        // 1. Рисуем картинку образа
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        // 2. Рисуем деревенскую плашку снизу для текста
         ctx.fillStyle = "rgba(45, 26, 3, 0.82)";
         ctx.fillRect(40, 630, 720, 130);
         
-        // Обводка плашки
         ctx.strokeStyle = "#fcd34d";
         ctx.lineWidth = 4;
         ctx.strokeRect(40, 630, 720, 130);
 
-        // 3. Добавляем водяной знак или заголовок хутора
         ctx.fillStyle = "#fcd34d";
         ctx.font = "bold 20px 'Courier New', monospace";
         ctx.textAlign = "left";
         ctx.fillText("📌 ПLОМБИР • ИЗ ГОРОДА В ДЕРЕВНЮ", 65, 670);
 
-        // 4. Добавляем подпись или слоган образа
         ctx.fillStyle = "#fef3c7";
         ctx.font = "bold 24px 'Courier New', monospace";
-        ctx.textAlign = "left";
-        
-        const slogan = "Я создал себе образ🔥🚜";
-        ctx.fillText(slogan, 65, 720);
+        ctx.fillText("Я создал себе образ🔥🚜", 65, 720);
 
-        // 5. Вызываем системное меню шеринга или скачивание
         canvas.toBlob((blob) => {
             const file = new File([blob], "plombir-look.jpg", { type: "image/jpeg" });
             
@@ -1790,7 +1780,6 @@ setInterval(() => {
                     files: [file],
                 }).catch(() => {});
             } else {
-                // Запасной вариант для десктопов или неподдерживаемых браузеров
                 const link = document.createElement('a');
                 link.download = 'plombir-look.jpg';
                 link.href = URL.createObjectURL(blob);
