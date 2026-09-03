@@ -1218,12 +1218,7 @@ function triggerTractoristSound() {
         tomatoBtn.innerHTML = `🍅 БРОСИТЬ ПОМИДОРЫ (<span id="clicksLeft">10</span>)`;
     }
 
-    // Переключаем экраны
-    document.getElementById('screen-result').classList.add('hidden');
-    document.getElementById('screen-gender').classList.remove('hidden');
-}
-
-   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRUDfa3U6cYswiyrVt-8Y5ejymyeGEPAFtnrWktnp0wY6tp0W_0Js0LkoKY83TZfAY/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/library/d/1d4xBdzizaRjmZQono_i7Es6rWolC7X461C3IqdJ23hBHccKLLrggJw46/2";
 
 document.addEventListener("DOMContentLoaded", () => {
     fetchStats();
@@ -1241,9 +1236,9 @@ function fetchStats() {
         })
         .catch(err => {
             console.log("Ошибка загрузки статистики:", err);
-            document.getElementById('statToday').textContent = "-";
-            document.getElementById('statTotal').textContent = "-";
-            document.getElementById('statTomatoes').textContent = "-";
+            document.getElementById('statToday').textContent = "0";
+            document.getElementById('statTotal').textContent = "0";
+            document.getElementById('statTomatoes').textContent = "0";
         });
 }
 
@@ -1254,9 +1249,7 @@ function recordAction(actionType) {
             if (data && data.success) {
                 document.getElementById('statToday').textContent = data.today;
                 document.getElementById('statTotal').textContent = data.total.toLocaleString();
-                if (actionType === 'tomato') {
-                    document.getElementById('statTomatoes').textContent = data.tomatoes.toLocaleString();
-                }
+                document.getElementById('statTomatoes').textContent = data.tomatoes.toLocaleString();
             }
         })
         .catch(err => console.log("Ошибка обновления:", err));
