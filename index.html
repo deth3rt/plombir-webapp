@@ -1039,6 +1039,40 @@
     background: #b45309;
     transform: scale(1.05);
 }
+
+        .village-share-box {
+    margin-top: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.village-share-btn {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    color: #fef3c7;
+    border: 2px solid #78350f;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(120, 53, 15, 0.3);
+    transition: transform 0.2s ease, background 0.2s ease;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.village-share-btn:hover {
+    background: linear-gradient(135deg, #b45309, #92400e);
+    transform: scale(1.02);
+}
+
+.village-share-btn:active {
+    transform: scale(0.98);
+}
         
     </style>
 </head>
@@ -1139,7 +1173,11 @@
             <div class="result-actions">
     <div class="wooden-plaque">🌻19/09 | ПLОМБИР🌻</div>
     <button class="tomato-action-btn" id="tomatoBtn" onclick="throwTomatoes(event)">🍅 БРОСИТЬ ПОМИДОРЫ (<span id="clicksLeft">10</span>)</button>
-    
+    <div class="village-share-box">
+    <button class="village-share-btn" onclick="shareGeneratedLook()">
+        🌾 Поделиться образом
+    </button>
+</div>
     <!-- Эта кнопка теперь полностью автономна -->
     <button class="secondary-action-btn" onclick="resetApp()">ВЫБРАТЬ ДРУГОЙ ОБРАЗ</button>
 </div>
@@ -1695,6 +1733,76 @@ loadMessagesFromSheet(true);
 setInterval(() => {
     loadMessagesFromSheet(false);
 }, 2000);
+
+        function shareGeneratedLook() {
+    const imgElement = document.getElementById('generatedImage');
+    if (!imgElement || !imgElement.src) {
+        alert("Сначала сгенерируйте образ, чтобы им делиться!");
+        return;
+    }
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = imgElement.src;
+
+    img.onload = () => {
+        // Устанавливаем квадратный формат открытки высокого качества
+        canvas.width = 800;
+        canvas.height = 800;
+
+        // 1. Рисуем картинку образа
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // 2. Рисуем деревенскую плашку снизу для текста
+        ctx.fillStyle = "rgba(45, 26, 3, 0.82)";
+        ctx.fillRect(40, 630, 720, 130);
+        
+        // Обводка плашки
+        ctx.strokeStyle = "#fcd34d";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(40, 630, 720, 130);
+
+        // 3. Добавляем водяной знак или заголовок хутора
+        ctx.fillStyle = "#fcd34d";
+        ctx.font = "bold 20px 'Courier New', monospace";
+        ctx.textAlign = "left";
+        ctx.fillText("📌 ПLОМБИР • ИЗ ГОРОДА В ДЕРЕВНЮ", 65, 670);
+
+        // 4. Добавляем подпись или слоган образа
+        ctx.fillStyle = "#fef3c7";
+        ctx.font = "bold 24px 'Courier New', monospace";
+        ctx.textAlign = "left";
+        
+        const slogan = "Я создал себе образ🔥🚜";
+        ctx.fillText(slogan, 65, 720);
+
+        // 5. Вызываем системное меню шеринга или скачивание
+        canvas.toBlob((blob) => {
+            const file = new File([blob], "plombir-look.jpg", { type: "image/jpeg" });
+            
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                navigator.share({
+                    title: 'Мой образ в ПLОМБИР',
+                    text: 'Зацени мой деревенский прикид с хутора! 🚜🌾',
+                    files: [file],
+                }).catch(() => {});
+            } else {
+                // Запасной вариант для десктопов или неподдерживаемых браузеров
+                const link = document.createElement('a');
+                link.download = 'plombir-look.jpg';
+                link.href = URL.createObjectURL(blob);
+                link.click();
+            }
+        }, 'image/jpeg', 0.92);
+    };
+
+    img.onerror = () => {
+        alert("Не удалось загрузить картинку для отправки.");
+    };
+}
     </script>
 </body>
 </html>
