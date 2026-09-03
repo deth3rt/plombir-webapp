@@ -904,42 +904,95 @@
     color: #92400e;
 }
 
-/* Контейнер ленты (бегущая строка) */
+.village-board {
+    background: #fef3c7;
+    border: 3px dashed #b45309;
+    border-radius: 14px;
+    padding: 14px;
+    margin: 16px 0;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 6px 16px rgba(120, 53, 15, 0.15);
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.village-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #fde68a;
+    padding-bottom: 6px;
+}
+
+.village-pin {
+    font-size: 1rem;
+}
+
+.village-title {
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: #78350f;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.char-counter {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #92400e;
+}
+
+/* Контейнер ленты с вертикальными карточками в ряд */
 .village-ticker-container {
     width: 100%;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
     position: relative;
     background: #fffbeb;
     border: 1.5px solid #fcd34d;
     border-radius: 8px;
-    padding: 8px 0;
+    padding: 8px;
     margin-bottom: 10px;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+    scrollbar-width: thin;
+    scrollbar-color: #d97706 #fef3c7;
+}
+
+.village-ticker-container::-webkit-scrollbar {
+    height: 6px;
+}
+.village-ticker-container::-webkit-scrollbar-thumb {
+    background: #d97706;
+    border-radius: 4px;
 }
 
 .village-ticker-track {
     display: flex;
-    gap: 12px;
-    padding: 0 8px;
+    gap: 10px;
     width: max-content;
-    /* Плавное смещение влево при добавлении / движении */
-    transition: transform 0.5s ease-in-out;
+    transition: transform 0.4s ease-in-out;
 }
 
-/* Маленькие карточки-записки */
-.village-ticker-item {
+/* Вертикальные прямоугольные карточки */
+.village-note-card {
     background: #ffffff;
-    border: 1.5px solid #fef3c7;
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 0.75rem; /* Уменьшенный шрифт */
+    border: 1.5px solid #fcd34d;
+    border-radius: 8px;
+    padding: 10px;
+    width: 130px;         /* Фиксированная ширина вертикального прямоугольника */
+    min-height: 85px;     /* Высота прямоугольника */
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    font-size: 0.7rem;    /* Уменьшенный шрифт */
     font-weight: 700;
     color: #451a03;
-    max-width: 220px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    word-break: break-word;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+    box-sizing: border-box;
+    line-height: 1.25;
 }
 
 .village-form {
@@ -985,7 +1038,7 @@
 .village-btn:hover {
     background: #b45309;
     transform: scale(1.05);
-}  
+}
         
     </style>
 </head>
@@ -1004,7 +1057,7 @@
     <div class="app-wrapper">
         
         <section id="screen-gender" class="screen active">
-         <!-- Деревенская доска объявлений с лентой бегущей строки -->
+         <!-- Деревенская доска с вертикальными записками -->
 <div class="village-board">
     <div class="village-header">
         <span class="village-pin">📌</span>
@@ -1012,10 +1065,10 @@
         <span class="char-counter" id="charCounter">60</span>
     </div>
     
-    <!-- Лента сообщений (горизонтальный скролл как бегущая строка) -->
-    <div class="village-ticker-container">
+    <!-- Лента вертикальных карточек с прокруткой -->
+    <div class="village-ticker-container" id="tickerContainer">
         <div class="village-ticker-track" id="tickerTrack">
-            <div class="village-ticker-item">Запрягаем коней, подгружаем весточки...</div>
+            <div class="village-note-card">Запрягаем коней, подгружаем весточки...</div>
         </div>
     </div>
 
@@ -1492,15 +1545,15 @@ function loadMessagesFromSheet() {
     .then(data => {
         if (data && Array.isArray(data.messages) && data.messages.length > 0) {
             communityMessages = data.messages;
-            renderTicker(true); // Рендерим и прокручиваем в самый конец к последнему
+            renderTicker(true);
         } else {
             const track = document.getElementById('tickerTrack');
-            if (track) track.innerHTML = '<div class="village-ticker-item">Забор пока пуст, чиркни первым!</div>';
+            if (track) track.innerHTML = '<div class="village-note-card">Забор пока пуст, чиркни первым!</div>';
         }
     })
     .catch(() => {
         const track = document.getElementById('tickerTrack');
-        if (track) track.innerHTML = '<div class="village-ticker-item">Связь с хутором оборвалась 📡</div>';
+        if (track) track.innerHTML = '<div class="village-note-card">Связь с хутором оборвалась 📡</div>';
     });
 }
 
@@ -1510,16 +1563,19 @@ function renderTicker(scrollToEnd = false) {
 
     track.innerHTML = '';
     communityMessages.forEach(msg => {
-        const item = document.createElement('div');
-        item.className = 'village-ticker-item';
-        item.textContent = msg;
-        track.appendChild(item);
+        const card = document.createElement('div');
+        card.className = 'village-note-card';
+        card.textContent = msg;
+        track.appendChild(card);
     });
 
     if (scrollToEnd && communityMessages.length > 0) {
-        // Смещаем ленту влево (показываем самые свежие записи в конце)
+        // Смещаем ленту влево, показывая новые вертикальные прямоугольники
         setTimeout(() => {
-            track.parentElement.scrollLeft = track.parentElement.scrollWidth;
+            const container = document.getElementById('tickerContainer');
+            if (container) {
+                container.scrollLeft = container.scrollWidth;
+            }
         }, 100);
     }
 }
@@ -1558,7 +1614,7 @@ function sendUserMessage() {
     .then(data => {
         if (data && data.success) {
             communityMessages.push(text);
-            renderTicker(true); // Перерисовываем и сдвигаем ленту влево к новому сообщению
+            renderTicker(true); // Перерисовывает и смещает ленту к новому вертикальному прямоугольнику
             input.value = "";
             updateCharCounter();
         }
