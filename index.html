@@ -1749,43 +1749,67 @@ setInterval(() => {
     img.src = imgElement.src;
 
     img.onload = () => {
-        canvas.width = 800;
-        canvas.height = 800;
+        // Устанавливаем вертикальный формат под соотношение 3:4 (например, 900x1200 пикселей)
+        canvas.width = 900;
+        canvas.height = 1200;
 
+        // 1. Заливаем фон подложкой под дерево / старую бумагу на случай отступов
+        ctx.fillStyle = "#fffbeb";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 2. Рисуем картинку образа на весь холст (или с красивыми пропорциями)
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = "rgba(45, 26, 3, 0.82)";
-        ctx.fillRect(40, 630, 720, 130);
+        // 3. Создаем красивую градиентную плашку снизу для информации
+        const gradient = ctx.createLinearGradient(0, 960, 0, 1200);
+        gradient.addColorStop(0, "rgba(45, 26, 3, 0)");
+        gradient.addColorStop(0.3, "rgba(45, 26, 3, 0.85)");
+        gradient.addColorStop(1, "rgba(30, 16, 2, 0.95)");
         
-        ctx.strokeStyle = "#fcd34d";
-        ctx.lineWidth = 4;
-        ctx.strokeRect(40, 630, 720, 130);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 940, canvas.width, 260);
 
-        ctx.fillStyle = "#fcd34d";
-        ctx.font = "bold 20px 'Courier New', monospace";
+        // 4. Текст: Название проекта / Слоган
+        ctx.fillStyle = "#fcd34d"; // Теплый золотисто-деревенский цвет
+        ctx.font = "bold 32px 'Courier New', monospace";
         ctx.textAlign = "left";
-        ctx.fillText("📌 ПLОМБИР • ИЗ ГОРОДА В ДЕРЕВНЮ", 65, 670);
+        ctx.fillText("ПLОМБИР: ИЗ ГОРОДА В ДЕРЕВНЮ", 60, 1010);
 
+        // 5. Текст: Статус / Действие (мол я иду, все дела)
         ctx.fillStyle = "#fef3c7";
-        ctx.font = "bold 24px 'Courier New', monospace";
-        ctx.fillText("Я создал себе образ🔥🚜", 65, 720);
+        ctx.font = "bold 26px 'Courier New', monospace";
+        ctx.fillText("ВРЫВАЕМСЯ НА ЛЮТЫЙ ДВИЖ!🔥", 60, 1060);
 
+        // 6. Дата и Инстаграм (в одну строку, разделенные точкой или отступом)
+        ctx.fillStyle = "#cbd5e1"; // Светло-серый оттенок для второстепенной инфы
+        ctx.font = "bold 22px 'Courier New', monospace";
+        
+        const dateStr = "19.09.2026";
+        const instaStr = "📸 @plombir.grodno";
+        
+        ctx.fillText(dateStr, 60, 1125);
+        
+        // Выравниваем Instagram по правому краю плашки для баланса
+        ctx.textAlign = "right";
+        ctx.fillText(instaStr, 840, 1125);
+
+        // 7. Превращаем в файл и вызываем шеринг
         canvas.toBlob((blob) => {
-            const file = new File([blob], "plombir-look.jpg", { type: "image/jpeg" });
+            const file = new File([blob], "plombir-look-19-09.jpg", { type: "image/jpeg" });
             
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 navigator.share({
-                    title: 'Мой образ в ПLОМБИР',
-                    text: 'Зацени мой деревенский прикид с хутора! 🚜🌾',
+                    title: 'МОЙ ОБРАЗ НА ПLОМБИР',
+                    text: 'Зацени мой прикид🌾',
                     files: [file],
                 }).catch(() => {});
             } else {
                 const link = document.createElement('a');
-                link.download = 'plombir-look.jpg';
+                link.download = 'plombir-look-19-09.jpg';
                 link.href = URL.createObjectURL(blob);
                 link.click();
             }
-        }, 'image/jpeg', 0.92);
+        }, 'image/jpeg', 0.95);
     };
 
     img.onerror = () => {
