@@ -1535,9 +1535,9 @@ function triggerTractoristSound() {
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfabpz-1aTNLnL6WZIXvew5z5BawuqPcbwBL0hdyqJ4z1y9gQv1-e4v14x6x5Dx9V3JA/exec";
 
 let communityMessages = [];
-let isSending = "false"; // Защита от двойного клика
+let lastMessageCount = 0; // Для отслеживания появления новых записей от других пользователей
 
-// Функция загрузки сообщений (работает в фоновом режиме каждые 7 секунд)
+// Частая проверка в фоне (каждые 2 секунды)
 function loadMessagesFromSheet(isInitial = false) {
     fetch(SCRIPT_URL, {
         method: 'POST',
@@ -1546,21 +1546,26 @@ function loadMessagesFromSheet(isInitial = false) {
     .then(res => res.json())
     .then(data => {
         if (data && Array.isArray(data.messages)) {
-            // Обновляем список, только если появились новые сообщения
-            if (JSON.stringify(data.messages) !== JSON.stringify(communityMessages)) {
+            // Если количество сообщений изменилось (кто-то написал или мы сами добавили)
+            if (data.messages.length !== communityMessages.length || JSON.stringify(data.messages) !== JSON.stringify(communityMessages)) {
+                const isNewMessageAdded = data.messages.length > lastMessageCount;
                 communityMessages = data.messages;
-                renderTicker(isInitial);
+                lastMessageCount = communityMessages.length;
+                
+                // Рендерим и автоматически сдвигаем ползунок, если прилетело что-то новое
+                renderTicker(isInitial || isNewMessageAdded);
             }
         }
     })
     .catch(() => {
-        // Тихо игнорируем ошибки сети в фоне, чтобы не раздражать пользователя
+        // Тихо пропускаем сетевые сбои в фоне
     });
 }
 
-function renderTicker(scrollToEnd = false) {
+function renderTicker(shouldScroll = false) {
     const track = document.getElementById('tickerTrack');
-    if (!track) return;
+    const container = document.getElementById('tickerContainer');
+    if (!track || !container) return;
 
     if (communityMessages.length === 0) {
         track.innerHTML = '<div class="village-note-card">Забор пока пуст, чиркни первым!</div>';
@@ -1575,14 +1580,12 @@ function renderTicker(scrollToEnd = false) {
         track.appendChild(card);
     });
 
-    if (scrollToEnd) {
-        const container = document.getElementById('tickerContainer');
-        if (container) {
-            container.scrollTo({
-                left: container.scrollWidth,
-                behavior: 'smooth' // Плавная прокрутка к новому сообщению
-            });
-        }
+    if (shouldScroll) {
+        // Мгновенно или плавно сдвигаем ползунок в самый конец к новому сообщению
+        container.scrollTo({
+            left: container.scrollWidth,
+            behavior: 'smooth'
+        });
     }
 }
 
@@ -1593,7 +1596,25 @@ function updateCharCounter() {
     counter.textContent = 60 - input.value.length;
 }
 
-const badWords = ["хуй", "пизд", "еб", "бля", "сука"];
+const badWords = [
+  "хуй", "хуя", "хую", "хуем", "хуе", "хуи", "хуев", "хуям", "хуями", "хуях",
+  "пизд", "пизда", "пизды", "пизде", "пизду", "пиздой", "пиздой", "пизды", "пиздуй", "пиздеть",
+  "еб", "ебат", "ебать", "ебал", "ебала", "ебали", "ебано", "ебаный", "ебанат", "ебу", "ебешь", "ебет",
+  "бля", "блядь", "блять", "блядина", "блядский", "блядо",
+  "сук", "сука", "суки", "сучка", "сукин",
+  "хуесос", "хуеплет", "хуеверт", "хуйню", "хуйня", "хуйно",
+  "пиздабол", "пиздолиз", "пиздюк", "пиздятина",
+  "ебальник", "ебанутый", "ебануцца", "ебена", "ебучий", "еблана", "еблан",
+  "заеб", "заебал", "заебался", "наебал", "подъеб", "выеб", "доебался", "переебал", "охуел", "ахуел", "охуительно",
+  "мудак", "мудила", "мудило",
+  "пидор", "пидарас", "педик", "пидорас", "пидорок",
+  "гондон", "гандон",
+  "шлюха", "шалава", "проститутка",
+  "мразь", "урод", "ублюдок", "скотина", "тварь",
+  "залупа", "залупаться",
+  "моча", "срань", "срать", "иссука",
+  "дерьмо", "говно", "говнюк", "говнище"
+];
 
 function sendUserMessage() {
     const input = document.getElementById('userMessageInput');
@@ -1606,39 +1627,38 @@ function sendUserMessage() {
         return;
     }
     if (badWords.some(word => text.toLowerCase().includes(word))) {
-        alert("Ээ, дед Захар запрещает такие слова на заборе! 🛑");
+        alert("Ээ, дед запрещает такие слова на заборе! 🛑");
         input.value = "";
         updateCharCounter();
         return;
     }
 
-    // 1. ОПТИМИСТИЧНОЕ ОБНОВЛЕНИЕ: показываем сразу в интерфейсе
+    // Мгновенное добавление (оптимистичное обновление)
     communityMessages.push(text);
+    lastMessageCount = communityMessages.length;
     renderTicker(true);
     
-    // Очищаем поле ввода и счетчик сразу, не дожидаясь ответа сервера
     input.value = "";
     updateCharCounter();
 
-    // 2. Отправляем в Google Таблицу в фоне
+    // Отправка в таблицу в фоне
     fetch(SCRIPT_URL, {
         method: 'POST',
         body: JSON.stringify({ action: "addMessage", text: text })
     })
     .then(res => res.json())
     .catch(() => {
-        // Если вдруг сеть упала, можно уведомить, но сообщение уже на экране
         console.error("Ошибка сохранения на сервере");
     });
 }
 
-// Запускаем при открытии страницы
+// Первичная загрузка при открытии страницы (с прокруткой в конец)
 loadMessagesFromSheet(true);
 
-// Фоновое обновление ленты каждые 7 секунд (чтобы видеть сообщения других)
+// Автообновление каждые 2 секунды (чтобы видеть свежие записи от других)
 setInterval(() => {
     loadMessagesFromSheet(false);
-}, 7000);
+}, 2000);
     </script>
 </body>
 </html>
