@@ -1218,8 +1218,8 @@ function triggerTractoristSound() {
             document.getElementById('screen-gender').classList.remove('hidden');
         }
 
-        // ==========================================
-        // ВОССТАНОВЛЕННЫЕ ФУНКЦИИ (КУРИЦА И ГЕНЕРАЦИЯ)
+       // ==========================================
+        // ГЛОБАЛЬНЫЕ ФУНКЦИИ И ОБРАБОТЧИКИ
         // ==========================================
 
         function hitChicken() {
@@ -1230,13 +1230,88 @@ function triggerTractoristSound() {
             setTimeout(() => {
                 chicken.classList.remove('chicken-hit');
             }, 300);
+        }
 
-            // Рандомный звук или реплика курицы (если есть)
-            console.Hog ? console.Hog("Кукдахтер сработал") : null;
+        function resolveExistingFile(basePath) {
+            return new Promise(resolve => {
+                const exts = ['.jpg', '.png', '.webp'];
+                let currentIndex = 0;
+
+                function tryNext() {
+                    if (currentIndex >= exts.length) {
+                        resolve(null);
+                        return;
+                    }
+                    const testUrl = basePath + exts[currentIndex];
+                    currentIndex++;
+
+                    const img = new Image();
+                    img.onload = () => resolve(testUrl);
+                    img.onerror = () => tryNext();
+                    img.src = testUrl;
+                }
+
+                tryNext();
+            });
+        }
+
+        function startGeneration(gender) {
+            currentGender = gender;
+            
+            document.getElementById('screen-gender').classList.add('hidden');
+            document.getElementById('screen-loading').classList.remove('hidden');
+
+            const statusEl = document.getElementById('loadingStatus');
+            let step = 0;
+            statusEl.textContent = loadingPhrases[Math.floor(Math.random() * loadingPhrases.length)];
+
+            const interval = setInterval(() => {
+                step++;
+                statusEl.textContent = loadingPhrases[step % loadingPhrases.length];
+            }, 400);
+
+            setTimeout(() => {
+                clearInterval(interval);
+                
+                const list = gender === 'boys' ? boysImages : girlsImages;
+                currentLookSrc = getRandomUniqueLook(list, currentLookSrc);
+                let currentVibe = funnyVibes[Math.floor(Math.random() * funnyVibes.length)];
+
+                const imgElement = document.getElementById('resultImg');
+                imgElement.src = currentLookSrc;
+                
+                imgElement.onerror = function() {
+                    if (currentLookSrc.endsWith('.jpg')) {
+                        currentLookSrc = currentLookSrc.replace('.jpg', '.png');
+                    } else {
+                        currentLookSrc = currentLookSrc.replace('.png', '.jpg');
+                    }
+                    imgElement.src = currentLookSrc;
+                };
+
+                document.getElementById('vibeText').textContent = currentVibe;
+                updateTomatoButtonState();
+
+                document.getElementById('screen-loading').classList.add('hidden');
+                document.getElementById('screen-result').classList.remove('hidden');
+            }, 1200);
+        }
+
+        function resetApp() {
+            localStorage.setItem(IP_LIMIT_KEY, JSON.stringify({ count: 0 }));
+
+            const tomatoBtn = document.getElementById('tomatoBtn');
+            if (tomatoBtn) {
+                tomatoBtn.disabled = false;
+                tomatoBtn.innerHTML = `🍅 БРОСИТЬ ПОМИДОРЫ (<span id="clicksLeft">10</span>)`;
+            }
+
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('screen-gender').classList.remove('hidden');
         }
 
         // ==========================================
-        // РАБОТА С ДОСКОЙ ОБЪЯВЛЕНИЙ И GOOGLE APPS SCRIPT
+        // ДОСКА ОБЪЯВЛЕНИЙ И GOOGLE APPS SCRIPT
         // ==========================================
 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM3FUE1nJuCqrL9pxbCt5ge33kXbky-zMetwqytPT-4VeD-7Quppp59qonLzLJVBvf_A/exec";
@@ -1247,10 +1322,6 @@ function triggerTractoristSound() {
             "Лучший лук делает тот, кто не боится грязи",
             "Закинул помидор — плюс к карме 🍅"
         ];
-
-        document.addEventListener("DOMContentLoaded", () => {
-            loadMessagesFromSheet();
-        });
 
         function loadMessagesFromSheet() {
             fetch(`${SCRIPT_URL}?action=getMessages`)
@@ -1322,6 +1393,87 @@ function triggerTractoristSound() {
                     alert("Ошибка отправки, попробуй еще раз.");
                 });
         }
+
+        // ==========================================
+        // ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+        // ==========================================
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Загружаем доску объявлений
+            loadMessagesFromSheet();
+
+            // Загружаем галерею
+            const container = document.getElementById('galleryContainer');
+            if (!container) return;
+
+            let captions = [];
+            let looks = [];
+
+            try {
+                const textRes = await fetch('user/text.txt');
+                const textData = await textRes.text();
+                captions = textData.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            } catch (e) {
+                console.log("text.txt не найден");
+            }
+
+            try {
+                const lookRes = await fetch('user/look.txt');
+                const lookData = await lookRes.text();
+                looks = lookData.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            } catch (e) {
+                console.log("look.txt не найден");
+            }
+
+            const imageFiles = ['1.jpg', '1.png', '1.webp', '2.jpg', '2.png', '2.webp', '3.jpg', '3.png', '3.webp'];
+            let validIndices = [];
+
+            for (let i = 0; i < imageFiles.length; i++) {
+                const baseName = imageFiles[i].split('.')[0];
+                if (!validIndices.includes(baseName)) {
+                    const avatarPath = await resolveExistingFile(`user/${baseName}`);
+                    if (avatarPath) {
+                        validIndices.push(baseName);
+                    }
+                }
+            }
+
+            if (validIndices.length === 0) validIndices = ['1'];
+
+            for (let index = 0; index < validIndices.length; index++) {
+                const id = validIndices[index];
+                const slide = document.createElement('div');
+                slide.className = `gallery-slide ${index === 0 ? 'active' : ''}`;
+                
+                const avatarSrc = await resolveExistingFile(`user/${id}`) || `user/${id}.jpg`;
+                const captionText = captions[index] || "«Деревенский стиль 🔥»";
+                
+                let lookName = looks[index] || 'look1';
+                let lookFolder = lookName.startsWith('g') ? 'girl' : 'boys';
+                
+                const lookSrc = await resolveExistingFile(`${lookFolder}/${lookName}`) || `${lookFolder}/${lookName}.jpg`;
+
+                slide.innerHTML = `
+                    <div class="gallery-row">
+                        <img src="${avatarSrc}" alt="Аватар" class="gallery-avatar">
+                        <span class="gallery-symbol">➔</span>
+                        <img src="${lookSrc}" alt="Лук" class="gallery-look-img">
+                    </div>
+                    <div class="gallery-caption">${captionText}</div>
+                `;
+                container.appendChild(slide);
+            }
+
+            const slides = container.querySelectorAll('.gallery-slide');
+            if (slides.length > 1) {
+                let currentSlide = 0;
+                setInterval(() => {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                }, 4000);
+            }
+        });
     </script>
 </body>
 </html>
