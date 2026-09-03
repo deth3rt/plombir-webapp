@@ -644,90 +644,7 @@
     transform: scale(0.98);
 }
 
-.wood-stats-card {
-    background: #854d0e;
-    background-image: linear-gradient(135deg, #a16207 0%, #713f12 100%);
-    border: 3px solid #451a03;
-    border-radius: 14px;
-    padding: 8px 10px;
-    margin: 0 auto 12px auto;
-    box-shadow: 0 6px 16px rgba(69, 26, 3, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.15);
-    text-align: center;
-    width: 92%;
-    max-width: 420px; /* Сделали плашку шире */
-    box-sizing: border-box;
-}
 
-.wood-header {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 900;
-    font-size: 0.6rem;
-    color: #fef08a;
-    letter-spacing: 1.5px;
-    margin-bottom: 6px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-.wood-content-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(0, 0, 0, 0.2);
-    border: 2px solid rgba(69, 26, 3, 0.4);
-    border-radius: 10px;
-    padding: 6px 10px;
-}
-
-.wood-poster-box {
-    width: 75px;
-    height: 75px; /* Сделали по вертикали уже */
-    border-radius: 8px;
-    overflow: hidden;
-    flex-shrink: 0;
-    border: 2px solid #fef08a;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-}
-
-.wood-poster-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.wood-stats-box {
-    flex-grow: 1;
-    display: flex;
-    justify-content: space-between; /* Распределяем цифры в ряд для горизонтального формата */
-    gap: 6px;
-}
-
-.stat-item {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 6px 8px;
-    border-radius: 6px;
-    border-top: 3px solid #fef08a;
-    flex: 1;
-    text-align: center;
-}
-
-.stat-label {
-    display: block;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 0.45rem;
-    color: #fde047;
-    text-transform: uppercase;
-    margin-bottom: 2px;
-}
-
-.stat-value {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 900;
-    font-size: 0.75rem;
-    color: #ffffff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-        
     </style>
 </head>
 <body>
@@ -745,32 +662,7 @@
     <div class="app-wrapper">
         
         <section id="screen-gender" class="screen active">
-        <div class="wood-stats-card">
-    <div class="wood-header">★ АФИША И СТАТИСТИКА ПРОЕКТА ★</div>
-    
-    <div class="wood-content-row">
-        <!-- Афиша (слева) -->
-        <div class="wood-poster-box">
-            <img src="etc/afisha/poster.jpg" alt="Афиша" class="wood-poster-img" onerror="this.src='etc/afisha/poster.png'">
-        </div>
-        
-        <!-- Реальная статистика (справа) -->
-        <div class="wood-stats-box">
-            <div class="stat-item">
-                <span class="stat-label">Сегодня образов:</span>
-                <span class="stat-value" id="statToday">...</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">За всё время:</span>
-                <span class="stat-value" id="statTotal">...</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Помидоров брошено:</span>
-                <span class="stat-value" id="statTomatoes">...</span>
-            </div>
-        </div>
-    </div>
-</div>
+       
             <div class="header-box">
                 <span class="top-badge">ПLОМБИР</span>
                 <h1>ИЗ ГОРОДА<br>В ДЕРЕВНЮ</h1>
@@ -1218,42 +1110,7 @@ function triggerTractoristSound() {
         tomatoBtn.innerHTML = `🍅 БРОСИТЬ ПОМИДОРЫ (<span id="clicksLeft">10</span>)`;
     }
 
-    const SCRIPT_URL = "https://script.google.com/macros/library/d/1d4xBdzizaRjmZQono_i7Es6rWolC7X461C3IqdJ23hBHccKLLrggJw46/2";
-
-document.addEventListener("DOMContentLoaded", () => {
-    fetchStats();
-});
-
-function fetchStats() {
-    fetch(`${SCRIPT_URL}?action=get`)
-        .then(response => response.json())
-        .then(data => {
-            if (data) {
-                document.getElementById('statToday').textContent = data.today || 0;
-                document.getElementById('statTotal').textContent = (data.total || 0).toLocaleString();
-                document.getElementById('statTomatoes').textContent = (data.tomatoes || 0).toLocaleString();
-            }
-        })
-        .catch(err => {
-            console.log("Ошибка загрузки статистики:", err);
-            document.getElementById('statToday').textContent = "0";
-            document.getElementById('statTotal').textContent = "0";
-            document.getElementById('statTomatoes').textContent = "0";
-        });
-}
-
-function recordAction(actionType) {
-    fetch(`${SCRIPT_URL}?action=add&type=${actionType}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data && data.success) {
-                document.getElementById('statToday').textContent = data.today;
-                document.getElementById('statTotal').textContent = data.total.toLocaleString();
-                document.getElementById('statTomatoes').textContent = data.tomatoes.toLocaleString();
-            }
-        })
-        .catch(err => console.log("Ошибка обновления:", err));
-}
+    
     </script>
 </body>
 </html>
