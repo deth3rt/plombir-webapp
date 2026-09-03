@@ -2012,45 +2012,51 @@ function handleReadyNo() {
     }, 10);
 }
 
-// Когда нажимают «ДА»
+// Функция для запуска приложения (вызывается по нажатию «ДА»)
 function handleReadyYes() {
-    // 1. Убираем стартовый экран, показываем экран загрузки с видео
+    // 1. Показываем прелоадер с видео, скрываем стартовый экран
     document.getElementById('screen-start').classList.add('hidden-screen');
     const preloadScreen = document.getElementById('screen-preload');
     preloadScreen.classList.remove('hidden-screen');
 
-    // 2. Параллельно запускаем фоновую музыку (если она есть)
-    const audio = document.getElementById('bgAudio');
-    if (audio) {
-        audio.play().then(() => {
-            isMusicPlaying = true;
-            const musicBtn = document.getElementById('musicBtn');
-            if (musicBtn) musicBtn.textContent = "🔊";
-            document.body.classList.add('disco-active');
-        }).catch(e => console.log("Музыка ждет клика:", e));
+    // 2. Запускаем видео на прелоадере (оно беззвучное и крутится)
+    const introVideo = document.getElementById('introVideo');
+    if (introVideo) {
+        introVideo.play().catch(e => console.log("Видео запущено", e));
     }
 
-    // 3. Текст загрузки
+    // 3. Управляем текстом статуса и обратным отсчетом (15 секунд)
     const statusEl = document.getElementById('loadingStatus');
-    const phrases = [
-        "Калибруем уровень сельского гламура...",
-        "Выпускаем гусей на свободу...",
-        "Протираем фары трактора..."
-    ];
+    let timeLeft = 15;
     
-    let index = 0;
-    const phraseInterval = setInterval(() => {
-        index++;
-        if (phrases[index]) {
-            statusEl.textContent = phrases[index];
-        }
-    }, 800);
+    statusEl.textContent = `Врываемся через ${timeLeft} сек...`;
 
-    // 4. Завершаем прелоадер и пускаем в приложение
+    const countdownInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+            statusEl.textContent = `Врываемся через ${timeLeft} сек...`;
+        } else {
+            clearInterval(countdownInterval);
+            statusEl.textContent = "Погнали!";
+        }
+    }, 1000);
+
+    // 4. СТРОГО ЧЕРЕЗ 15 СЕКУНД убираем прелоадер и включаем фоновую музыку
     setTimeout(() => {
-        clearInterval(phraseInterval);
+        clearInterval(countdownInterval);
         preloadScreen.classList.add('hidden-screen');
-    }, 2600);
+
+        // Вот теперь включается музыка под колонкой!
+        const audio = document.getElementById('bgAudio');
+        if (audio) {
+            audio.play().then(() => {
+                isMusicPlaying = true;
+                const musicBtn = document.getElementById('musicBtn');
+                if (musicBtn) musicBtn.textContent = "🔊";
+                document.body.classList.add('disco-active');
+            }).catch(e => console.log("Аудио заблокировано браузером", e));
+        }
+    }, 15000); // Ровно 15 секунд показа видео
 }
         
     </script>
