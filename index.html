@@ -644,118 +644,70 @@
     transform: scale(0.98);
 }
 
- /* Обнови стили для карточки галереи, увеличив аватарки и уменьшив текст */
-
-.user-gallery-card {
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
+ .board-widget {
+    background: #fffbeb;
+    border: 2px solid #fde68a;
     border-radius: 16px;
-    padding: 10px;
-    margin: 0 auto 12px auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    padding: 12px;
+    margin-bottom: 12px;
     text-align: center;
-    width: 85%;
-    max-width: 280px;
-    box-sizing: border-box;
-}
-
-.gallery-header {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 900;
-    font-size: 0.65rem;
-    color: #94a3b8;
-    letter-spacing: 1.5px;
-    margin-bottom: 6px;
-}
-
-.gallery-slider-container {
-    position: relative;
     width: 100%;
-    height: 115px;
-    border-radius: 10px;
-    overflow: hidden;
-    background: #f8fafc;
-    border: 1px solid #f1f5f9;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
 }
 
-.gallery-slide {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4px;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-}
-
-.gallery-slide.active {
-    opacity: 1;
-}
-
-.gallery-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 4px;
-}
-
-/* Сделали аватарки заметно больше */
-.gallery-avatar, .gallery-look-img {
-    width: 62px;
-    height: 62px;
-    border-radius: 12px;
-    object-fit: cover;
-    border: 2px solid #e2e8f0;
-    background: #ffffff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-}
-
-.gallery-avatar {
-    border-color: #3b82f6;
-}
-
-.gallery-look-img {
-    border-color: #10b981;
-}
-
-.gallery-symbol {
-    font-family: 'Montserrat', sans-serif;
+.board-title {
+    font-size: 0.7rem;
     font-weight: 900;
-    font-size: 0.8rem;
-    color: #cbd5e1;
+    color: #d97706;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
 }
 
-/* Уменьшили размер подписи */
-.gallery-caption {
-    font-family: 'Montserrat', sans-serif;
+.board-message {
+    font-size: 0.85rem;
     font-weight: 800;
-    font-size: 0.6rem;
-    color: #1e293b;
-    text-align: center;
-    line-height: 1.1;
-    padding: 0 4px;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.gallery-footer-text {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 0.55rem;
-    color: #64748b;
-    margin-top: 6px;
+    color: #78350f;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
     line-height: 1.2;
 }
 
-.gallery-footer-text a {
-    color: #2563eb;
-    text-decoration: underline;
+.board-input-box {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.board-input {
+    flex: 1;
+    background: #ffffff;
+    border: 1.5px solid #fcd34d;
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 0.75rem;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: #78350f;
+    outline: none;
+}
+
+.board-input::placeholder {
+    color: #9ca3af;
+}
+
+.board-send-btn {
+    background: #f59e0b;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0 12px;
     font-weight: 900;
+    font-size: 0.75rem;
+    cursor: pointer;
 }
         
     </style>
@@ -775,15 +727,13 @@
     <div class="app-wrapper">
         
         <section id="screen-gender" class="screen active">
-            <div class="user-gallery-card">
-    <div class="gallery-header">★ УЖЕ В ОБРАЗАХ ★</div>
-    
-    <div class="gallery-slider-container" id="galleryContainer">
-        <!-- Слайды генерируются динамически -->
-    </div>
-
-    <div class="gallery-footer-text">
-        Хочешь сюда? Кидай свой лук и аватар нашему <a href="https://t.me/plombirsupport" target="_blank">саппорту</a>!
+            <!-- Доска объявлений / Чат -->
+<div class="board-widget">
+    <div class="board-title">📌 Сельская доска объявлений</div>
+    <div class="board-message" id="activeMessage">Загружаем сводки с полей...</div>
+    <div class="board-input-box">
+        <input type="text" id="userMessageInput" class="board-input" placeholder="Написать весточку..." maxlength="60">
+        <button class="board-send-btn" onclick="sendUserMessage()">💬</button>
     </div>
 </div>
             <div class="header-box">
@@ -1238,101 +1188,77 @@ function triggerTractoristSound() {
     document.getElementById('screen-gender').classList.remove('hidden');
 }
 
-      document.addEventListener("DOMContentLoaded", async () => {
-    const container = document.getElementById('galleryContainer');
-    if (!container) return;
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwONfNVAeg59HgiwXKD482JUjvA4PunZM1Xl9lGC3nhJNoSY_Y24NawjAq5b-PTdi-Ofw/exec";
 
-    let captions = [];
-    let looks = [];
+let communityMessages = [
+    "Кто потерял трактор возле клуба? Отзовись 🚜",
+    "Гродно гудит, картошка в безопасности 🔥",
+    "Лучший лук делает тот, кто не боится грязи"
+];
 
-    try {
-        const textRes = await fetch('user/text.txt');
-        const textData = await textRes.text();
-        captions = textData.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    } catch (e) {
-        console.log("text.txt не найден");
-    }
-
-    try {
-        const lookRes = await fetch('user/look.txt');
-        const lookData = await lookRes.text();
-        looks = lookData.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    } catch (e) {
-        console.log("look.txt не найден");
-    }
-
-    const imageFiles = ['1.jpg', '1.png', '1.webp', '2.jpg', '2.png', '2.webp', '3.jpg', '3.png', '3.webp'];
-    let validIndices = [];
-
-    for (let i = 0; i < imageFiles.length; i++) {
-        const baseName = imageFiles[i].split('.')[0];
-        if (!validIndices.includes(baseName)) {
-            const avatarPath = await resolveExistingFile(`user/${baseName}`);
-            if (avatarPath) {
-                validIndices.push(baseName);
+function loadMessagesFromSheet() {
+    fetch(`${SCRIPT_URL}?action=getMessages`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && Array.isArray(data.messages) && data.messages.length > 0) {
+                communityMessages = data.messages;
             }
-        }
-    }
-
-    if (validIndices.length === 0) validIndices = ['1'];
-
-    for (let index = 0; index < validIndices.length; index++) {
-        const id = validIndices[index];
-        const slide = document.createElement('div');
-        slide.className = `gallery-slide ${index === 0 ? 'active' : ''}`;
-        
-        const avatarSrc = await resolveExistingFile(`user/${id}`) || `user/${id}.jpg`;
-        const captionText = captions[index] || "«Деревенский стиль 🔥»";
-        
-        let lookName = looks[index] || 'look1';
-        let lookFolder = lookName.startsWith('g') ? 'girl' : 'boys';
-        
-        const lookSrc = await resolveExistingFile(`${lookFolder}/${lookName}`) || `${lookFolder}/${lookName}.jpg`;
-
-        slide.innerHTML = `
-            <div class="gallery-row">
-                <img src="${avatarSrc}" alt="Аватар" class="gallery-avatar">
-                <span class="gallery-symbol">➔</span>
-                <img src="${lookSrc}" alt="Лук" class="gallery-look-img">
-            </div>
-            <div class="gallery-caption">${captionText}</div>
-        `;
-        container.appendChild(slide);
-    }
-
-    const slides = container.querySelectorAll('.gallery-slide');
-    if (slides.length > 1) {
-        let currentSlide = 0;
-        setInterval(() => {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }, 4000);
-    }
-});
-
-function resolveExistingFile(basePath) {
-    return new Promise(resolve => {
-        const exts = ['.jpg', '.png', '.webp'];
-        let currentIndex = 0;
-
-        function tryNext() {
-            if (currentIndex >= exts.length) {
-                resolve(null);
-                return;
-            }
-            const testUrl = basePath + exts[currentIndex];
-            currentIndex++;
-
-            const img = new Image();
-            img.onload = () => resolve(testUrl);
-            img.onerror = () => tryNext();
-            img.src = testUrl;
-        }
-
-        tryNext();
-    });
+            startMessageRotation();
+        })
+        .catch(() => {
+            startMessageRotation();
+        });
 }
+
+function startMessageRotation() {
+    const msgEl = document.getElementById('activeMessage');
+    if (!msgEl) return;
+    showRandomMessage();
+    setInterval(showRandomMessage, 5000);
+}
+
+function showRandomMessage() {
+    const msgEl = document.getElementById('activeMessage');
+    if (!msgEl || communityMessages.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * communityMessages.length);
+    msgEl.textContent = communityMessages[randomIndex];
+}
+
+const badWords = ["хуй", "пизд", "еб", "бля", "сука"];
+
+function sendUserMessage() {
+    const input = document.getElementById('userMessageInput');
+    if (!input) return;
+    const text = input.value.trim();
+
+    if (!text) return;
+    if (text.length > 60) {
+        alert("Слишком длинно! До 60 символов.");
+        return;
+    }
+    if (badWords.some(word => text.toLowerCase().includes(word))) {
+        alert("Ээ, давай без матов 🛑");
+        input.value = "";
+        return;
+    }
+
+    fetch(`${SCRIPT_URL}?action=addMessage&text=${encodeURIComponent(text)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.success) {
+                communityMessages.push(text);
+                document.getElementById('activeMessage').textContent = text;
+                input.value = "";
+                alert("Объявление залетело на доску! 📌");
+            }
+        })
+        .catch(() => {
+            alert("Ошибка отправки, попробуй еще раз.");
+        });
+}
+
+// Запустите функцию при загрузке страницы (внутри вашего DOMContentLoaded)
+loadMessagesFromSheet();
     </script>
 </body>
 </html>
