@@ -1933,7 +1933,7 @@ function shareGeneratedLook() {
         canvas.width = 900;
         canvas.height = 1200;
 
-        // 1. Отрисовка холста (ваш дизайн)
+        // 1. Отрисовка холста
         ctx.fillStyle = "#09090b";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -2000,7 +2000,7 @@ function shareGeneratedLook() {
 
         canvas.toBlob((blob) => {
             if (isIOS) {
-                // АЙФОН: Родной нативный шэрер
+                // АЙФОН: Родной нативный шэрер (работает идеально)
                 const file = new File([blob], "plombir-baza-19-09.jpg", { type: "image/jpeg" });
                 const shareData = {
                     title: 'Мой образ в ПLОМБИР',
@@ -2017,11 +2017,9 @@ function shareGeneratedLook() {
                     link.click();
                 }
             } else {
-                // АНДРОИД: Загрузка через Telegraph API без сервера
-                const formData = new FormData();
-                formData.append('file', blob, 'look.jpg');
-
-                // Показываем пользователю процесс
+                // АНДРОИД: Мгновенное создание ссылки Data URL и открытие в модальном окне
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+                
                 let modal = document.getElementById('saveModal');
                 if (!modal) {
                     modal = document.createElement('div');
@@ -2036,31 +2034,13 @@ function shareGeneratedLook() {
 
                 modal.innerHTML = `
                     <div style="background: #18181b; border: 2px solid #fcd34d; border-radius: 16px; padding: 20px; text-align: center; max-width: 340px; width: 100%;">
-                        <h3 style="color: #fcd34d; font-family: 'Impact', sans-serif; margin-bottom: 10px;">СОЗДАЕМ ССЫЛКУ...</h3>
-                        <p style="color: #e4e4e7; font-size: 0.85rem;">Подождите секунду, готовится шэрер для Android</p>
+                        <h3 style="color: #fcd34d; font-family: 'Impact', sans-serif; margin-bottom: 6px; font-size: 1.3rem;">ТВОЙ ЛУК ГОТОВ!</h3>
+                        <p style="color: #e4e4e7; font-size: 0.75rem; margin-bottom: 12px; line-height: 1.3;">Зажми картинку пальцем и выбери <b>«Сохранить картинку»</b>:</p>
+                        <img src="${dataUrl}" style="width: 100%; max-height: 300px; object-fit: contain; border-radius: 8px; border: 1px solid #3f3f46; margin-bottom: 12px; -webkit-touch-callout: default;" />
+                        <button onclick="document.getElementById('saveModal').style.display='none'" style="background: #f59e0b; color: #000; border: none; border-radius: 10px; padding: 10px; width: 100%; font-weight: 900; font-family: 'Impact', sans-serif; cursor: pointer; font-size: 0.95rem;">ГОТОВО</button>
                     </div>
                 `;
                 modal.style.display = 'flex';
-
-                fetch('https://telegra.ph/upload', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data && data[0] && data[0].src) {
-                        const imageUrl = 'https://telegra.ph' + data[0].src;
-                        openAndroidModal(imageUrl);
-                    } else {
-                        alert("Не удалось сформировать ссылку. Попробуйте еще раз.");
-                        modal.style.display = 'none';
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert("Ошибка соединения.");
-                    modal.style.display = 'none';
-                });
             }
         }, 'image/jpeg', 0.95);
     };
@@ -2068,26 +2048,6 @@ function shareGeneratedLook() {
     img.onerror = () => {
         alert("Не удалось сгенерировать карточку.");
     };
-}
-
-// Окно для Android с готовой ссылкой
-function openAndroidModal(imageUrl) {
-    const modal = document.getElementById('saveModal');
-    const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(imageUrl)}&text=${encodeURIComponent('Зацени мой лук на ПLОМБИР в Базе! 🚜🔥 #PLMBR')}`;
-
-    modal.innerHTML = `
-        <div style="background: #18181b; border: 2px solid #fcd34d; border-radius: 16px; padding: 20px; text-align: center; max-width: 340px; width: 100%;">
-            <h3 style="color: #fcd34d; font-family: 'Impact', sans-serif; margin-bottom: 6px; font-size: 1.3rem;">ТВОЙ ЛУК ГОТОВ!</h3>
-            <p style="color: #e4e4e7; font-size: 0.75rem; margin-bottom: 12px; line-height: 1.3;">Отправляй в чат/сторис или скачивай в галерею:</p>
-            <img src="${imageUrl}" style="width: 100%; max-height: 280px; object-fit: contain; border-radius: 8px; border: 1px solid #3f3f46; margin-bottom: 12px;" />
-            
-            <a href="${telegramShareUrl}" target="_blank" style="display: block; background: #229ED9; color: #fff; text-decoration: none; border-radius: 10px; padding: 10px; width: 100%; font-weight: 900; font-family: 'Impact', sans-serif; font-size: 0.95rem; margin-bottom: 8px; box-sizing: border-box;">ПОДЕЛИТЬСЯ В TELEGRAM ✈️</a>
-            
-            <a href="${imageUrl}" download="plombir-baza.jpg" target="_blank" style="display: block; background: #f59e0b; color: #000; text-decoration: none; border-radius: 10px; padding: 10px; width: 100%; font-weight: 900; font-family: 'Impact', sans-serif; font-size: 0.95rem; margin-bottom: 8px; box-sizing: border-box;">СКАЧАТЬ КАРТИНКУ 📥</a>
-
-            <button onclick="document.getElementById('saveModal').style.display='none'" style="background: #3f3f46; color: #fff; border: none; border-radius: 10px; padding: 8px; width: 100%; font-weight: 700; font-size: 0.85rem; cursor: pointer;">ЗАКРЫТЬ</button>
-        </div>
-    `;
 }
 // Переменные для управления таймерами пропусков
 let preloadTimer = null;
