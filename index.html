@@ -1999,32 +1999,34 @@ setInterval(() => {
         ctx.fillText("#PLMBR", 860, 1175);
         ctx.restore();
 
-        // 5. Экспорт и надежный шеринг с фоллбеком для Android
+        // 5. Железобетонный экспорт для Android и всех мобильных устройств
         canvas.toBlob((blob) => {
-            const file = new File([blob], "plombir-baza-19-09.jpg", { type: "image/jpeg" });
-            const shareData = {
-                title: 'Мой образ в ПLОМБИР',
-                text: 'Зацени мой лук на движ в Базе! 🚜🔥',
-                files: [file]
-            };
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'plombir-baza-19-09.jpg';
             
-            // Проверяем поддержку нативного шеринга файлов с принудительным отловом ошибок
-            if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-                navigator.share(shareData).catch((error) => {
-                    console.log("Шеринг отменен или заблокирован:", error);
-                });
-            } else {
-                // Фоллбек: если Android заблокировал files, скачиваем картинку локально
-                const link = document.createElement('a');
-                link.download = 'plombir-baza-19-09.jpg';
-                link.href = URL.createObjectURL(blob);
-                link.click();
-            }
+            // Обязательные атрибуты для надежного срабатывания в Android WebView / Telegram
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            
+            // Очистка памяти после клика
+            setTimeout(() => {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }, 100);
+
+            // Мягкое уведомление для пользователя
+            setTimeout(() => {
+                alert("✨ Образ сохранен в галерею! Закидывай в сторис!");
+            }, 300);
+
         }, 'image/jpeg', 0.95);
     };
 
     img.onerror = () => {
-        alert("Не удалось загрузить картинку для отправки.");
+        alert("Не удалось загрузить картинку для сохранения.");
     };
 }
 
