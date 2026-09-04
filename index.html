@@ -1998,9 +1998,15 @@ function shareGeneratedLook() {
         ctx.fillText("#PLMBR", 860, 1175);
         ctx.restore();
 
+        // Экспорт и показ результата
         canvas.toBlob((blob) => {
+            if (!blob) {
+                alert("Ошибка создания файла изображения.");
+                return;
+            }
+
             if (isIOS) {
-                // АЙФОН: Родной нативный шэрер (работает идеально)
+                // АЙФОН: Родной нативный шэрер
                 const file = new File([blob], "plombir-baza-19-09.jpg", { type: "image/jpeg" });
                 const shareData = {
                     title: 'Мой образ в ПLОМБИР',
@@ -2017,22 +2023,30 @@ function shareGeneratedLook() {
                     link.click();
                 }
             } else {
-                // Альтернативный вариант: открыть картинку в новой вкладке
-const dataUrl = canvas.toDataURL('image/jpeg', 0.90);
-const newWindow = window.open();
-if (newWindow) {
-    newWindow.document.write(`
-        <body style="margin:0; background:#000; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; color:#fff; font-family:sans-serif; text-align:center; padding:15px;">
-            <p style="font-size:14px; margin-bottom:12px; color:#fcd34d; font-weight:bold;">Зажми картинку пальцем и выбери «Сохранить»:</p>
-            <img src="${dataUrl}" style="max-width:100%; max-height:75vh; border-radius:8px; border:1px solid #444;" />
-        </body>
-    `);
-} else {
-    alert("Разрешите всплывающие окна в браузере, чтобы сохранить картинку.");
-}
+                // АНДРОИД: Надежное модальное окно без блокировки
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.90);
+                
+                let modal = document.getElementById('saveModal');
+                if (!modal) {
+                    modal = document.createElement('div');
+                    modal.id = 'saveModal';
+                    modal.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.95);z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;';
+                    document.body.appendChild(modal);
+                }
+
+                modal.innerHTML = '<div style="background:#18181b;border:2px solid #fcd34d;border-radius:16px;padding:20px;text-align:center;max-width:340px;width:100%;box-sizing:border-box;"><h3 style="color:#fcd34d;margin:0 0 6px 0;font-size:1.3rem;font-family:sans-serif;">ТВОЙ ЛУК ГОТОВ!</h3><p style="color:#e4e4e7;font-size:0.75rem;margin:0 0 12px 0;line-height:1.3;font-family:sans-serif;">Удерживай картинку пальцем и выбери <b>«Скачать изображение»</b>:</p><div style="background:#000;border-radius:8px;padding:4px;margin-bottom:12px;border:1px solid #3f3f46;"><img src="' + dataUrl + '" style="width:100%;max-height:260px;object-fit:contain;border-radius:6px;display:block;" /></div><button id="closeModalBtn" style="background:#f59e0b;color:#000;border:none;border-radius:10px;padding:10px;width:100%;font-weight:900;cursor:pointer;font-size:0.95rem;">ЗАКРЫТЬ</button></div>';
+                
+                modal.style.display = 'flex';
+
+                document.getElementById('closeModalBtn').onclick = function() {
+                    modal.style.display = 'none';
+                };
+            }
+        }, 'image/jpeg', 0.90);
+    };
 
     img.onerror = () => {
-        alert("Не удалось сгенерировать карточку.");
+        alert("Не удалось загрузить исходное изображение для карточки.");
     };
 }
 // Переменные для управления таймерами пропусков
