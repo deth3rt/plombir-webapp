@@ -2017,36 +2017,19 @@ function shareGeneratedLook() {
                     link.click();
                 }
             } else {
-                // АНДРОИД: Заменяем функцию генерации на этот рабочий вариант
+                // Альтернативный вариант: открыть картинку в новой вкладке
 const dataUrl = canvas.toDataURL('image/jpeg', 0.90);
-
-let modal = document.getElementById('saveModal');
-if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'saveModal';
-    modal.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(0,0,0,0.95); z-index: 999999; display: flex;
-        flex-direction: column; align-items: center; justify-content: center; padding: 20px;
-    `;
-    document.body.appendChild(modal);
+const newWindow = window.open();
+if (newWindow) {
+    newWindow.document.write(`
+        <body style="margin:0; background:#000; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; color:#fff; font-family:sans-serif; text-align:center; padding:15px;">
+            <p style="font-size:14px; margin-bottom:12px; color:#fcd34d; font-weight:bold;">Зажми картинку пальцем и выбери «Сохранить»:</p>
+            <img src="${dataUrl}" style="max-width:100%; max-height:75vh; border-radius:8px; border:1px solid #444;" />
+        </body>
+    `);
+} else {
+    alert("Разрешите всплывающие окна в браузере, чтобы сохранить картинку.");
 }
-
-modal.innerHTML = `
-    <div style="background: #18181b; border: 2px solid #fcd34d; border-radius: 16px; padding: 20px; text-align: center; max-width: 340px; width: 100%;">
-        <h3 style="color: #fcd34d; font-family: 'Impact', sans-serif; margin-bottom: 6px; font-size: 1.3rem;">ТВОЙ ЛУК ГОТОВ!</h3>
-        <p style="color: #e4e4e7; font-size: 0.75rem; margin-bottom: 10px; line-height: 1.3;">Удерживай картинку пальцем и выбери <b>«Скачать изображение»</b>:</p>
-        
-        <div style="background: #000; border-radius: 8px; padding: 4px; margin-bottom: 12px; border: 1px solid #3f3f46;">
-            <img src="${dataUrl}" style="width: 100%; max-height: 260px; object-fit: contain; border-radius: 6px; display: block;" />
-        </div>
-
-        <button onclick="document.getElementById('saveModal').style.display='none'" style="background: #f59e0b; color: #000; border: none; border-radius: 10px; padding: 10px; width: 100%; font-weight: 900; font-family: 'Impact', sans-serif; cursor: pointer; font-size: 0.95rem;">ЗАКРЫТЬ</button>
-    </div>
-`;
-modal.style.display = 'flex';
-        }, 'image/jpeg', 0.95);
-    };
 
     img.onerror = () => {
         alert("Не удалось сгенерировать карточку.");
