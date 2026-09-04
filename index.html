@@ -2017,8 +2017,8 @@ function shareGeneratedLook() {
                     link.click();
                 }
             } else {
-                // АНДРОИД: Мгновенное создание ссылки Data URL и открытие в модальном окне
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+                // АНДРОИД: Создаем реальную ссылку на объект в памяти браузера
+                const blobUrl = URL.createObjectURL(blob);
                 
                 let modal = document.getElementById('saveModal');
                 if (!modal) {
@@ -2035,9 +2035,11 @@ function shareGeneratedLook() {
                 modal.innerHTML = `
                     <div style="background: #18181b; border: 2px solid #fcd34d; border-radius: 16px; padding: 20px; text-align: center; max-width: 340px; width: 100%;">
                         <h3 style="color: #fcd34d; font-family: 'Impact', sans-serif; margin-bottom: 6px; font-size: 1.3rem;">ТВОЙ ЛУК ГОТОВ!</h3>
-                        <p style="color: #e4e4e7; font-size: 0.75rem; margin-bottom: 12px; line-height: 1.3;">Зажми картинку пальцем и выбери <b>«Сохранить картинку»</b>:</p>
-                        <img src="${dataUrl}" style="width: 100%; max-height: 300px; object-fit: contain; border-radius: 8px; border: 1px solid #3f3f46; margin-bottom: 12px; -webkit-touch-callout: default;" />
-                        <button onclick="document.getElementById('saveModal').style.display='none'" style="background: #f59e0b; color: #000; border: none; border-radius: 10px; padding: 10px; width: 100%; font-weight: 900; font-family: 'Impact', sans-serif; cursor: pointer; font-size: 0.95rem;">ГОТОВО</button>
+                        <p style="color: #e4e4e7; font-size: 0.75rem; margin-bottom: 12px; line-height: 1.3;">Нажми кнопку ниже, чтобы открыть картинку для сохранения:</p>
+                        
+                        <a href="${blobUrl}" target="_blank" download="plombir-baza-19-09.jpg" style="display: block; background: #f59e0b; color: #000; text-decoration: none; border-radius: 10px; padding: 12px; width: 100%; font-weight: 900; font-family: 'Impact', sans-serif; font-size: 1rem; margin-bottom: 10px; box-sizing: border-box;">ОТКРЫТЬ И СОХРАНИТЬ 📥</a>
+
+                        <button onclick="document.getElementById('saveModal').style.display='none'" style="background: #3f3f46; color: #fff; border: none; border-radius: 10px; padding: 8px; width: 100%; font-weight: 700; font-size: 0.85rem; cursor: pointer;">ЗАКРЫТЬ</button>
                     </div>
                 `;
                 modal.style.display = 'flex';
