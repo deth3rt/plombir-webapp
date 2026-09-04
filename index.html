@@ -2017,8 +2017,8 @@ function shareGeneratedLook() {
                     link.click();
                 }
             } else {
-                // АНДРОИД: Создаем реальную ссылку на объект в памяти браузера
-                const blobUrl = URL.createObjectURL(blob);
+                // АНДРОИД: Чистый вывод картинки без тяжелых ссылок и зависаний
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.90); // Снижаем вес до 90%, чтобы телефон не падал
                 
                 let modal = document.getElementById('saveModal');
                 if (!modal) {
@@ -2026,7 +2026,7 @@ function shareGeneratedLook() {
                     modal.id = 'saveModal';
                     modal.style.cssText = `
                         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-                        background: rgba(0,0,0,0.92); z-index: 999999; display: flex;
+                        background: rgba(0,0,0,0.95); z-index: 999999; display: flex;
                         flex-direction: column; align-items: center; justify-content: center; padding: 20px;
                     `;
                     document.body.appendChild(modal);
@@ -2035,11 +2035,13 @@ function shareGeneratedLook() {
                 modal.innerHTML = `
                     <div style="background: #18181b; border: 2px solid #fcd34d; border-radius: 16px; padding: 20px; text-align: center; max-width: 340px; width: 100%;">
                         <h3 style="color: #fcd34d; font-family: 'Impact', sans-serif; margin-bottom: 6px; font-size: 1.3rem;">ТВОЙ ЛУК ГОТОВ!</h3>
-                        <p style="color: #e4e4e7; font-size: 0.75rem; margin-bottom: 12px; line-height: 1.3;">Нажми кнопку ниже, чтобы открыть картинку для сохранения:</p>
+                        <p style="color: #e4e4e7; font-size: 0.75rem; margin-bottom: 10px; line-height: 1.3;">Удерживай картинку пальцем и выбери <b>«Скачать изображение»</b> или <b>«Сохранить»</b>:</p>
                         
-                        <a href="${blobUrl}" target="_blank" download="plombir-baza-19-09.jpg" style="display: block; background: #f59e0b; color: #000; text-decoration: none; border-radius: 10px; padding: 12px; width: 100%; font-weight: 900; font-family: 'Impact', sans-serif; font-size: 1rem; margin-bottom: 10px; box-sizing: border-box;">ОТКРЫТЬ И СОХРАНИТЬ 📥</a>
+                        <div style="background: #000; border-radius: 8px; padding: 4px; margin-bottom: 12px; border: 1px solid #3f3f46;">
+                            <img src="${dataUrl}" style="width: 100%; max-height: 260px; object-fit: contain; border-radius: 6px; display: block;" />
+                        </div>
 
-                        <button onclick="document.getElementById('saveModal').style.display='none'" style="background: #3f3f46; color: #fff; border: none; border-radius: 10px; padding: 8px; width: 100%; font-weight: 700; font-size: 0.85rem; cursor: pointer;">ЗАКРЫТЬ</button>
+                        <button onclick="document.getElementById('saveModal').style.display='none'" style="background: #f59e0b; color: #000; border: none; border-radius: 10px; padding: 10px; width: 100%; font-weight: 900; font-family: 'Impact', sans-serif; cursor: pointer; font-size: 0.95rem;">ЗАКРЫТЬ</button>
                     </div>
                 `;
                 modal.style.display = 'flex';
