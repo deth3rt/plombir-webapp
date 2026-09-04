@@ -1207,7 +1207,7 @@
 <!-- Стартовый экран (развилка) -->
 <div id="screen-start" class="custom-overlay-screen">
     <div class="overlay-card">
-        <h1 class="overlay-title">#PLMBR</h1>
+        <h1 class="overlay-title">ПLОМБИР</h1>
         <p class="overlay-text">Жигуль прогрет, клуб «БАЗА» ждет. Врываемся?</p>
         
         <div class="overlay-buttons">
@@ -1223,7 +1223,7 @@
 <div id="screen-preload" class="custom-overlay-screen hidden-screen">
     <div class="overlay-card">
         <h2 class="preload-main-title">ПLОМБИР</h2>
-        <p id="loadingStatus" class="preload-status-text">Запуск приложения через 15 сек...</p>
+        <p id="loadingStatus" class="preload-status-text">Запуск приложения через 14 сек...</p>
         
         <!-- Видео со звуком (без autoplay, запустится по клику из скрипта) -->
         <video id="introVideo" class="preload-video-player" playsinline>
@@ -2027,7 +2027,7 @@ function handleReadyYes() {
 
     // 3. Запускаем обратный отсчет от 15 до 0
     const statusEl = document.getElementById('loadingStatus');
-    let timeLeft = 15;
+    let timeLeft = 14;
     
     statusEl.textContent = `Запуск приложения через ${timeLeft} сек...`;
 
@@ -2040,7 +2040,7 @@ function handleReadyYes() {
         }
     }, 1000);
 
-    // 4. Ровно через 15 секунд: выключаем видео, убираем прелоадер, включаем музыку под колонкой
+    // 4. Ровно через 14 секунд: выключаем видео, убираем прелоадер, включаем музыку под колонкой
     setTimeout(() => {
         clearInterval(countdownInterval);
         
@@ -2062,7 +2062,7 @@ function handleReadyYes() {
                 document.body.classList.add('disco-active');
             }).catch(e => console.log("Фоновое аудио не запустилось:", e));
         }
-    }, 15000); // Строго 15 секунд
+    }, 14000); // Строго 14 секунд
 }
         
     </script>
