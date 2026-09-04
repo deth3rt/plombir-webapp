@@ -1999,30 +1999,67 @@ setInterval(() => {
         ctx.fillText("#PLMBR", 860, 1175);
         ctx.restore();
 
-        // 5. Вывод готовой картинки в модальное окно для сохранения на любых телефонах
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-        
-        let modal = document.getElementById('saveModal');
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'saveModal';
-            modal.style.cssText = `
-                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-                background: rgba(0,0,0,0.92); z-index: 999999; display: flex;
-                flex-direction: column; align-items: center; justify-content: center; padding: 20px;
-            `;
-            document.body.appendChild(modal);
-        }
+        // Проверяем тип платформы через Telegram WebApp или UserAgent
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.platform === 'ios');
+        const isAndroid = !isIOS; // Всё остальное считаем андроид-средой
 
-        modal.innerHTML = `
-            <div style="background: #18181b; border: 2px solid #fcd34d; border-radius: 16px; padding: 20px; text-align: center; max-width: 340px; width: 100%;">
-                <h3 style="color: #fcd34d; font-family: 'Impact', sans-serif; margin-bottom: 8px; font-size: 1.4rem;">ТВОЙ ЛУК ГОТОВ!</h3>
-                <p style="color: #e4e4e7; font-size: 0.8rem; margin-bottom: 12px; line-height: 1.3;">Зажми картинку пальцем и выбери <b>«Сохранить»</b></p>
-                <img src="${dataUrl}" style="width: 100%; max-height: 360px; object-fit: contain; border-radius: 8px; border: 1px solid #3f3f46; margin-bottom: 15px; -webkit-touch-callout: default;" />
-                <button onclick="document.getElementById('saveModal').style.display='none'" style="background: #f59e0b; color: #000; border: none; border-radius: 10px; padding: 12px; width: 100%; font-weight: 900; font-family: 'Impact', sans-serif; cursor: pointer; font-size: 1rem;">ГОТОВО</button>
-            </div>
-        `;
-        modal.style.display = 'flex';
+        canvas.toBlob((blob) => {
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+
+            if (isIOS) {
+                // АЙФОН: возвращаем идеальный нативный шеринг, как просил пользователь
+                const file = new File([blob], "plombir-baza-19-09.jpg", { type: "image/jpeg" });
+                const shareData = {
+                    title: 'Мой образ в ПLОМБИР',
+                    text: 'Зацени мой лук на движ в Базе! 🚜🔥',
+                    files: [file]
+                };
+
+                if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                    navigator.share(shareData).catch((error) => console.log("Шеринг отменен", error));
+                } else {
+                    // Фоллбек для iOS, если что-то пошло не так
+                    const link = document.createElement('a');
+                    link.download = 'plombir-baza-19-09.jpg';
+                    link.href = URL.createObjectURL(blob);
+                    link.click();
+                }
+            } else {
+                // АНДРОИД: Показываем модальное окно с готовой картинкой и кнопкой отправки в чат / инлайн-режим
+                let modal = document.getElementById('saveModal');
+                if (!modal) {
+                    modal = document.createElement('div');
+                    modal.id = 'saveModal';
+                    modal.style.cssText = `
+                        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                        background: rgba(0,0,0,0.92); z-index: 999999; display: flex;
+                        flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+                    `;
+                    document.body.appendChild(modal);
+                }
+
+                modal.innerHTML = `
+                    <div style="background: #18181b; border: 2px solid #fcd34d; border-radius: 16px; padding: 20px; text-align: center; max-width: 340px; width: 100%;">
+                        <h3 style="color: #fcd34d; font-family: 'Impact', sans-serif; margin-bottom: 6px; font-size: 1.3rem;">ТВОЙ ЛУК ГОТОВ!</h3>
+                        <p style="color: #e4e4e7; font-size: 0.75rem; margin-bottom: 10px; line-height: 1.3;">Зажми картинку пальцем и выбери <b>«Сохранить»</b>, либо поделись в чат</p>
+                        <img src="${dataUrl}" style="width: 100%; max-height: 330px; object-fit: contain; border-radius: 8px; border: 1px solid #3f3f46; margin-bottom: 12px; -webkit-touch-callout: default;" />
+                        <button id="sendToChatBtn" style="background: #229ED9; color: #fff; border: none; border-radius: 10px; padding: 10px; width: 100%; font-weight: 900; font-family: 'Impact', sans-serif; cursor: pointer; font-size: 0.95rem; margin-bottom: 8px;">ОТПРАВИТЬ В ЧАТ ТЕЛЕГРАМ ✈️</button>
+                        <button onclick="document.getElementById('saveModal').style.display='none'" style="background: #3f3f46; color: #fff; border: none; border-radius: 10px; padding: 8px; width: 100%; font-weight: 700; font-size: 0.85rem; cursor: pointer;">ЗАКРЫТЬ</button>
+                    </div>
+                `;
+                modal.style.display = 'flex';
+
+                // Интеграция с Telegram WebApp для отправки в чат (если доступно)
+                document.getElementById('sendToChatBtn').onclick = () => {
+                    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.switchInlineQuery) {
+                        // Перенаправляем в инлайн-режим бота для отправки друзьям/в чат
+                        window.Telegram.WebApp.switchInlineQuery('Зацени мой лук на ПLОМБИР в Базе! 🚜🔥', ['users', 'groups', 'channels']);
+                    } else {
+                        alert("Сделайте долгий тап по картинке выше, чтобы сохранить её на устройство!");
+                    }
+                };
+            }
+        }, 'image/jpeg', 0.95);
     };
 
     img.onerror = () => {
