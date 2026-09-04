@@ -1913,7 +1913,9 @@ setInterval(() => {
     loadMessagesFromSheet(false);
 }, 2000);
 
-        function shareGeneratedLook() {
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.platform === 'ios');
+
+function shareGeneratedLook() {
     const imgElement = document.getElementById('resultImg');
     if (!imgElement || !imgElement.src) {
         alert("Сначала сгенерируйте образ, чтобы им делиться!");
@@ -1931,21 +1933,19 @@ setInterval(() => {
         canvas.width = 900;
         canvas.height = 1200;
 
-        // 1. Фон и картинка
+        // 1. Отрисовка холста (ваш дизайн)
         ctx.fillStyle = "#09090b";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        // 2. Крупная печать С ЛЕВОЙ СТОРОНЫ (полупрозрачная)
+        // Печать 19.09
         ctx.save();
         ctx.globalAlpha = 0.85;
         ctx.translate(140, 240);
         ctx.rotate(14 * Math.PI / 180);
-        
         ctx.strokeStyle = "#ef4444";
         ctx.lineWidth = 8;
         ctx.strokeRect(-110, -55, 220, 110);
-
         ctx.fillStyle = "#ef4444";
         ctx.font = "900 52px 'Impact', 'Arial Black', sans-serif";
         ctx.textAlign = "center";
@@ -1953,7 +1953,7 @@ setInterval(() => {
         ctx.fillText("19.09", 0, 4);
         ctx.restore();
 
-        // 3. Брутальная плашка СВЕРХУ для заголовков
+        // Верхняя плашка
         const topGrad = ctx.createLinearGradient(0, 0, 0, 200);
         topGrad.addColorStop(0, "rgba(9, 9, 11, 0.95)");
         topGrad.addColorStop(1, "rgba(9, 9, 11, 0)");
@@ -1969,7 +1969,7 @@ setInterval(() => {
         ctx.font = "bold 20px 'Arial Black', sans-serif";
         ctx.fillText("НОЧНОЙ КЛУБ \"БАЗА\" • УЛ. ПОБЕДЫ 35", 45, 105);
 
-        // 4. Опущенная плашка СНИЗУ для лука, контактов и крупного бренда в правом углу
+        // Нижняя плашка
         const bottomGrad = ctx.createLinearGradient(0, 950, 0, 1200);
         bottomGrad.addColorStop(0, "rgba(9, 9, 11, 0)");
         bottomGrad.addColorStop(0.35, "rgba(9, 9, 11, 0.92)");
@@ -1977,7 +1977,6 @@ setInterval(() => {
         ctx.fillStyle = bottomGrad;
         ctx.fillRect(0, 930, canvas.width, 270);
 
-        // Текст лука
         ctx.fillStyle = "#ffffff";
         ctx.font = "900 28px 'Impact', 'Arial Black', sans-serif";
         ctx.textAlign = "left";
@@ -1990,7 +1989,7 @@ setInterval(() => {
         ctx.font = "bold 22px 'Arial Black', sans-serif";
         ctx.fillText("📸 @plombir.grodno", 45, 1135);
 
-        // Крупный водяной знак ПLОМБИР в самом правом нижнем углу
+        // Водяной знак
         ctx.save();
         ctx.fillStyle = "rgba(252, 211, 77, 0.25)";
         ctx.font = "900 64px 'Impact', 'Arial Black', sans-serif";
@@ -1999,15 +1998,9 @@ setInterval(() => {
         ctx.fillText("#PLMBR", 860, 1175);
         ctx.restore();
 
-        // Проверяем тип платформы через Telegram WebApp или UserAgent
-        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.platform === 'ios');
-        const isAndroid = !isIOS; // Всё остальное считаем андроид-средой
-
         canvas.toBlob((blob) => {
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-
             if (isIOS) {
-                // АЙФОН: возвращаем идеальный нативный шеринг, как просил пользователь
+                // АЙФОН: Родной нативный шэрер
                 const file = new File([blob], "plombir-baza-19-09.jpg", { type: "image/jpeg" });
                 const shareData = {
                     title: 'Мой образ в ПLОМБИР',
@@ -2016,16 +2009,19 @@ setInterval(() => {
                 };
 
                 if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-                    navigator.share(shareData).catch((error) => console.log("Шеринг отменен", error));
+                    navigator.share(shareData).catch(() => {});
                 } else {
-                    // Фоллбек для iOS, если что-то пошло не так
                     const link = document.createElement('a');
                     link.download = 'plombir-baza-19-09.jpg';
                     link.href = URL.createObjectURL(blob);
                     link.click();
                 }
             } else {
-                // АНДРОИД: Показываем модальное окно с готовой картинкой и кнопкой отправки в чат / инлайн-режим
+                // АНДРОИД: Загрузка через Telegraph API без сервера
+                const formData = new FormData();
+                formData.append('file', blob, 'look.jpg');
+
+                // Показываем пользователю процесс
                 let modal = document.getElementById('saveModal');
                 if (!modal) {
                     modal = document.createElement('div');
@@ -2040,24 +2036,31 @@ setInterval(() => {
 
                 modal.innerHTML = `
                     <div style="background: #18181b; border: 2px solid #fcd34d; border-radius: 16px; padding: 20px; text-align: center; max-width: 340px; width: 100%;">
-                        <h3 style="color: #fcd34d; font-family: 'Impact', sans-serif; margin-bottom: 6px; font-size: 1.3rem;">ТВОЙ ЛУК ГОТОВ!</h3>
-                        <p style="color: #e4e4e7; font-size: 0.75rem; margin-bottom: 10px; line-height: 1.3;">Зажми картинку пальцем и выбери <b>«Сохранить»</b>, либо поделись в чат</p>
-                        <img src="${dataUrl}" style="width: 100%; max-height: 330px; object-fit: contain; border-radius: 8px; border: 1px solid #3f3f46; margin-bottom: 12px; -webkit-touch-callout: default;" />
-                        <button id="sendToChatBtn" style="background: #229ED9; color: #fff; border: none; border-radius: 10px; padding: 10px; width: 100%; font-weight: 900; font-family: 'Impact', sans-serif; cursor: pointer; font-size: 0.95rem; margin-bottom: 8px;">ОТПРАВИТЬ В ЧАТ ТЕЛЕГРАМ ✈️</button>
-                        <button onclick="document.getElementById('saveModal').style.display='none'" style="background: #3f3f46; color: #fff; border: none; border-radius: 10px; padding: 8px; width: 100%; font-weight: 700; font-size: 0.85rem; cursor: pointer;">ЗАКРЫТЬ</button>
+                        <h3 style="color: #fcd34d; font-family: 'Impact', sans-serif; margin-bottom: 10px;">СОЗДАЕМ ССЫЛКУ...</h3>
+                        <p style="color: #e4e4e7; font-size: 0.85rem;">Подождите секунду, готовится шэрер для Android</p>
                     </div>
                 `;
                 modal.style.display = 'flex';
 
-                // Интеграция с Telegram WebApp для отправки в чат (если доступно)
-                document.getElementById('sendToChatBtn').onclick = () => {
-                    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.switchInlineQuery) {
-                        // Перенаправляем в инлайн-режим бота для отправки друзьям/в чат
-                        window.Telegram.WebApp.switchInlineQuery('Зацени мой лук на ПLОМБИР в Базе! 🚜🔥', ['users', 'groups', 'channels']);
+                fetch('https://telegra.ph/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data[0] && data[0].src) {
+                        const imageUrl = 'https://telegra.ph' + data[0].src;
+                        openAndroidModal(imageUrl);
                     } else {
-                        alert("Сделайте долгий тап по картинке выше, чтобы сохранить её на устройство!");
+                        alert("Не удалось сформировать ссылку. Попробуйте еще раз.");
+                        modal.style.display = 'none';
                     }
-                };
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Ошибка соединения.");
+                    modal.style.display = 'none';
+                });
             }
         }, 'image/jpeg', 0.95);
     };
@@ -2065,6 +2068,26 @@ setInterval(() => {
     img.onerror = () => {
         alert("Не удалось сгенерировать карточку.");
     };
+}
+
+// Окно для Android с готовой ссылкой
+function openAndroidModal(imageUrl) {
+    const modal = document.getElementById('saveModal');
+    const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(imageUrl)}&text=${encodeURIComponent('Зацени мой лук на ПLОМБИР в Базе! 🚜🔥 #PLMBR')}`;
+
+    modal.innerHTML = `
+        <div style="background: #18181b; border: 2px solid #fcd34d; border-radius: 16px; padding: 20px; text-align: center; max-width: 340px; width: 100%;">
+            <h3 style="color: #fcd34d; font-family: 'Impact', sans-serif; margin-bottom: 6px; font-size: 1.3rem;">ТВОЙ ЛУК ГОТОВ!</h3>
+            <p style="color: #e4e4e7; font-size: 0.75rem; margin-bottom: 12px; line-height: 1.3;">Отправляй в чат/сторис или скачивай в галерею:</p>
+            <img src="${imageUrl}" style="width: 100%; max-height: 280px; object-fit: contain; border-radius: 8px; border: 1px solid #3f3f46; margin-bottom: 12px;" />
+            
+            <a href="${telegramShareUrl}" target="_blank" style="display: block; background: #229ED9; color: #fff; text-decoration: none; border-radius: 10px; padding: 10px; width: 100%; font-weight: 900; font-family: 'Impact', sans-serif; font-size: 0.95rem; margin-bottom: 8px; box-sizing: border-box;">ПОДЕЛИТЬСЯ В TELEGRAM ✈️</a>
+            
+            <a href="${imageUrl}" download="plombir-baza.jpg" target="_blank" style="display: block; background: #f59e0b; color: #000; text-decoration: none; border-radius: 10px; padding: 10px; width: 100%; font-weight: 900; font-family: 'Impact', sans-serif; font-size: 0.95rem; margin-bottom: 8px; box-sizing: border-box;">СКАЧАТЬ КАРТИНКУ 📥</a>
+
+            <button onclick="document.getElementById('saveModal').style.display='none'" style="background: #3f3f46; color: #fff; border: none; border-radius: 10px; padding: 8px; width: 100%; font-weight: 700; font-size: 0.85rem; cursor: pointer;">ЗАКРЫТЬ</button>
+        </div>
+    `;
 }
 // Переменные для управления таймерами пропусков
 let preloadTimer = null;
