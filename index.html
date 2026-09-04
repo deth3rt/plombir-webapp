@@ -1999,50 +1999,36 @@ setInterval(() => {
         ctx.fillText("#PLMBR", 860, 1175);
         ctx.restore();
 
-        // Определяем тип устройства
-        const isAndroid = /Android/i.e.test(navigator.userAgent);
-        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        // 5. Вывод готовой картинки в модальное окно для сохранения на любых телефонах
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+        
+        let modal = document.getElementById('saveModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'saveModal';
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                background: rgba(0,0,0,0.92); z-index: 999999; display: flex;
+                flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+            `;
+            document.body.appendChild(modal);
+        }
 
-        canvas.toBlob((blob) => {
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-
-            if (isAndroid) {
-                // АНДРОИД-РЕШЕНИЕ: открываем картинку в новой вкладке с подсказкой
-                const openLink = document.createElement('a');
-                openLink.href = dataUrl;
-                openLink.target = '_blank';
-                document.body.appendChild(openLink);
-                openLink.click();
-                document.body.removeChild(openLink);
-                
-                alert("🚜 Открыли твой лук! Зажми картинку пальцем и выбери «Сохранить изображение» или поделись из вкладки.");
-            } else {
-                // АЙФОН-РЕШЕНИЕ: нативный iOS шеринг через файлы
-                const file = new File([blob], "plombir-baza-19-09.jpg", { type: "image/jpeg" });
-                const shareData = {
-                    title: 'Мой образ в ПLОМБИР',
-                    text: 'Зацени мой лук на движ в Базе! 🚜🔥',
-                    files: [file]
-                };
-
-                if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-                    navigator.share(shareData).catch(() => {});
-                } else {
-                    // Фоллбек для ПК или других систем
-                    const link = document.createElement('a');
-                    link.download = 'plombir-baza-19-09.jpg';
-                    link.href = URL.createObjectURL(blob);
-                    link.click();
-                }
-            }
-        }, 'image/jpeg', 0.95);
+        modal.innerHTML = `
+            <div style="background: #18181b; border: 2px solid #fcd34d; border-radius: 16px; padding: 20px; text-align: center; max-width: 340px; width: 100%;">
+                <h3 style="color: #fcd34d; font-family: 'Impact', sans-serif; margin-bottom: 8px; font-size: 1.4rem;">ТВОЙ ЛУК ГОТОВ!</h3>
+                <p style="color: #e4e4e7; font-size: 0.8rem; margin-bottom: 12px; line-height: 1.3;">Зажми картинку пальцем и выбери <b>«Сохранить»</b></p>
+                <img src="${dataUrl}" style="width: 100%; max-height: 360px; object-fit: contain; border-radius: 8px; border: 1px solid #3f3f46; margin-bottom: 15px; -webkit-touch-callout: default;" />
+                <button onclick="document.getElementById('saveModal').style.display='none'" style="background: #f59e0b; color: #000; border: none; border-radius: 10px; padding: 12px; width: 100%; font-weight: 900; font-family: 'Impact', sans-serif; cursor: pointer; font-size: 1rem;">ГОТОВО</button>
+            </div>
+        `;
+        modal.style.display = 'flex';
     };
 
     img.onerror = () => {
         alert("Не удалось сгенерировать карточку.");
     };
 }
-
 // Переменные для управления таймерами пропусков
 let preloadTimer = null;
 let countdownInterval = null;
