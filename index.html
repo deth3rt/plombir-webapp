@@ -1201,6 +1201,26 @@
     border-radius: 12px;
     border: 2px solid #fcd34d;
 }   
+.btn-skip {
+    margin-top: 15px;
+    background: transparent;
+    color: #fcd34d;
+    border: 2px dashed #fcd34d;
+    border-radius: 12px;
+    padding: 10px 15px;
+    font-size: 0.85rem;
+    font-weight: 900;
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.btn-skip:active {
+    background: rgba(252, 211, 77, 0.1);
+    transform: scale(0.97);
+}
+        
     </style>
 </head>
 <body>
@@ -1225,10 +1245,13 @@
         <h2 class="preload-main-title">ПLОМБИР</h2>
         <p id="loadingStatus" class="preload-status-text">Запуск приложения через 14 сек...</p>
         
-        <!-- Видео со звуком (без autoplay, запустится по клику из скрипта) -->
+        <!-- Видео со звуком -->
         <video id="introVideo" class="preload-video-player" playsinline>
             <source src="etc/fabric.mp4" type="video/mp4">
         </video>
+
+        <!-- Кнопка ускорения/пропуска -->
+        <button class="btn-skip" onclick="skipPreload()">ПРОПУСТИТЬ</button>
     </div>
 </div>
     
@@ -2000,6 +2023,10 @@ setInterval(() => {
     };
 }
 
+// Переменные для управления таймерами пропусков
+let preloadTimer = null;
+let countdownInterval = null;
+
 // Обработка клика на «НЕТ»
 function handleReadyNo() {
     const notification = document.getElementById('noNotification');
@@ -2025,13 +2052,13 @@ function handleReadyYes() {
         introVideo.play().catch(e => console.log("Видео заблокировано:", e));
     }
 
-    // 3. Запускаем обратный отсчет от 15 до 0
+    // 3. Запускаем обратный отсчет от 14 до 0
     const statusEl = document.getElementById('loadingStatus');
     let timeLeft = 14;
     
     statusEl.textContent = `Запуск приложения через ${timeLeft} сек...`;
 
-    const countdownInterval = setInterval(() => {
+    countdownInterval = setInterval(() => {
         timeLeft--;
         if (timeLeft > 0) {
             statusEl.textContent = `Запуск приложения через ${timeLeft} сек...`;
@@ -2041,30 +2068,42 @@ function handleReadyYes() {
     }, 1000);
 
     // 4. Ровно через 14 секунд: выключаем видео, убираем прелоадер, включаем музыку под колонкой
-    setTimeout(() => {
-        clearInterval(countdownInterval);
-        
-        // Останавливаем прелоадер-видео
-        if (introVideo) {
-            introVideo.pause();
-        }
-        
-        // Скрываем экран прелоадера
-        preloadScreen.classList.add('hidden-screen');
-
-        // Включаем фоновый трек приложения (под колонкой)
-        const audio = document.getElementById('bgAudio');
-        if (audio) {
-            audio.play().then(() => {
-                isMusicPlaying = true;
-                const musicBtn = document.getElementById('musicBtn');
-                if (musicBtn) musicBtn.textContent = "🔊";
-                document.body.classList.add('disco-active');
-            }).catch(e => console.log("Фоновое аудио не запустилось:", e));
-        }
+    preloadTimer = setTimeout(() => {
+        finishPreload();
     }, 14000); // Строго 14 секунд
 }
-        
+
+// Функция мгновенного пропуска по кнопке «Ускорить / Пропустить»
+function skipPreload() {
+    clearTimeout(preloadTimer);
+    clearInterval(countdownInterval);
+    finishPreload();
+}
+
+// Общая функция завершения прелоадера (используется как по таймеру, так и при клике на пропуск)
+function finishPreload() {
+    const preloadScreen = document.getElementById('screen-preload');
+    const introVideo = document.getElementById('introVideo');
+    
+    // Останавливаем прелоадер-видео
+    if (introVideo) {
+        introVideo.pause();
+    }
+    
+    // Скрываем экран прелоадера
+    preloadScreen.classList.add('hidden-screen');
+
+    // Включаем фоновый трек приложения (под колонкой)
+    const audio = document.getElementById('bgAudio');
+    if (audio) {
+        audio.play().then(() => {
+            isMusicPlaying = true;
+            const musicBtn = document.getElementById('musicBtn');
+            if (musicBtn) musicBtn.textContent = "🔊";
+            document.body.classList.add('disco-active');
+        }).catch(e => console.log("Фоновое аудио не запустилось:", e));
+    }
+}
     </script>
 </body>
 </html>
